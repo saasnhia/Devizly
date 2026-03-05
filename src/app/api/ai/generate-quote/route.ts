@@ -1,0 +1,50 @@
+import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { openai } from "@/lib/openai";
+
+export async function POST(request: Request) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  }
+
+  const { prompt } = await request.json();
+
+  if (!prompt) {
+    return NextResponse.json({ error: "Le prompt est requis" }, { status: 400 });
+  }
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: `Tu es un assistant qui génère des devis professionnels français.
+Retourne un JSON avec: title (string), items (array of {description: string, quantity: number, unit_price: number}), notes (string).
+Réponds uniquement en JSON valide, sans markdown ni backticks.
+Les prix doivent être en euros HT, réalistes pour le marché français.`,
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      temperature: 0.7,
+      max_tokens: 1000,
+    });
+
+    const content = completion.choices[0]?.message?.content;
+    if (!content) {
+      return NextResponse.json({ error: "Réponse vide de l'IA" }, { status: 500 });
+    }
+
+    const parsed = JSON.parse(content);
+    return NextResponse.json({ success: true, data: parsed });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Erreur IA";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}

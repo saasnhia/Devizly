@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Quotify - Créez vos devis professionnels avec l'IA",
-  description: "Quotify : générez des devis professionnels en quelques secondes grâce à l'intelligence artificielle.",
+  title: "Devizly - Créez vos devis professionnels avec l'IA",
+  description: "Devizly : générez des devis professionnels en quelques secondes grâce à l'intelligence artificielle.",
 };
 
 export default function RootLayout({

@@ -67,7 +67,7 @@ export function DashboardShell({
       >
         <div className="flex h-16 items-center gap-2 border-b px-6">
           <FileText className="h-6 w-6 text-primary" />
-          <span className="text-lg font-bold">Quotify</span>
+          <span className="text-lg font-bold">Devizly</span>
         </div>
 
         <nav className="flex-1 space-y-1 p-4">
@@ -117,7 +117,7 @@ export function DashboardShell({
           <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(true)}>
             {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
-          <span className="text-lg font-bold">Quotify</span>
+          <span className="text-lg font-bold">Devizly</span>
         </header>
 
         <main className="flex-1 overflow-y-auto p-6">

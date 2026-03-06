@@ -1,4 +1,4 @@
-# Quotify
+# Devizly
 
 SaaS de génération de devis professionnels avec l'IA. Créez, envoyez et suivez vos devis en quelques secondes.
 

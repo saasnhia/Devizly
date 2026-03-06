@@ -1,4 +1,4 @@
-# Quotify — Progress
+# Devizly — Progress
 
 ## Built (Steps 1-12)
 

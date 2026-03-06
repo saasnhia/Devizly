@@ -11,23 +11,40 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { FileText, Send, CheckCircle, Euro, Plus } from "lucide-react";
+import { FileText, Send, CheckCircle, Euro, Plus, Sparkles } from "lucide-react";
 import { formatCurrency, formatDate, getStatusColor, getStatusLabel } from "@/lib/utils/quote";
+import { PLANS } from "@/lib/stripe";
 import type { QuoteWithClient } from "@/types";
+import type { PlanId } from "@/lib/stripe";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data: quotes } = await supabase
-    .from("quotes")
-    .select("*, clients(*)")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
+  const [{ data: quotes }, { data: profile }] = await Promise.all([
+    supabase
+      .from("quotes")
+      .select("*, clients(*)")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("profiles")
+      .select("subscription_status, devis_used")
+      .eq("id", user.id)
+      .single(),
+  ]);
 
   const allQuotes = (quotes || []) as QuoteWithClient[];
   const recentQuotes = allQuotes.slice(0, 5);
+
+  const plan = (profile?.subscription_status || "free") as PlanId;
+  const devisUsed = profile?.devis_used || 0;
+  const planInfo = PLANS[plan];
+  const devisLimit = planInfo.devisLimit;
+  const isUnlimited = devisLimit === -1;
+  const quotaPercent = isUnlimited ? 0 : Math.min((devisUsed / devisLimit) * 100, 100);
+  const isNearLimit = !isUnlimited && devisUsed >= devisLimit - 1;
 
   const totalQuotes = allQuotes.length;
   const sentQuotes = allQuotes.filter((q) => q.status === "envoyé").length;
@@ -56,6 +73,42 @@ export default async function DashboardPage() {
           </Link>
         </Button>
       </div>
+
+      {/* Quota bar */}
+      <Card>
+        <CardContent className="flex flex-col gap-4 pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-medium">
+                Plan {planInfo.name}
+              </p>
+              <Badge variant="secondary" className="text-xs">
+                {isUnlimited
+                  ? `${devisUsed} devis ce mois`
+                  : `${devisUsed} / ${devisLimit} devis ce mois`}
+              </Badge>
+            </div>
+            {!isUnlimited && (
+              <div className="mt-2 h-2 w-full rounded-full bg-slate-100">
+                <div
+                  className={`h-2 rounded-full transition-all ${
+                    isNearLimit ? "bg-red-500" : "bg-primary"
+                  }`}
+                  style={{ width: `${quotaPercent}%` }}
+                />
+              </div>
+            )}
+          </div>
+          {plan === "free" && (
+            <Button asChild size="sm">
+              <Link href="/pricing">
+                <Sparkles className="mr-2 h-4 w-4" />
+                Passer au Pro — 19€/mois
+              </Link>
+            </Button>
+          )}
+        </CardContent>
+      </Card>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (

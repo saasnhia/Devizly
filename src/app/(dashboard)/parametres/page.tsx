@@ -15,11 +15,13 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Save, Loader2, CreditCard, Building } from "lucide-react";
+import { Save, Loader2, CreditCard, Building, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 export default function ParametresPage() {
   const [loading, setLoading] = useState(false);
+  const [portalLoading, setPortalLoading] = useState(false);
+  const [subscriptionStatus, setSubscriptionStatus] = useState("free");
   const [profile, setProfile] = useState({
     full_name: "",
     company_name: "",
@@ -33,7 +35,9 @@ export default function ParametresPage() {
     async function loadProfile() {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
-      if (user?.user_metadata) {
+      if (!user) return;
+
+      if (user.user_metadata) {
         setProfile({
           full_name: user.user_metadata.full_name || "",
           company_name: user.user_metadata.company_name || "",
@@ -43,6 +47,15 @@ export default function ParametresPage() {
           default_tva_rate: user.user_metadata.default_tva_rate || "20",
         });
       }
+
+      const { data } = await supabase
+        .from("profiles")
+        .select("subscription_status")
+        .eq("id", user.id)
+        .single();
+      if (data?.subscription_status) {
+        setSubscriptionStatus(data.subscription_status);
+      }
     }
     loadProfile();
   }, []);
@@ -50,9 +63,7 @@ export default function ParametresPage() {
   async function handleSave() {
     setLoading(true);
     const supabase = createClient();
-    const { error } = await supabase.auth.updateUser({
-      data: profile,
-    });
+    const { error } = await supabase.auth.updateUser({ data: profile });
     if (error) {
       toast.error(error.message);
     } else {
@@ -60,6 +71,30 @@ export default function ParametresPage() {
     }
     setLoading(false);
   }
+
+  async function handlePortal() {
+    setPortalLoading(true);
+    try {
+      const response = await fetch("/api/stripe/portal", { method: "POST" });
+      const result = await response.json();
+      if (result.url) {
+        window.location.href = result.url;
+      } else {
+        toast.error(result.error || "Erreur");
+      }
+    } catch {
+      toast.error("Erreur de connexion");
+    } finally {
+      setPortalLoading(false);
+    }
+  }
+
+  const planLabel =
+    subscriptionStatus === "business"
+      ? "Business"
+      : subscriptionStatus === "pro"
+        ? "Pro"
+        : "Free";
 
   return (
     <div className="space-y-6">
@@ -168,48 +203,74 @@ export default function ParametresPage() {
             <div className="rounded-lg border p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">Plan actuel</p>
+                  <p className="font-medium">Plan {planLabel}</p>
                   <p className="text-sm text-muted-foreground">
-                    Fonctionnalités de base
+                    {subscriptionStatus === "free"
+                      ? "5 devis/mois"
+                      : subscriptionStatus === "pro"
+                        ? "50 devis/mois"
+                        : "Devis illimités"}
                   </p>
                 </div>
-                <Badge variant="secondary">Gratuit</Badge>
+                <Badge
+                  variant="secondary"
+                  className={
+                    subscriptionStatus === "free"
+                      ? ""
+                      : "bg-green-100 text-green-700"
+                  }
+                >
+                  {planLabel}
+                </Badge>
               </div>
             </div>
 
-            <Separator />
-
-            <div className="space-y-3">
-              <div className="flex items-center justify-between rounded-lg border p-4">
-                <div>
-                  <p className="font-medium">Starter</p>
-                  <p className="text-sm text-muted-foreground">
-                    50 devis/mois + IA
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-lg font-bold">19€/mois</p>
-                  <Button size="sm" variant="outline" disabled>
-                    Bientôt disponible
+            {subscriptionStatus !== "free" ? (
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={handlePortal}
+                disabled={portalLoading}
+              >
+                {portalLoading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <ExternalLink className="mr-2 h-4 w-4" />
+                )}
+                Gérer mon abonnement
+              </Button>
+            ) : (
+              <>
+                <Separator />
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between rounded-lg border p-4">
+                    <div>
+                      <p className="font-medium">Pro</p>
+                      <p className="text-sm text-muted-foreground">
+                        50 devis/mois + IA avancée
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-lg font-bold">19€<span className="text-sm font-normal text-muted-foreground">/mois HT</span></p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between rounded-lg border border-primary/20 bg-primary/5 p-4">
+                    <div>
+                      <p className="font-medium">Business</p>
+                      <p className="text-sm text-muted-foreground">
+                        Devis illimités + Signature
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-lg font-bold">49€<span className="text-sm font-normal text-muted-foreground">/mois HT</span></p>
+                    </div>
+                  </div>
+                  <Button asChild className="w-full">
+                    <a href="/pricing">Voir les tarifs</a>
                   </Button>
                 </div>
-              </div>
-
-              <div className="flex items-center justify-between rounded-lg border border-primary/20 bg-primary/5 p-4">
-                <div>
-                  <p className="font-medium">Pro</p>
-                  <p className="text-sm text-muted-foreground">
-                    Devis illimités + PDF + Signature
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-lg font-bold">49€/mois</p>
-                  <Button size="sm" disabled>
-                    Bientôt disponible
-                  </Button>
-                </div>
-              </div>
-            </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>

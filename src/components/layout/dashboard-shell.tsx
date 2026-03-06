@@ -11,6 +11,7 @@ import {
   FileText,
   Users,
   Settings,
+  CreditCard,
   LogOut,
   Menu,
   X,
@@ -21,6 +22,7 @@ const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/devis", label: "Devis", icon: FileText },
   { href: "/clients", label: "Clients", icon: Users },
+  { href: "/pricing", label: "Tarifs", icon: CreditCard },
   { href: "/parametres", label: "Paramètres", icon: Settings },
 ];
 

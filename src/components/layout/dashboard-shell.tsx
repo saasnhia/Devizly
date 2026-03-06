@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { DevizlyLogo } from "@/components/devizly-logo";
 import {
   LayoutDashboard,
   FileText,
@@ -67,9 +68,10 @@ export function DashboardShell({
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex h-16 items-center gap-2 border-b px-6">
-          <FileText className="h-6 w-6 text-primary" />
-          <span className="text-lg font-bold">Devizly</span>
+        <div className="flex h-16 items-center border-b px-6">
+          <Link href="/dashboard" className="transition-transform hover:scale-105">
+            <DevizlyLogo width={160} height={40} />
+          </Link>
         </div>
 
         <nav className="flex-1 space-y-1 p-4">
@@ -119,7 +121,7 @@ export function DashboardShell({
           <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(true)}>
             {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
-          <span className="text-lg font-bold">Devizly</span>
+          <DevizlyLogo width={120} height={32} />
         </header>
 
         <main className="flex-1 overflow-y-auto p-6">

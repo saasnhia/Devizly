@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { DevizlyLogo } from "@/components/devizly-logo";
 import {
-  FileText,
   Sparkles,
   Download,
   PenTool,
@@ -201,10 +201,9 @@ export default function LandingPage() {
       {/* ── Sticky Header ── */}
       <header className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur-md">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-          <div className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-primary" />
-            <span className="text-lg font-bold">Devizly</span>
-          </div>
+          <Link href="/" className="transition-transform hover:scale-105">
+            <DevizlyLogo width={140} height={36} />
+          </Link>
           <nav className="hidden items-center gap-6 text-sm md:flex">
             <a href="#features" className="text-muted-foreground transition-colors hover:text-foreground">Fonctionnalités</a>
             <a href="#pricing" className="text-muted-foreground transition-colors hover:text-foreground">Tarifs</a>
@@ -541,10 +540,9 @@ export default function LandingPage() {
       <footer className="border-t py-10">
         <div className="mx-auto max-w-6xl px-4">
           <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
-            <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-primary" />
-              <span className="font-bold">Devizly</span>
-            </div>
+            <Link href="/" className="transition-transform hover:scale-105">
+              <DevizlyLogo width={120} height={32} />
+            </Link>
             <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
               <a href="#features" className="hover:text-foreground">Fonctionnalités</a>
               <a href="#pricing" className="hover:text-foreground">Tarifs</a>

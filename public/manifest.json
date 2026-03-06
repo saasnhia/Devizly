@@ -1,0 +1,16 @@
+{
+  "name": "Devizly",
+  "short_name": "Devizly",
+  "description": "Devis professionnels avec l'IA",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#22D3A5",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

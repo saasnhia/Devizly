@@ -38,6 +38,8 @@ export interface Quote {
   valid_until: string | null;
   pdf_url: string | null;
   ai_prompt: string | null;
+  share_token: string | null;
+  viewed_at: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -30,6 +30,7 @@ import {
   Copy,
   Trash2,
   FileText,
+  Share2,
 } from "lucide-react";
 import {
   formatCurrency,
@@ -38,6 +39,7 @@ import {
   getStatusLabel,
 } from "@/lib/utils/quote";
 import type { QuoteWithClient, QuoteStatus } from "@/types";
+import { ShareModal } from "@/components/quotes/ShareModal";
 import { toast } from "sonner";
 
 const statusTabs: { label: string; value: QuoteStatus | "all" }[] = [
@@ -216,7 +218,7 @@ export default function DevisPage() {
                   <TableHead>Montant TTC</TableHead>
                   <TableHead>Statut</TableHead>
                   <TableHead>Date</TableHead>
-                  <TableHead className="w-10" />
+                  <TableHead className="w-28" />
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -240,6 +242,14 @@ export default function DevisPage() {
                     </TableCell>
                     <TableCell>{formatDate(quote.created_at)}</TableCell>
                     <TableCell>
+                      <div className="flex items-center gap-1">
+                        {quote.share_token && (
+                          <ShareModal
+                            shareToken={quote.share_token}
+                            quoteTitle={quote.title}
+                            clientEmail={quote.clients?.email}
+                          />
+                        )}
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon">
@@ -288,6 +298,7 @@ export default function DevisPage() {
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

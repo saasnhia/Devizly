@@ -1,13 +1,17 @@
 import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { resend } from "@/lib/resend";
+import { REMINDER_TEMPLATES } from "@/lib/emails/reminder";
+import { formatCurrency } from "@/lib/utils/quote";
 
 /**
  * Cron endpoint: auto-send reminders for "envoyé" quotes at J+3, J+7, J+14.
- * Trigger via Vercel Cron or external scheduler.
+ * Vercel Cron runs daily at 9:00 AM (vercel.json).
  * Protected by CRON_SECRET header.
  */
 
 const REMINDER_DAYS = [3, 7, 14] as const;
+const FROM_EMAIL = "Devizly <noreply@devizly.fr>";
 
 function createServiceClient() {
   return createServerClient(
@@ -25,16 +29,18 @@ export async function GET(request: Request) {
   }
 
   const supabase = createServiceClient();
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const now = new Date();
   let totalSent = 0;
+  const errors: string[] = [];
 
-  // Find all "envoyé" quotes from pro/business users
+  // Find all "envoyé" quotes with client + owner profile
   const { data: quotes } = await supabase
     .from("quotes")
     .select(`
-      id, title, created_at, user_id, client_id,
-      clients(name, email, phone),
-      profiles!quotes_user_id_fkey(subscription_status)
+      id, title, number, total_ttc, share_token, created_at, user_id, client_id,
+      clients(name, email),
+      profiles!quotes_user_id_fkey(subscription_status, company_name, full_name)
     `)
     .eq("status", "envoyé");
 
@@ -44,16 +50,28 @@ export async function GET(request: Request) {
 
   for (const quote of quotes) {
     // Only pro and business users get auto-reminders
-    const profile = quote.profiles as unknown as { subscription_status: string } | null;
+    const profile = quote.profiles as unknown as {
+      subscription_status: string;
+      company_name: string | null;
+      full_name: string | null;
+    } | null;
     if (!profile || profile.subscription_status === "free") continue;
 
-    const client = quote.clients as unknown as { name: string; email: string | null; phone: string | null } | null;
+    const client = quote.clients as unknown as {
+      name: string;
+      email: string | null;
+    } | null;
     if (!client?.email) continue;
 
     const createdAt = new Date(quote.created_at);
     const daysSinceCreated = Math.floor(
       (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24)
     );
+
+    const quoteRef = `DEV-${String(quote.number).padStart(4, "0")}`;
+    const shareUrl = `${appUrl}/devis/${quote.share_token}`;
+    const companyName =
+      profile.company_name || profile.full_name || "Votre prestataire";
 
     for (let i = 0; i < REMINDER_DAYS.length; i++) {
       const reminderDay = REMINDER_DAYS[i];
@@ -72,10 +90,36 @@ export async function GET(request: Request) {
 
       if (existing) continue;
 
-      // TODO: integrate real email service (Resend, SendGrid, etc.)
-      // For now, just log and record the reminder
+      // Generate email from template
+      const templateFn = REMINDER_TEMPLATES[i];
+      const { subject, html } = templateFn({
+        clientName: client.name,
+        quoteTitle: quote.title,
+        quoteRef,
+        totalTTC: formatCurrency(Number(quote.total_ttc)),
+        shareUrl,
+        companyName,
+      });
+
+      // Send via Resend
+      const { error: sendError } = await resend.emails.send({
+        from: FROM_EMAIL,
+        to: client.email,
+        subject,
+        html,
+      });
+
+      if (sendError) {
+        console.error(
+          `[Reminder] Failed J+${reminderDay} for ${quoteRef}:`,
+          sendError
+        );
+        errors.push(`${quoteRef} J+${reminderDay}: ${sendError.message}`);
+        continue;
+      }
+
       console.log(
-        `[Reminder] J+${reminderDay} for quote "${quote.title}" → ${client.email}`
+        `[Reminder] Sent J+${reminderDay} for ${quoteRef} → ${client.email}`
       );
 
       // Record reminder as sent
@@ -90,5 +134,8 @@ export async function GET(request: Request) {
     }
   }
 
-  return NextResponse.json({ sent: totalSent });
+  return NextResponse.json({
+    sent: totalSent,
+    errors: errors.length > 0 ? errors : undefined,
+  });
 }

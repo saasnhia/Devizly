@@ -20,6 +20,8 @@ import {
   Clock,
   Target,
   CreditCard,
+  Bell,
+  Download,
 } from "lucide-react";
 import {
   formatCurrency,
@@ -57,18 +59,23 @@ export default async function DashboardPage() {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const [{ data: quotes }, { data: profile }] = await Promise.all([
-    supabase
-      .from("quotes")
-      .select("*, clients(*)")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false }),
-    supabase
-      .from("profiles")
-      .select("subscription_status, devis_used")
-      .eq("id", user.id)
-      .single(),
-  ]);
+  const [{ data: quotes }, { data: profile }, { count: remindersSent }] =
+    await Promise.all([
+      supabase
+        .from("quotes")
+        .select("*, clients(*)")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("profiles")
+        .select("subscription_status, devis_used")
+        .eq("id", user.id)
+        .single(),
+      supabase
+        .from("quote_reminders")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id),
+    ]);
 
   const allQuotes = (quotes || []) as QuoteWithClient[];
   const recentQuotes = allQuotes.slice(0, 5);
@@ -226,6 +233,17 @@ export default async function DashboardPage() {
       color: "text-violet-600",
       bgColor: "bg-violet-50",
     },
+    {
+      label: "Relances envoyees",
+      value: String(remindersSent || 0),
+      subtitle:
+        plan === "free"
+          ? "Disponible en Pro"
+          : `${sentQuotes} devis en attente`,
+      icon: Bell,
+      color: "text-amber-600",
+      bgColor: "bg-amber-50",
+    },
   ];
 
   return (
@@ -235,12 +253,20 @@ export default async function DashboardPage() {
           <h1 className="text-2xl font-bold">Dashboard</h1>
           {user.id === ADMIN_USER_ID && <SeedButton />}
         </div>
-        <Button asChild>
-          <Link href="/devis/nouveau">
-            <Plus className="mr-2 h-4 w-4" />
-            Nouveau devis
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <a href={`/api/export/csv?year=${new Date().getFullYear()}`}>
+              <Download className="mr-2 h-4 w-4" />
+              Export CSV
+            </a>
+          </Button>
+          <Button asChild>
+            <Link href="/devis/nouveau">
+              <Plus className="mr-2 h-4 w-4" />
+              Nouveau devis
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* Quota bar */}
@@ -278,7 +304,7 @@ export default async function DashboardPage() {
       </Card>
 
       {/* KPI Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {kpis.map((kpi) => (
           <Card key={kpi.label}>
             <CardContent className="flex items-center gap-4 pt-6">

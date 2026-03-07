@@ -15,13 +15,16 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Save, Loader2, CreditCard, Building, ExternalLink } from "lucide-react";
+import { Save, Loader2, CreditCard, Building, ExternalLink, Upload, Trash2, ImageIcon } from "lucide-react";
 import { toast } from "sonner";
+import Image from "next/image";
 
 export default function ParametresPage() {
   const [loading, setLoading] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
+  const [logoLoading, setLogoLoading] = useState(false);
   const [subscriptionStatus, setSubscriptionStatus] = useState("free");
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [profile, setProfile] = useState({
     full_name: "",
     company_name: "",
@@ -50,15 +53,66 @@ export default function ParametresPage() {
 
       const { data } = await supabase
         .from("profiles")
-        .select("subscription_status")
+        .select("subscription_status, logo_url")
         .eq("id", user.id)
         .single();
       if (data?.subscription_status) {
         setSubscriptionStatus(data.subscription_status);
       }
+      if (data?.logo_url) {
+        setLogoUrl(data.logo_url);
+      }
     }
     loadProfile();
   }, []);
+
+  async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Veuillez sélectionner une image (PNG, JPEG)");
+      return;
+    }
+    if (file.size > 500_000) {
+      toast.error("Logo trop volumineux (500KB max)");
+      return;
+    }
+
+    setLogoLoading(true);
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const dataUrl = reader.result as string;
+      const res = await fetch("/api/admin/logo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ logo_url: dataUrl }),
+      });
+      if (res.ok) {
+        setLogoUrl(dataUrl);
+        toast.success("Logo mis à jour");
+      } else {
+        const data = await res.json();
+        toast.error(data.error || "Erreur upload");
+      }
+      setLogoLoading(false);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async function handleLogoDelete() {
+    setLogoLoading(true);
+    const res = await fetch("/api/admin/logo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ logo_url: null }),
+    });
+    if (res.ok) {
+      setLogoUrl(null);
+      toast.success("Logo supprimé");
+    }
+    setLogoLoading(false);
+  }
 
   async function handleSave() {
     setLoading(true);
@@ -109,6 +163,67 @@ export default function ParametresPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Logo upload */}
+            <div className="space-y-2">
+              <Label>Logo entreprise (PDF & devis)</Label>
+              <div className="flex items-center gap-4">
+                {logoUrl ? (
+                  <div className="relative h-12 w-24 rounded border bg-white p-1">
+                    <Image
+                      src={logoUrl}
+                      alt="Logo"
+                      fill
+                      className="object-contain"
+                      unoptimized
+                    />
+                  </div>
+                ) : (
+                  <div className="flex h-12 w-24 items-center justify-center rounded border border-dashed bg-slate-50">
+                    <ImageIcon className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                )}
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={logoLoading}
+                    onClick={() =>
+                      document.getElementById("logo-input")?.click()
+                    }
+                  >
+                    {logoLoading ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Upload className="mr-2 h-4 w-4" />
+                    )}
+                    {logoUrl ? "Changer" : "Uploader"}
+                  </Button>
+                  {logoUrl && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleLogoDelete}
+                      disabled={logoLoading}
+                    >
+                      <Trash2 className="h-4 w-4 text-red-500" />
+                    </Button>
+                  )}
+                </div>
+                <input
+                  id="logo-input"
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  className="hidden"
+                  onChange={handleLogoUpload}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                PNG ou JPEG, 500KB max. Apparaît sur vos PDF.
+              </p>
+            </div>
+
+            <Separator />
+
             <div className="space-y-2">
               <Label>Nom complet</Label>
               <Input

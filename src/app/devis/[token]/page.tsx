@@ -314,7 +314,13 @@ export default function PublicQuotePage({
 
             {/* Action buttons */}
             <div className="flex flex-col gap-3">
-              <Button variant="outline" className="w-full sm:w-auto" disabled>
+              <Button
+                variant="outline"
+                className="w-full sm:w-auto"
+                onClick={() =>
+                  window.open(`/api/quotes/share/${token}/pdf`, "_blank")
+                }
+              >
                 <Download className="mr-2 h-4 w-4" />
                 Télécharger PDF
               </Button>

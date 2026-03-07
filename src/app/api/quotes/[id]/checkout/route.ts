@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { getStripe } from "@/lib/stripe";
+import type Stripe from "stripe";
 
 function createServiceClient() {
   return createServerClient(
@@ -36,23 +37,10 @@ export async function POST(
     return NextResponse.json({ error: "Devis introuvable" }, { status: 404 });
   }
 
-  if (quote.status !== "signé") {
+  // Allow payment for envoyé or signé quotes
+  if (quote.status !== "envoyé" && quote.status !== "signé") {
     return NextResponse.json(
-      { error: "Le devis doit être signé avant le paiement" },
-      { status: 400 }
-    );
-  }
-
-  // Check owner has Stripe Connect
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("stripe_account_id, stripe_connect_status")
-    .eq("id", quote.user_id)
-    .single();
-
-  if (!profile?.stripe_account_id || profile.stripe_connect_status !== "connected") {
-    return NextResponse.json(
-      { error: "Le prestataire n'a pas configuré les paiements" },
+      { error: "Ce devis ne peut pas être payé dans son état actuel" },
       { status: 400 }
     );
   }
@@ -91,28 +79,44 @@ export async function POST(
     });
   }
 
-  // Create Checkout Session on the connected account
-  const session = await stripe.checkout.sessions.create(
-    {
-      payment_method_types: ["card"],
-      line_items: lineItems,
-      mode: "payment",
-      success_url: `${appUrl}/devis/${share_token}?paid=true`,
-      cancel_url: `${appUrl}/devis/${share_token}`,
+  // Check if owner has Stripe Connect
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("stripe_account_id, stripe_connect_status")
+    .eq("id", quote.user_id)
+    .single();
+
+  const hasConnect =
+    profile?.stripe_account_id && profile.stripe_connect_status === "connected";
+
+  const sessionConfig: Stripe.Checkout.SessionCreateParams = {
+    payment_method_types: ["card"],
+    line_items: lineItems,
+    mode: "payment",
+    success_url: `${appUrl}/devis/${share_token}?paid=true`,
+    cancel_url: `${appUrl}/devis/${share_token}`,
+    metadata: {
+      quote_id: quote.id,
+      devizly_payment: "true",
+    },
+    payment_intent_data: {
       metadata: {
         quote_id: quote.id,
-        devizly_payment: "true",
-      },
-      payment_intent_data: {
-        metadata: {
-          quote_id: quote.id,
-        },
       },
     },
-    {
-      stripeAccount: profile.stripe_account_id,
-    }
-  );
+  };
+
+  // Add customer email if available
+  if (quote.clients?.email) {
+    sessionConfig.customer_email = quote.clients.email;
+  }
+
+  // Create session — on connected account if available, otherwise platform
+  const session = hasConnect
+    ? await stripe.checkout.sessions.create(sessionConfig, {
+        stripeAccount: profile!.stripe_account_id!,
+      })
+    : await stripe.checkout.sessions.create(sessionConfig);
 
   // Save session ID
   await supabase

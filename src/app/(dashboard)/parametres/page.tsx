@@ -438,23 +438,9 @@ export default function ParametresPage() {
               <Button
                 className="w-full"
                 disabled={connectLoading}
-                onClick={async () => {
+                onClick={() => {
                   setConnectLoading(true);
-                  try {
-                    const res = await fetch("/api/stripe/connect/authorize", {
-                      method: "POST",
-                    });
-                    const data = await res.json();
-                    if (data.url) {
-                      window.location.href = data.url;
-                    } else {
-                      toast.error(data.error || "Erreur Stripe Connect");
-                    }
-                  } catch {
-                    toast.error("Erreur de connexion");
-                  } finally {
-                    setConnectLoading(false);
-                  }
+                  window.location.href = "/api/stripe/connect/authorize";
                 }}
               >
                 {connectLoading ? (

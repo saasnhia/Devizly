@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState, use, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -41,10 +42,12 @@ export default function PublicQuotePage({
   params: Promise<{ token: string }>;
 }) {
   const { token } = use(params);
+  const searchParams = useSearchParams();
   const [quote, setQuote] = useState<QuoteWithItems | null>(null);
   const [loading, setLoading] = useState(true);
   const [responding, setResponding] = useState(false);
   const [error, setError] = useState("");
+  const [paidSuccess, setPaidSuccess] = useState(false);
 
   // Signature state
   const [showSignature, setShowSignature] = useState(false);
@@ -52,20 +55,32 @@ export default function PublicQuotePage({
   const [signerName, setSignerName] = useState("");
   const [payLoading, setPayLoading] = useState(false);
 
-  useEffect(() => {
-    async function fetchQuote() {
-      const response = await fetch(`/api/quotes/share/${token}`);
-      if (!response.ok) {
-        setError("Ce devis est introuvable ou le lien est invalide.");
-        setLoading(false);
-        return;
-      }
-      const result = await response.json();
-      setQuote(result.data);
+  const fetchQuote = useCallback(async () => {
+    const response = await fetch(`/api/quotes/share/${token}`);
+    if (!response.ok) {
+      setError("Ce devis est introuvable ou le lien est invalide.");
       setLoading(false);
+      return;
     }
-    fetchQuote();
+    const result = await response.json();
+    setQuote(result.data);
+    setLoading(false);
   }, [token]);
+
+  useEffect(() => {
+    fetchQuote();
+  }, [fetchQuote]);
+
+  // Handle return from Stripe Checkout
+  useEffect(() => {
+    if (searchParams.get("paid") === "true") {
+      setPaidSuccess(true);
+      toast.success("Paiement effectué avec succès !");
+      // Refetch to get updated status from webhook
+      const timer = setTimeout(() => fetchQuote(), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams, fetchQuote]);
 
   async function handleSign() {
     if (!signatureData) {
@@ -337,6 +352,19 @@ export default function PublicQuotePage({
 
             <Separator />
 
+            {/* Paid success banner */}
+            {paidSuccess && quote.status !== "payé" && (
+              <div className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-4">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+                <div>
+                  <p className="font-medium text-green-800">Paiement en cours de traitement</p>
+                  <p className="text-sm text-green-600">
+                    Votre paiement a été reçu et sera confirmé sous quelques instants.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Action buttons */}
             <div className="flex flex-col gap-3">
               <Button
@@ -350,53 +378,32 @@ export default function PublicQuotePage({
                 Télécharger PDF
               </Button>
 
-              {alreadyResponded ? (
+              {/* Paid state */}
+              {quote.status === "payé" ? (
                 <div className="space-y-3">
-                  <div className="flex items-center justify-center rounded-lg border bg-slate-50 py-3 text-sm text-muted-foreground">
-                    {quote.status === "payé" ? (
-                      <>
-                        <CheckCircle className="mr-2 h-4 w-4 text-violet-600" />
-                        Devis payé
-                      </>
-                    ) : quote.status === "signé" ? (
-                      <>
-                        <CheckCircle className="mr-2 h-4 w-4 text-green-600" />
-                        Devis signé
-                      </>
-                    ) : quote.status === "accepté" ? (
-                      <>
-                        <CheckCircle className="mr-2 h-4 w-4 text-green-600" />
-                        Devis accepté
-                      </>
-                    ) : (
-                      <>
-                        <XCircle className="mr-2 h-4 w-4 text-red-600" />
-                        Devis refusé
-                      </>
-                    )}
+                  <div className="flex items-center justify-center rounded-lg border border-green-200 bg-green-50 py-3 text-sm font-medium text-green-700">
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Devis payé
                   </div>
-
-                  {quote.status === "signé" && (
-                    <Button
-                      className="w-full"
-                      onClick={handlePayment}
-                      disabled={payLoading}
-                    >
-                      {payLoading ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      ) : (
-                        <CreditCard className="mr-2 h-4 w-4" />
-                      )}
-                      Payer {formatCurrency(Number(quote.total_ttc))} TTC
-                    </Button>
-                  )}
-
-                  {quote.status === "payé" && quote.paid_at && (
+                  {quote.paid_at && (
                     <div className="rounded-lg border border-violet-200 bg-violet-50 p-3 text-center text-sm text-violet-700">
                       Paiement reçu le {formatDate(quote.paid_at)}
                     </div>
                   )}
                 </div>
+
+              ) : quote.status === "refusé" ? (
+                <div className="flex items-center justify-center rounded-lg border bg-slate-50 py-3 text-sm text-muted-foreground">
+                  <XCircle className="mr-2 h-4 w-4 text-red-600" />
+                  Devis refusé
+                </div>
+
+              ) : quote.status === "accepté" ? (
+                <div className="flex items-center justify-center rounded-lg border bg-slate-50 py-3 text-sm text-muted-foreground">
+                  <CheckCircle className="mr-2 h-4 w-4 text-green-600" />
+                  Devis accepté
+                </div>
+
               ) : showSignature ? (
                 /* Signature flow */
                 <div className="space-y-4 rounded-lg border border-primary/20 bg-primary/5 p-4">
@@ -451,30 +458,59 @@ export default function PublicQuotePage({
                     </Button>
                   </div>
                 </div>
+
               ) : (
-                /* Accept / Refuse buttons */
-                <div className="flex flex-col gap-3 sm:flex-row">
+                /* Main actions: Pay + Sign + Refuse */
+                <div className="flex flex-col gap-3">
+                  {/* Pay button — always visible for envoyé/signé */}
                   <Button
-                    className="flex-1 bg-green-600 hover:bg-green-700"
-                    onClick={() => setShowSignature(true)}
-                    disabled={responding}
+                    className="w-full bg-green-600 hover:bg-green-700 text-lg py-6"
+                    onClick={handlePayment}
+                    disabled={payLoading}
                   >
-                    <PenLine className="mr-2 h-4 w-4" />
-                    Accepter et signer
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="flex-1 border-red-200 text-red-600 hover:bg-red-50"
-                    onClick={handleRefuse}
-                    disabled={responding}
-                  >
-                    {responding ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {payLoading ? (
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                     ) : (
-                      <XCircle className="mr-2 h-4 w-4" />
+                      <CreditCard className="mr-2 h-5 w-5" />
                     )}
-                    Refuser
+                    Payer {formatCurrency(Number(quote.total_ttc))} maintenant
                   </Button>
+
+                  {/* Sign/Refuse — only for envoyé */}
+                  {quote.status === "envoyé" && (
+                    <div className="flex flex-col gap-3 sm:flex-row">
+                      <Button
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => setShowSignature(true)}
+                        disabled={responding}
+                      >
+                        <PenLine className="mr-2 h-4 w-4" />
+                        Accepter et signer
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="flex-1 border-red-200 text-red-600 hover:bg-red-50"
+                        onClick={handleRefuse}
+                        disabled={responding}
+                      >
+                        {responding ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          <XCircle className="mr-2 h-4 w-4" />
+                        )}
+                        Refuser
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* Signed badge */}
+                  {quote.status === "signé" && (
+                    <div className="flex items-center justify-center rounded-lg border bg-slate-50 py-2 text-sm text-muted-foreground">
+                      <CheckCircle className="mr-2 h-4 w-4 text-green-600" />
+                      Devis signé
+                    </div>
+                  )}
                 </div>
               )}
             </div>

@@ -44,10 +44,21 @@ export async function POST(
   const { token } = await params;
   const supabase = createPublicClient();
 
-  const { action } = await request.json();
+  const body = await request.json();
+  const { action, signature_data, signer_name } = body;
 
-  if (action !== "accepté" && action !== "refusé") {
+  if (action !== "accepté" && action !== "refusé" && action !== "signé") {
     return NextResponse.json({ error: "Action invalide" }, { status: 400 });
+  }
+
+  // For signing, require signature data + signer name
+  if (action === "signé") {
+    if (!signature_data || !signer_name?.trim()) {
+      return NextResponse.json(
+        { error: "Signature et nom requis" },
+        { status: 400 }
+      );
+    }
   }
 
   const { data: quote, error: findError } = await supabase
@@ -60,19 +71,33 @@ export async function POST(
     return NextResponse.json({ error: "Devis introuvable" }, { status: 404 });
   }
 
-  if (quote.status === "accepté" || quote.status === "refusé") {
+  if (
+    quote.status === "signé" ||
+    quote.status === "accepté" ||
+    quote.status === "refusé"
+  ) {
     return NextResponse.json(
       { error: "Ce devis a déjà reçu une réponse" },
       { status: 400 }
     );
   }
 
+  const now = new Date().toISOString();
+
+  const updateData: Record<string, unknown> = {
+    status: action,
+    updated_at: now,
+  };
+
+  if (action === "signé") {
+    updateData.signature_data = signature_data;
+    updateData.signer_name = signer_name.trim();
+    updateData.signed_at = now;
+  }
+
   const { error: updateError } = await supabase
     .from("quotes")
-    .update({
-      status: action,
-      updated_at: new Date().toISOString(),
-    })
+    .update(updateData)
     .eq("id", quote.id);
 
   if (updateError) {

@@ -40,6 +40,9 @@ export interface Quote {
   ai_prompt: string | null;
   share_token: string | null;
   viewed_at: string | null;
+  signature_data: string | null;
+  signer_name: string | null;
+  signed_at: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useState, use } from "react";
+import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -19,6 +22,7 @@ import {
   CheckCircle,
   XCircle,
   Loader2,
+  PenLine,
 } from "lucide-react";
 import {
   formatCurrency,
@@ -26,6 +30,7 @@ import {
   getStatusColor,
   getStatusLabel,
 } from "@/lib/utils/quote";
+import { SignatureCanvas } from "@/components/signature-canvas";
 import type { QuoteWithItems } from "@/types";
 import { toast } from "sonner";
 
@@ -39,6 +44,11 @@ export default function PublicQuotePage({
   const [loading, setLoading] = useState(true);
   const [responding, setResponding] = useState(false);
   const [error, setError] = useState("");
+
+  // Signature state
+  const [showSignature, setShowSignature] = useState(false);
+  const [signatureData, setSignatureData] = useState<string | null>(null);
+  const [signerName, setSignerName] = useState("");
 
   useEffect(() => {
     async function fetchQuote() {
@@ -55,12 +65,25 @@ export default function PublicQuotePage({
     fetchQuote();
   }, [token]);
 
-  async function handleRespond(action: "accepté" | "refusé") {
+  async function handleSign() {
+    if (!signatureData) {
+      toast.error("Veuillez signer dans le cadre ci-dessus");
+      return;
+    }
+    if (!signerName.trim()) {
+      toast.error("Veuillez entrer votre nom complet");
+      return;
+    }
+
     setResponding(true);
     const response = await fetch(`/api/quotes/share/${token}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action }),
+      body: JSON.stringify({
+        action: "signé",
+        signature_data: signatureData,
+        signer_name: signerName.trim(),
+      }),
     });
     const result = await response.json();
     if (!response.ok) {
@@ -68,10 +91,37 @@ export default function PublicQuotePage({
       setResponding(false);
       return;
     }
-    toast.success(
-      action === "accepté" ? "Devis accepté !" : "Devis refusé."
+    toast.success("Devis signé avec succès !");
+    setQuote((prev) =>
+      prev
+        ? {
+            ...prev,
+            status: "signé",
+            signature_data: signatureData,
+            signer_name: signerName.trim(),
+            signed_at: new Date().toISOString(),
+          }
+        : prev
     );
-    setQuote((prev) => (prev ? { ...prev, status: action } : prev));
+    setShowSignature(false);
+    setResponding(false);
+  }
+
+  async function handleRefuse() {
+    setResponding(true);
+    const response = await fetch(`/api/quotes/share/${token}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "refusé" }),
+    });
+    const result = await response.json();
+    if (!response.ok) {
+      toast.error(result.error || "Erreur");
+      setResponding(false);
+      return;
+    }
+    toast.success("Devis refusé.");
+    setQuote((prev) => (prev ? { ...prev, status: "refusé" } : prev));
     setResponding(false);
   }
 
@@ -102,10 +152,11 @@ export default function PublicQuotePage({
   const items = (quote.quote_items || []).sort(
     (a, b) => a.position - b.position
   );
-  const tvaAmount =
-    Number(quote.total_ttc) - Number(quote.total_ht);
+  const tvaAmount = Number(quote.total_ttc) - Number(quote.total_ht);
   const alreadyResponded =
-    quote.status === "accepté" || quote.status === "refusé";
+    quote.status === "accepté" ||
+    quote.status === "refusé" ||
+    quote.status === "signé";
 
   return (
     <div className="min-h-screen bg-slate-50 py-8">
@@ -229,18 +280,53 @@ export default function PublicQuotePage({
               </div>
             )}
 
+            {/* Signature display (when signed) */}
+            {quote.status === "signé" && quote.signature_data && (
+              <div className="rounded-lg border border-green-200 bg-green-50 p-4">
+                <div className="mb-3 flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  <p className="font-medium text-green-800">
+                    Devis signé electroniquement
+                  </p>
+                </div>
+                <div className="rounded-lg border bg-white p-3">
+                  <Image
+                    src={quote.signature_data}
+                    alt="Signature"
+                    width={300}
+                    height={120}
+                    className="max-h-[120px] w-auto"
+                    unoptimized
+                  />
+                </div>
+                <div className="mt-3 flex flex-col gap-1 text-sm text-green-700">
+                  <p>
+                    Signé par : <strong>{quote.signer_name}</strong>
+                  </p>
+                  {quote.signed_at && (
+                    <p>Le {formatDate(quote.signed_at)}</p>
+                  )}
+                </div>
+              </div>
+            )}
+
             <Separator />
 
             {/* Action buttons */}
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Button variant="outline" className="flex-1" disabled>
+            <div className="flex flex-col gap-3">
+              <Button variant="outline" className="w-full sm:w-auto" disabled>
                 <Download className="mr-2 h-4 w-4" />
                 Télécharger PDF
               </Button>
 
               {alreadyResponded ? (
-                <div className="flex flex-1 items-center justify-center rounded-lg border bg-slate-50 py-2 text-sm text-muted-foreground">
-                  {quote.status === "accepté" ? (
+                <div className="flex items-center justify-center rounded-lg border bg-slate-50 py-3 text-sm text-muted-foreground">
+                  {quote.status === "signé" ? (
+                    <>
+                      <CheckCircle className="mr-2 h-4 w-4 text-green-600" />
+                      Devis signé
+                    </>
+                  ) : quote.status === "accepté" ? (
                     <>
                       <CheckCircle className="mr-2 h-4 w-4 text-green-600" />
                       Devis accepté
@@ -252,24 +338,75 @@ export default function PublicQuotePage({
                     </>
                   )}
                 </div>
+              ) : showSignature ? (
+                /* Signature flow */
+                <div className="space-y-4 rounded-lg border border-primary/20 bg-primary/5 p-4">
+                  <div className="flex items-center gap-2">
+                    <PenLine className="h-5 w-5 text-primary" />
+                    <p className="font-semibold">Signature electronique</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="signer-name">Votre nom complet</Label>
+                    <Input
+                      id="signer-name"
+                      placeholder="Jean Dupont"
+                      value={signerName}
+                      onChange={(e) => setSignerName(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Votre signature</Label>
+                    <SignatureCanvas onSignatureChange={setSignatureData} />
+                  </div>
+
+                  <p className="text-xs text-muted-foreground">
+                    En signant, je confirme avoir lu et accepté les termes de ce
+                    devis pour un montant de{" "}
+                    <strong>
+                      {formatCurrency(Number(quote.total_ttc))} TTC
+                    </strong>
+                    .
+                  </p>
+
+                  <div className="flex gap-3">
+                    <Button
+                      className="flex-1 bg-green-600 hover:bg-green-700"
+                      onClick={handleSign}
+                      disabled={responding || !signatureData || !signerName.trim()}
+                    >
+                      {responding ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <CheckCircle className="mr-2 h-4 w-4" />
+                      )}
+                      Signer et accepter
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={() => setShowSignature(false)}
+                      disabled={responding}
+                    >
+                      Annuler
+                    </Button>
+                  </div>
+                </div>
               ) : (
-                <>
+                /* Accept / Refuse buttons */
+                <div className="flex flex-col gap-3 sm:flex-row">
                   <Button
                     className="flex-1 bg-green-600 hover:bg-green-700"
-                    onClick={() => handleRespond("accepté")}
+                    onClick={() => setShowSignature(true)}
                     disabled={responding}
                   >
-                    {responding ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                      <CheckCircle className="mr-2 h-4 w-4" />
-                    )}
-                    Accepter
+                    <PenLine className="mr-2 h-4 w-4" />
+                    Accepter et signer
                   </Button>
                   <Button
                     variant="outline"
                     className="flex-1 border-red-200 text-red-600 hover:bg-red-50"
-                    onClick={() => handleRespond("refusé")}
+                    onClick={handleRefuse}
                     disabled={responding}
                   >
                     {responding ? (
@@ -279,7 +416,7 @@ export default function PublicQuotePage({
                     )}
                     Refuser
                   </Button>
-                </>
+                </div>
               )}
             </div>
           </CardContent>

@@ -29,22 +29,42 @@ export default function SignupPage() {
       return;
     }
     setLoading(true);
-    const supabase = createClient();
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: fullName },
-      },
-    });
-    if (error) {
-      toast.error(error.message);
+
+    try {
+      // Server-side signup with IP rate limiting
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, fullName }),
+      });
+      const result = await response.json();
+
+      if (!response.ok) {
+        toast.error(result.error || "Erreur lors de la création du compte");
+        setLoading(false);
+        return;
+      }
+
+      // Sign in the user client-side after server-side creation
+      const supabase = createClient();
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) {
+        toast.error(signInError.message);
+        setLoading(false);
+        return;
+      }
+
+      toast.success("Compte créé avec succès !");
+      router.push("/dashboard");
+      router.refresh();
+    } catch {
+      toast.error("Erreur de connexion");
       setLoading(false);
-      return;
     }
-    toast.success("Compte créé ! Vérifiez votre email pour confirmer.");
-    router.push("/dashboard");
-    router.refresh();
   }
 
   return (

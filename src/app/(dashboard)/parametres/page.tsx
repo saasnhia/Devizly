@@ -206,7 +206,7 @@ export default function ParametresPage() {
                   <p className="font-medium">Plan {planLabel}</p>
                   <p className="text-sm text-muted-foreground">
                     {subscriptionStatus === "free"
-                      ? "5 devis/mois"
+                      ? "3 devis/mois"
                       : subscriptionStatus === "pro"
                         ? "50 devis/mois"
                         : "Devis illimités"}

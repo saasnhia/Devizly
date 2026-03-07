@@ -37,12 +37,13 @@ const comparisonFeatures: PlanFeature[] = [
   { text: "Export PDF personnalisé", free: false, pro: true, business: true },
   { text: "Signature en ligne", free: false, pro: true, business: true },
   { text: "Tableau de bord avancé", free: false, pro: true, business: true },
-  { text: "Relances automatiques", free: false, pro: false, business: true },
+  { text: "Relances automatiques (J+3, J+7, J+14)", free: false, pro: true, business: true },
+  { text: "Équipe (multi-utilisateurs)", free: false, pro: false, business: true },
   { text: "Support prioritaire", free: false, pro: false, business: true },
 ];
 
 const devisLimits: Record<string, string> = {
-  free: "5",
+  free: "3",
   pro: "50",
   business: "Illimités",
 };

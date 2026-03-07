@@ -14,8 +14,11 @@ import {
 import { FileText, Send, CheckCircle, Euro, Plus, Sparkles, TrendingUp, Clock, Target } from "lucide-react";
 import { formatCurrency, formatDate, getStatusColor, getStatusLabel } from "@/lib/utils/quote";
 import { PLANS } from "@/lib/stripe";
+import { SeedButton } from "@/components/seed-button";
 import type { QuoteWithClient } from "@/types";
 import type { PlanId } from "@/lib/stripe";
+
+const ADMIN_USER_ID = "ea81a899-f85b-4b61-b931-6f45cb532094";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -116,7 +119,10 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold">Dashboard</h1>
+          {user.id === ADMIN_USER_ID && <SeedButton />}
+        </div>
         <Button asChild>
           <Link href="/devis/nouveau">
             <Plus className="mr-2 h-4 w-4" />

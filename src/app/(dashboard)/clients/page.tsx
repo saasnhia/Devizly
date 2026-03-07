@@ -21,7 +21,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, Search, Pencil, Trash2, Users } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Users, ExternalLink, Copy } from "lucide-react";
 import type { Client } from "@/types";
 import { toast } from "sonner";
 
@@ -242,7 +242,8 @@ export default function ClientsPage() {
                   <TableHead>Nom</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Téléphone</TableHead>
-                  <TableHead>SIRET</TableHead>
+                  <TableHead className="hidden sm:table-cell">SIRET</TableHead>
+                  <TableHead>Portail</TableHead>
                   <TableHead className="w-20">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -252,8 +253,42 @@ export default function ClientsPage() {
                     <TableCell className="font-medium">{client.name}</TableCell>
                     <TableCell>{client.email || "—"}</TableCell>
                     <TableCell>{client.phone || "—"}</TableCell>
-                    <TableCell className="font-mono text-sm">
+                    <TableCell className="hidden font-mono text-sm sm:table-cell">
                       {client.siret || "—"}
+                    </TableCell>
+                    <TableCell>
+                      {client.portal_token ? (
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Ouvrir le portail"
+                            onClick={() =>
+                              window.open(
+                                `/portal/${client.portal_token}`,
+                                "_blank"
+                              )
+                            }
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Copier le lien"
+                            onClick={() => {
+                              navigator.clipboard.writeText(
+                                `${window.location.origin}/portal/${client.portal_token}`
+                              );
+                              toast.success("Lien portail copie");
+                            }}
+                          >
+                            <Copy className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-1">

@@ -10,6 +10,7 @@ export interface Client {
   city: string | null;
   postal_code: string | null;
   siret: string | null;
+  portal_token: string | null;
   created_at: string;
 }
 

@@ -160,22 +160,24 @@ export const LinkedInBanner: React.FC = () => {
           </div>
         </div>
 
-        {/* RIGHT — Full screenshot mockup, scaled to fit 191px */}
+        {/* RIGHT — Two stacked screenshots with perspective */}
         <div
           style={{
-            width: 160,
+            width: 380,
             flexShrink: 0,
             display: "flex",
             alignItems: "center",
             justifyContent: "flex-end",
             marginLeft: 20,
+            gap: 10,
           }}
         >
+          {/* Dashboard screenshot — larger */}
           <div
             style={{
               transform:
                 "perspective(800px) rotateY(-6deg) rotateX(2deg)",
-              width: 145,
+              width: 200,
             }}
           >
             <div
@@ -187,7 +189,6 @@ export const LinkedInBanner: React.FC = () => {
                   "0 12px 40px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.05)",
               }}
             >
-              {/* Tiny title bar */}
               <div
                 style={{
                   height: 12,
@@ -204,9 +205,48 @@ export const LinkedInBanner: React.FC = () => {
                   <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#28C840" }} />
                 </div>
               </div>
-              {/* Full screenshot scaled to fit */}
               <Img
-                src={staticFile("marketing/screenshot-devis-share.png")}
+                src={staticFile("marketing/final dashboard.png")}
+                style={{ width: "100%", display: "block" }}
+              />
+            </div>
+          </div>
+
+          {/* Devis form screenshot — smaller, offset */}
+          <div
+            style={{
+              transform:
+                "perspective(800px) rotateY(-8deg) rotateX(3deg) translateY(8px)",
+              width: 130,
+            }}
+          >
+            <div
+              style={{
+                background: C.white,
+                borderRadius: 6,
+                overflow: "hidden",
+                boxShadow:
+                  "0 12px 40px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.05)",
+              }}
+            >
+              <div
+                style={{
+                  height: 12,
+                  background: "#F6F6F8",
+                  borderBottom: "1px solid #E5E5EA",
+                  display: "flex",
+                  alignItems: "center",
+                  paddingLeft: 5,
+                }}
+              >
+                <div style={{ display: "flex", gap: 3 }}>
+                  <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#FF5F57" }} />
+                  <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#FEBC2E" }} />
+                  <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#28C840" }} />
+                </div>
+              </div>
+              <Img
+                src={staticFile("marketing/devis final form .png")}
                 style={{ width: "100%", display: "block" }}
               />
             </div>

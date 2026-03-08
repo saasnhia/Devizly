@@ -13,13 +13,33 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://devizly.fr";
+
 export const metadata: Metadata = {
   title: "Devizly - Créez vos devis professionnels avec l'IA",
-  description: "Devizly : générez des devis professionnels en quelques secondes grâce à l'intelligence artificielle.",
+  description:
+    "Devizly : générez des devis professionnels en quelques secondes grâce à l'intelligence artificielle. Signature, paiement Stripe et portail client intégrés.",
+  metadataBase: new URL(SITE_URL),
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    locale: "fr_FR",
+    url: SITE_URL,
+    siteName: "Devizly",
+    title: "Devizly - Devis pro en 30 secondes avec l'IA",
+    description:
+      "Générez, envoyez et faites signer vos devis professionnels en quelques clics. IA Mistral hébergée en France.",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Devizly" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Devizly - Devis pro en 30 secondes avec l'IA",
+    description:
+      "Générez, envoyez et faites signer vos devis en quelques clics. Gratuit.",
+    images: ["/og-image.png"],
+  },
   icons: {
-    icon: [
-      { url: "/favicon.svg", type: "image/svg+xml" },
-    ],
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
     apple: "/favicon.svg",
   },
   manifest: "/manifest.json",

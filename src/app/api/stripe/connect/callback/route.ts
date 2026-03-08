@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
 import { createServerClient } from "@supabase/ssr";
+import { getSiteUrl } from "@/lib/url";
 
 function createServiceClient() {
   return createServerClient(
@@ -16,7 +17,7 @@ export async function GET(request: Request) {
   const state = searchParams.get("state"); // supabase user id
   const errorParam = searchParams.get("error");
   const errorDesc = searchParams.get("error_description");
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const appUrl = getSiteUrl();
 
   console.log("[Stripe Callback] Params:", {
     code: code ? code.substring(0, 10) + "..." : null,

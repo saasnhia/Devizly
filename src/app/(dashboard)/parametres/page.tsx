@@ -395,23 +395,26 @@ export default function ParametresPage() {
         </Card>
       </div>
 
-      {/* Stripe Connect */}
-      <Card>
-        <CardHeader>
+      {/* Stripe Connect — Onboarding optimise conversion comptables */}
+      <Card className="overflow-hidden">
+        <CardHeader className="bg-[#1e40af]/[0.03] pb-4">
           <CardTitle className="flex items-center gap-2">
-            <Wallet className="h-5 w-5" />
-            Paiements
+            <Wallet className="h-5 w-5 text-[#1e40af]" />
+            Encaissement automatique
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-4">
           {stripeConnectStatus === "connected" ? (
             <>
               <div className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-4">
-                <CheckCircle2 className="h-5 w-5 text-green-600" />
+                <CheckCircle2 className="h-6 w-6 shrink-0 text-green-600" />
                 <div>
-                  <p className="font-medium text-green-700">Stripe connecté</p>
-                  <p className="text-sm text-green-600">
-                    Vos clients peuvent payer directement après signature.
+                  <p className="font-semibold text-green-800">
+                    Paiements actifs
+                  </p>
+                  <p className="text-sm text-green-700">
+                    Vos clients paient en ligne. Les fonds arrivent sur votre
+                    compte Stripe sous 2 jours.
                   </p>
                 </div>
               </div>
@@ -422,21 +425,43 @@ export default function ParametresPage() {
                   rel="noopener noreferrer"
                 >
                   <ExternalLink className="mr-2 h-4 w-4" />
-                  Voir tableau de bord Stripe
+                  Voir mes encaissements
                 </a>
               </Button>
             </>
           ) : (
             <>
-              <div className="rounded-lg border p-4">
-                <p className="font-medium">Recevez vos paiements</p>
-                <p className="text-sm text-muted-foreground">
-                  Connectez votre compte Stripe pour recevoir les paiements
-                  directement après signature de vos devis.
+              {/* Benefit block */}
+              <div className="rounded-xl border border-[#1e40af]/20 bg-[#1e40af]/[0.03] p-5">
+                <p className="text-base font-semibold text-[#1e40af]">
+                  Vos clients signent et paient en un clic
                 </p>
+                <p className="mt-1 text-sm text-slate-600">
+                  L&apos;argent arrive directement sur votre compte. Sans
+                  relance, sans attente.
+                </p>
+
+                {/* Trust pills */}
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-700 shadow-sm ring-1 ring-slate-200">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
+                    Virement sous 48h
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-700 shadow-sm ring-1 ring-slate-200">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
+                    Carte bancaire
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-700 shadow-sm ring-1 ring-slate-200">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
+                    100% securise
+                  </span>
+                </div>
               </div>
+
+              {/* CTA */}
               <Button
-                className="w-full"
+                className="w-full bg-[#1e40af] text-base font-semibold hover:bg-[#1e3a8a]"
+                size="lg"
                 disabled={connectLoading}
                 onClick={() => {
                   setConnectLoading(true);
@@ -444,16 +469,22 @@ export default function ParametresPage() {
                 }}
               >
                 {connectLoading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                 ) : (
-                  <Wallet className="mr-2 h-4 w-4" />
+                  <Wallet className="mr-2 h-5 w-5" />
                 )}
-                Connecter mon Stripe
+                Connecter Stripe
               </Button>
+
+              <p className="text-center text-xs text-muted-foreground">
+                Gratuit. Configuration en 2 minutes.
+              </p>
+
               {stripeConnectStatus === "pending" && (
-                <p className="text-sm text-amber-600">
-                  Onboarding en cours — complétez la configuration sur Stripe.
-                </p>
+                <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-center text-sm text-amber-700">
+                  Configuration en cours — finalisez sur Stripe pour activer
+                  les paiements.
+                </div>
               )}
             </>
           )}

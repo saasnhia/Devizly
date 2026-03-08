@@ -9,12 +9,22 @@ function createPublicClient() {
   );
 }
 
+function createServiceClient() {
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { cookies: { getAll: () => [], setAll: () => {} } }
+  );
+}
+
+const MAX_SIGNATURE_SIZE = 500_000; // 500KB
+
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ token: string }> }
 ) {
   const { token } = await params;
-  const supabase = createPublicClient();
+  const supabase = createServiceClient();
 
   const { data: quote, error } = await supabase
     .from("quotes")
@@ -42,7 +52,7 @@ export async function POST(
   { params }: { params: Promise<{ token: string }> }
 ) {
   const { token } = await params;
-  const supabase = createPublicClient();
+  const supabase = createServiceClient();
 
   const body = await request.json();
   const { action, signature_data, signer_name } = body;
@@ -56,6 +66,18 @@ export async function POST(
     if (!signature_data || !signer_name?.trim()) {
       return NextResponse.json(
         { error: "Signature et nom requis" },
+        { status: 400 }
+      );
+    }
+    if (typeof signature_data === "string" && signature_data.length > MAX_SIGNATURE_SIZE) {
+      return NextResponse.json(
+        { error: "Signature trop volumineuse (500KB max)" },
+        { status: 400 }
+      );
+    }
+    if (signer_name.trim().length > 200) {
+      return NextResponse.json(
+        { error: "Nom trop long (200 caracteres max)" },
         { status: 400 }
       );
     }

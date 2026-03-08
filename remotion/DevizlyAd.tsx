@@ -12,7 +12,7 @@ import { loadFont } from "@remotion/google-fonts/Inter";
 
 const { fontFamily } = loadFont();
 
-/* ── Colors (matching reference: light bg, dark text) ── */
+/* -- Colors (matching reference: light bg, dark text) -- */
 const C = {
   bg: "#EDEDF0",
   dark: "#1A1A2E",
@@ -24,7 +24,7 @@ const C = {
 
 const font = fontFamily;
 
-/* ── macOS Window Chrome ─────────────────────────── */
+/* -- macOS Window Chrome -------------------------------- */
 
 function MacWindow({
   children,
@@ -83,7 +83,7 @@ function MacWindow({
   );
 }
 
-/* ── Typing animation ────────────────────────────── */
+/* -- Typing animation ----------------------------------- */
 
 function TypeText({
   text,
@@ -119,7 +119,7 @@ function TypeText({
   );
 }
 
-/* ── Logo SVG ─────────────────────────────────────── */
+/* -- Logo SVG ------------------------------------------- */
 
 function Logo({ size = 80 }: { size?: number }) {
   return (
@@ -135,107 +135,130 @@ function Logo({ size = 80 }: { size?: number }) {
   );
 }
 
-/* ── Scene 1: App mockup with typing (0-5s = 0-150 frames) ── */
+/* -- Scene 0: AI typing prompt (0-4s = 0-120 frames) ---- */
 
-function Scene1() {
+function SceneTyping() {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  // Window slides up from bottom with perspective
   const enterProgress = spring({ frame, fps, config: { damping: 22, mass: 1 } });
-  const y = interpolate(enterProgress, [0, 1], [300, -40]);
-  const rotateX = interpolate(enterProgress, [0, 1], [12, 3]);
-  const rotateY = interpolate(enterProgress, [0, 1], [-8, -5]);
-  const scale = interpolate(enterProgress, [0, 1], [0.9, 1]);
+  const y = interpolate(enterProgress, [0, 1], [200, 0]);
+  const scale = interpolate(enterProgress, [0, 1], [0.92, 1]);
 
   return (
-    <AbsoluteFill style={{ background: C.bg, justifyContent: "flex-end", alignItems: "center" }}>
+    <AbsoluteFill
+      style={{
+        background: C.bg,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
       <div
         style={{
-          transform: `perspective(1400px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(${y}px) scale(${scale})`,
-          width: "92%",
-          maxWidth: 960,
+          transform: `translateY(${y}px) scale(${scale})`,
+          width: "88%",
+          maxWidth: 860,
         }}
       >
         <MacWindow title="Devizly — Nouveau devis">
           {/* AI prompt bar */}
-          <div style={{ padding: "20px 24px", borderBottom: "1px solid #E5E5EA" }}>
-            <div style={{ fontSize: 13, color: C.muted, fontFamily: font, marginBottom: 8, fontWeight: 600 }}>
-              Generer avec l'IA
+          <div style={{ padding: "28px 32px", borderBottom: "1px solid #E5E5EA" }}>
+            <div
+              style={{
+                fontSize: 14,
+                color: C.muted,
+                fontFamily: font,
+                marginBottom: 10,
+                fontWeight: 600,
+              }}
+            >
+              Generer avec l&apos;IA
             </div>
             <div
               style={{
                 background: "#F9FAFB",
                 border: "1px solid #E5E7EB",
-                borderRadius: 8,
-                padding: "14px 16px",
-                minHeight: 44,
+                borderRadius: 10,
+                padding: "18px 20px",
+                minHeight: 50,
               }}
             >
               <TypeText
-                text="Renovation salle de bain complete, douche italienne + WC suspendu, carrelage haut de gamme"
-                delay={20}
+                text="Renovation cuisine professionnelle, plan inox 6m, hotte extraction, plomberie complete"
+                delay={15}
                 style={{
-                  fontSize: 16,
+                  fontSize: 18,
                   color: C.dark,
                   fontFamily: "monospace",
-                  lineHeight: 1.5,
+                  lineHeight: 1.6,
                 }}
               />
             </div>
             <div
               style={{
-                marginTop: 12,
+                marginTop: 16,
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 8,
                 background: C.violet,
-                borderRadius: 8,
-                padding: "10px 20px",
-                opacity: interpolate(frame, [80, 95], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
+                borderRadius: 10,
+                padding: "12px 24px",
+                opacity: interpolate(frame, [70, 90], [0, 1], {
+                  extrapolateLeft: "clamp",
+                  extrapolateRight: "clamp",
+                }),
               }}
             >
-              <span style={{ fontSize: 14, fontWeight: 600, color: C.white, fontFamily: font }}>
-                Generer avec l'IA
+              <span
+                style={{
+                  fontSize: 15,
+                  fontWeight: 600,
+                  color: C.white,
+                  fontFamily: font,
+                }}
+              >
+                Generer avec l&apos;IA
               </span>
             </div>
           </div>
-          {/* Devis form preview */}
-          <div style={{ padding: "16px 24px 20px", display: "flex", gap: 24 }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 12, color: C.muted, fontFamily: font, marginBottom: 4 }}>Titre du devis</div>
-              <div style={{ fontSize: 15, color: C.dark, fontFamily: font, fontWeight: 500, padding: "8px 0", borderBottom: "1px solid #E5E7EB" }}>
-                Renovation salle de bain complete
-              </div>
-              <div style={{ fontSize: 12, color: C.muted, fontFamily: font, marginTop: 12, marginBottom: 4 }}>Client</div>
-              <div style={{ fontSize: 15, color: C.dark, fontFamily: font, fontWeight: 500, padding: "8px 0", borderBottom: "1px solid #E5E7EB" }}>
-                Martin Dupont
-              </div>
+          {/* Devis lines appearing */}
+          <div style={{ padding: "20px 32px 28px" }}>
+            <div
+              style={{
+                fontSize: 13,
+                color: C.muted,
+                fontFamily: font,
+                marginBottom: 8,
+                fontWeight: 600,
+              }}
+            >
+              Lignes generees
             </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 12, color: C.muted, fontFamily: font, marginBottom: 4 }}>Lignes du devis</div>
-              {[
-                { desc: "Demolition et evacuation", price: "1 200 EUR" },
-                { desc: "Plomberie complete", price: "3 200 EUR" },
-                { desc: "Carrelage sol et murs", price: "1 530 EUR" },
-              ].map((item, i) => (
-                <div
-                  key={item.desc}
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    padding: "6px 0",
-                    borderBottom: "1px solid #F3F4F6",
-                    fontSize: 13,
-                    fontFamily: font,
-                    opacity: interpolate(frame, [100 + i * 8, 108 + i * 8], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
-                  }}
-                >
-                  <span style={{ color: C.dark }}>{item.desc}</span>
-                  <span style={{ color: C.muted, fontWeight: 600 }}>{item.price}</span>
-                </div>
-              ))}
-            </div>
+            {[
+              { desc: "Plan de travail inox professionnel (6m lineaire)", price: "4 800 EUR" },
+              { desc: "Hotte extraction industrielle", price: "5 200 EUR" },
+              { desc: "Installation gaz + raccordements", price: "3 600 EUR" },
+              { desc: "Revetement sol antiderapant (35m2)", price: "4 200 EUR" },
+            ].map((item, i) => (
+              <div
+                key={item.desc}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  padding: "8px 0",
+                  borderBottom: "1px solid #F3F4F6",
+                  fontSize: 15,
+                  fontFamily: font,
+                  opacity: interpolate(frame, [85 + i * 6, 93 + i * 6], [0, 1], {
+                    extrapolateLeft: "clamp",
+                    extrapolateRight: "clamp",
+                  }),
+                }}
+              >
+                <span style={{ color: C.dark }}>{item.desc}</span>
+                <span style={{ color: C.muted, fontWeight: 600 }}>{item.price}</span>
+              </div>
+            ))}
           </div>
         </MacWindow>
       </div>
@@ -243,7 +266,69 @@ function Scene1() {
   );
 }
 
-/* ── Scene 2: Result mockup (5-8.5s = 150-255 frames) ── */
+/* -- Scene 1: Dashboard (4-6s = 120-180 frames) --------- */
+
+function Scene1() {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+
+  const enterProgress = spring({ frame, fps, config: { damping: 22, mass: 1 } });
+  const y = interpolate(enterProgress, [0, 1], [300, -40]);
+  const rotateX = interpolate(enterProgress, [0, 1], [12, 3]);
+  const rotateY = interpolate(enterProgress, [0, 1], [-6, -4]);
+  const scale = interpolate(enterProgress, [0, 1], [0.9, 1]);
+
+  const subtitleOpacity = interpolate(frame, [15, 30], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  return (
+    <AbsoluteFill style={{ background: C.bg, justifyContent: "center", alignItems: "center" }}>
+      <div
+        style={{
+          position: "absolute",
+          top: 50,
+          left: 0,
+          right: 0,
+          textAlign: "center",
+          zIndex: 2,
+          opacity: subtitleOpacity,
+        }}
+      >
+        <p
+          style={{
+            fontSize: 32,
+            fontWeight: 800,
+            color: C.dark,
+            fontFamily: font,
+            letterSpacing: -1,
+            margin: 0,
+          }}
+        >
+          Votre activite, en un coup d&apos;oeil
+        </p>
+      </div>
+
+      <div
+        style={{
+          transform: `perspective(1400px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(${y}px) scale(${scale})`,
+          width: "92%",
+          maxWidth: 960,
+        }}
+      >
+        <MacWindow title="Devizly — Dashboard">
+          <Img
+            src={staticFile("marketing/final dashboard.png")}
+            style={{ width: "100%", display: "block" }}
+          />
+        </MacWindow>
+      </div>
+    </AbsoluteFill>
+  );
+}
+
+/* -- Scene 2: Devis list (6-8s = 180-240 frames) -------- */
 
 function Scene2() {
   const frame = useCurrentFrame();
@@ -254,8 +339,38 @@ function Scene2() {
   const rotateX = interpolate(enterProgress, [0, 1], [10, 3]);
   const rotateY = interpolate(enterProgress, [0, 1], [6, 4]);
 
+  const subtitleOpacity = interpolate(frame, [15, 30], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
   return (
-    <AbsoluteFill style={{ background: C.bg, justifyContent: "flex-end", alignItems: "center" }}>
+    <AbsoluteFill style={{ background: C.bg, justifyContent: "center", alignItems: "center" }}>
+      <div
+        style={{
+          position: "absolute",
+          top: 50,
+          left: 0,
+          right: 0,
+          textAlign: "center",
+          zIndex: 2,
+          opacity: subtitleOpacity,
+        }}
+      >
+        <p
+          style={{
+            fontSize: 32,
+            fontWeight: 800,
+            color: C.dark,
+            fontFamily: font,
+            letterSpacing: -1,
+            margin: 0,
+          }}
+        >
+          Tous vos devis, organises
+        </p>
+      </div>
+
       <div
         style={{
           transform: `perspective(1400px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(${y}px)`,
@@ -263,9 +378,9 @@ function Scene2() {
           maxWidth: 960,
         }}
       >
-        <MacWindow title="Devizly — Devis #DEV-2026-0001">
+        <MacWindow title="Devizly — Devis">
           <Img
-            src={staticFile("marketing/screenshot-devis.png")}
+            src={staticFile("marketing/devis list.png")}
             style={{ width: "100%", display: "block" }}
           />
         </MacWindow>
@@ -274,9 +389,9 @@ function Scene2() {
   );
 }
 
-/* ── Scene 2b: Shared devis link page (7.5-10s = 225-300 frames) ── */
+/* -- Scene 3: Devis form + payment (8-10s = 240-300) ---- */
 
-function Scene2b() {
+function Scene3() {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
@@ -285,18 +400,48 @@ function Scene2b() {
   const rotateX = interpolate(enterProgress, [0, 1], [10, 3]);
   const rotateY = interpolate(enterProgress, [0, 1], [-6, -4]);
 
+  const subtitleOpacity = interpolate(frame, [15, 30], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
   return (
-    <AbsoluteFill style={{ background: C.bg, justifyContent: "flex-end", alignItems: "center" }}>
+    <AbsoluteFill style={{ background: C.bg, justifyContent: "center", alignItems: "center" }}>
+      <div
+        style={{
+          position: "absolute",
+          top: 40,
+          left: 0,
+          right: 0,
+          textAlign: "center",
+          zIndex: 2,
+          opacity: subtitleOpacity,
+        }}
+      >
+        <p
+          style={{
+            fontSize: 32,
+            fontWeight: 800,
+            color: C.dark,
+            fontFamily: font,
+            letterSpacing: -1,
+            margin: 0,
+          }}
+        >
+          Signature + paiement en ligne
+        </p>
+      </div>
+
       <div
         style={{
           transform: `perspective(1400px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(${y}px)`,
-          width: "80%",
-          maxWidth: 780,
+          width: "68%",
+          maxWidth: 700,
         }}
       >
         <MacWindow title="Devizly — Devis partage">
           <Img
-            src={staticFile("marketing/screenshot-devis-share.png")}
+            src={staticFile("marketing/devis final form .png")}
             style={{ width: "100%", display: "block" }}
           />
         </MacWindow>
@@ -305,9 +450,70 @@ function Scene2b() {
   );
 }
 
-/* ── Scene 3: Bold statement (10-12.5s = 300-375 frames) ── */
+/* -- Scene 4: Client portal (10-11.5s = 300-345) -------- */
 
-function Scene3() {
+function Scene4() {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+
+  const enterProgress = spring({ frame, fps, config: { damping: 20, mass: 0.9 } });
+  const y = interpolate(enterProgress, [0, 1], [250, -20]);
+  const rotateX = interpolate(enterProgress, [0, 1], [10, 3]);
+  const rotateY = interpolate(enterProgress, [0, 1], [5, 3]);
+
+  const subtitleOpacity = interpolate(frame, [15, 30], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  return (
+    <AbsoluteFill style={{ background: C.bg, justifyContent: "center", alignItems: "center" }}>
+      <div
+        style={{
+          position: "absolute",
+          top: 50,
+          left: 0,
+          right: 0,
+          textAlign: "center",
+          zIndex: 2,
+          opacity: subtitleOpacity,
+        }}
+      >
+        <p
+          style={{
+            fontSize: 32,
+            fontWeight: 800,
+            color: C.dark,
+            fontFamily: font,
+            letterSpacing: -1,
+            margin: 0,
+          }}
+        >
+          Portail client self-service
+        </p>
+      </div>
+
+      <div
+        style={{
+          transform: `perspective(1400px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(${y}px)`,
+          width: "92%",
+          maxWidth: 960,
+        }}
+      >
+        <MacWindow title="Devizly — Clients">
+          <Img
+            src={staticFile("marketing/portail client .png")}
+            style={{ width: "100%", display: "block" }}
+          />
+        </MacWindow>
+      </div>
+    </AbsoluteFill>
+  );
+}
+
+/* -- Scene 5: Bold statement (11.5-13s = 345-390) ------- */
+
+function Scene5() {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const textProgress = spring({ frame: frame - 5, fps, config: { damping: 25, mass: 0.7 } });
@@ -347,17 +553,17 @@ function Scene3() {
   );
 }
 
-/* ── Scene 4: CTA (11.5-15s = 345-450 frames) ────── */
+/* -- Scene 6: CTA (13-15s = 390-450 frames) ------------- */
 
-function Scene4() {
+function Scene6() {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
   const logoProgress = spring({ frame, fps, config: { damping: 18, mass: 0.6 } });
   const logoScale = interpolate(logoProgress, [0, 1], [0.5, 1]);
 
-  const textProgress = spring({ frame: frame - 15, fps, config: { damping: 25 } });
-  const ctaProgress = spring({ frame: frame - 35, fps, config: { damping: 20 } });
+  const textProgress = spring({ frame: frame - 12, fps, config: { damping: 25 } });
+  const ctaProgress = spring({ frame: frame - 28, fps, config: { damping: 20 } });
 
   return (
     <AbsoluteFill style={{ background: C.bg, justifyContent: "center", alignItems: "center" }}>
@@ -408,7 +614,7 @@ function Scene4() {
             }}
           >
             <span style={{ fontSize: 26, fontWeight: 700, color: C.white, fontFamily: font }}>
-              devizly.com
+              devizly.fr
             </span>
           </div>
           <p
@@ -427,34 +633,44 @@ function Scene4() {
   );
 }
 
-/* ── Main Composition ─────────────────────────────── */
+/* -- Main Composition ----------------------------------- */
 
 export const DevizlyAd: React.FC = () => {
   return (
     <AbsoluteFill style={{ background: C.bg }}>
-      {/* Scene 1: App mockup with AI typing (0-4.5s) */}
-      <Sequence from={0} durationInFrames={135}>
+      {/* Scene 0: AI typing prompt (0-4s) */}
+      <Sequence from={0} durationInFrames={120}>
+        <SceneTyping />
+      </Sequence>
+
+      {/* Scene 1: Dashboard overview (4-6s) */}
+      <Sequence from={120} durationInFrames={60}>
         <Scene1 />
       </Sequence>
 
-      {/* Scene 2: Filled devis editor (4.5-7s) */}
-      <Sequence from={135} durationInFrames={75}>
+      {/* Scene 2: Devis list (6-8s) */}
+      <Sequence from={180} durationInFrames={60}>
         <Scene2 />
       </Sequence>
 
-      {/* Scene 2b: Shared devis link (7-9.5s) */}
-      <Sequence from={210} durationInFrames={75}>
-        <Scene2b />
-      </Sequence>
-
-      {/* Scene 3: Bold statement (9.5-12s) */}
-      <Sequence from={285} durationInFrames={75}>
+      {/* Scene 3: Devis form + payment (8-10s) */}
+      <Sequence from={240} durationInFrames={60}>
         <Scene3 />
       </Sequence>
 
-      {/* Scene 4: Logo + CTA (12-15s) */}
-      <Sequence from={360} durationInFrames={90}>
+      {/* Scene 4: Client portal (10-11.5s) */}
+      <Sequence from={300} durationInFrames={45}>
         <Scene4 />
+      </Sequence>
+
+      {/* Scene 5: Bold statement (11.5-13s) */}
+      <Sequence from={345} durationInFrames={45}>
+        <Scene5 />
+      </Sequence>
+
+      {/* Scene 6: Logo + CTA (13-15s) */}
+      <Sequence from={390} durationInFrames={60}>
+        <Scene6 />
       </Sequence>
     </AbsoluteFill>
   );

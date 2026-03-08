@@ -401,7 +401,7 @@ function generateLinkedInBanner() {
   drawMetricsPills(ctx, leftX, 270, 16);
 
   // CTA
-  drawCTA(ctx, leftX, 320, "devizly.com", 14);
+  drawCTA(ctx, leftX, 320, "devizly.fr", 14);
 
   // Right side: Dashboard mockup
   drawDashboardMockup(ctx, W - 620, 30, 540, 340);
@@ -449,7 +449,7 @@ function generateTwitterHeader() {
   drawMetricsPills(ctx, leftX, 310, 18);
 
   // CTA
-  drawCTA(ctx, leftX, 380, "devizly.com", 16);
+  drawCTA(ctx, leftX, 380, "devizly.fr", 16);
 
   // Right: Phone mockup
   drawPhoneMockup(ctx, W - 280, 50, 180, 400);
@@ -561,7 +561,7 @@ function generateWebsiteHero() {
   ctx.font = "14px sans-serif";
   ctx.textAlign = "center";
   ctx.textBaseline = "bottom";
-  ctx.fillText("devizly.com", W / 2, H - 30);
+  ctx.fillText("devizly.fr", W / 2, H - 30);
 
   saveCanvas(canvas, "website-hero.png");
 }

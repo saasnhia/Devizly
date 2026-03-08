@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { getSiteUrl } from "@/lib/url";
 
 export async function GET() {
   const supabase = await createClient();
@@ -7,7 +8,7 @@ export async function GET() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const appUrl = getSiteUrl();
 
   if (!user) {
     console.error("[Stripe Connect] No authenticated user");

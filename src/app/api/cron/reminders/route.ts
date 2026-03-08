@@ -3,6 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 import { resend } from "@/lib/resend";
 import { REMINDER_TEMPLATES } from "@/lib/emails/reminder";
 import { formatCurrency } from "@/lib/utils/quote";
+import { getSiteUrl } from "@/lib/url";
 
 /**
  * Cron endpoint: auto-send reminders for "envoyé" quotes at J+3, J+7, J+14.
@@ -29,7 +30,7 @@ export async function GET(request: Request) {
   }
 
   const supabase = createServiceClient();
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const appUrl = getSiteUrl();
   const now = new Date();
   let totalSent = 0;
   const errors: string[] = [];

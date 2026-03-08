@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { getStripe } from "@/lib/stripe";
+import { getSiteUrl } from "@/lib/url";
 import type Stripe from "stripe";
 
 function createServiceClient() {
@@ -46,7 +47,7 @@ export async function POST(
   }
 
   const stripe = getStripe();
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const appUrl = getSiteUrl();
 
   // Build line items from quote
   const items = (quote.quote_items || []).sort(

@@ -29,6 +29,27 @@ export async function getPublicForm(slug: string): Promise<LeadForm | null> {
   return data as LeadForm;
 }
 
+// Simple in-memory rate limiter (per form, 5 submissions per minute)
+const submitTimestamps = new Map<string, number[]>();
+
+function isRateLimited(formId: string): boolean {
+  const now = Date.now();
+  const windowMs = 60_000;
+  const maxRequests = 5;
+  const timestamps = submitTimestamps.get(formId) || [];
+  const recent = timestamps.filter((t) => now - t < windowMs);
+  if (recent.length >= maxRequests) return true;
+  recent.push(now);
+  submitTimestamps.set(formId, recent);
+  return false;
+}
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function sanitize(str: string, maxLen: number): string {
+  return str.trim().slice(0, maxLen);
+}
+
 export async function submitLead(
   formId: string,
   data: {
@@ -42,6 +63,22 @@ export async function submitLead(
     deadline?: string;
   }
 ) {
+  // Rate limit
+  if (isRateLimited(formId)) {
+    return { error: "Trop de soumissions. Réessayez dans une minute." };
+  }
+
+  // Server-side validation
+  const name = sanitize(data.name || "", 200);
+  const email = sanitize(data.email || "", 254).toLowerCase();
+
+  if (!name) {
+    return { error: "Le nom est requis" };
+  }
+  if (!email || !EMAIL_REGEX.test(email)) {
+    return { error: "Adresse email invalide" };
+  }
+
   const supabase = createServiceClient();
 
   // Get form to find user_id and settings
@@ -55,18 +92,26 @@ export async function submitLead(
     return { error: "Formulaire introuvable" };
   }
 
+  // Sanitize optional fields
+  const phone = data.phone ? sanitize(data.phone, 30) : null;
+  const company = data.company ? sanitize(data.company, 200) : null;
+  const projectType = data.project_type ? sanitize(data.project_type, 200) : null;
+  const budgetRange = data.budget_range ? sanitize(data.budget_range, 100) : null;
+  const message = data.message ? sanitize(data.message, 5000) : null;
+  const deadline = data.deadline || null;
+
   // Insert lead
   const { error: insertError } = await supabase.from("leads").insert({
     user_id: form.user_id,
     form_id: formId,
-    name: data.name.trim(),
-    email: data.email.trim().toLowerCase(),
-    phone: data.phone?.trim() || null,
-    company: data.company?.trim() || null,
-    project_type: data.project_type?.trim() || null,
-    budget_range: data.budget_range?.trim() || null,
-    message: data.message?.trim() || null,
-    deadline: data.deadline || null,
+    name,
+    email,
+    phone,
+    company,
+    project_type: projectType,
+    budget_range: budgetRange,
+    message,
+    deadline,
     pipeline_stage: form.auto_pipeline_stage || "nouveau",
     source: "form",
   });
@@ -92,10 +137,10 @@ export async function submitLead(
 
       const { subject, html } = leadFormEmail({
         freelancerName,
-        prospectName: data.name.trim(),
-        prospectEmail: data.email.trim(),
-        prospectPhone: data.phone?.trim(),
-        message: data.message?.trim(),
+        prospectName: name,
+        prospectEmail: email,
+        prospectPhone: phone || undefined,
+        message: message || undefined,
         dashboardUrl: `${appUrl}/dashboard/leads`,
       });
 

@@ -69,8 +69,8 @@ export async function convertLeadToClient(leadId: string) {
 
   if (clientError || !client) throw new Error("Erreur création client");
 
-  // Update lead
-  await supabase
+  // Update lead status
+  const { error: updateError } = await supabase
     .from("leads")
     .update({
       status: "converted" as LeadStatus,
@@ -78,6 +78,10 @@ export async function convertLeadToClient(leadId: string) {
       updated_at: new Date().toISOString(),
     })
     .eq("id", leadId);
+
+  if (updateError) {
+    console.error("[Leads] Update error after conversion:", updateError);
+  }
 
   return client;
 }

@@ -2,6 +2,14 @@
  * Notification email sent to the freelancer when a prospect submits the lead form.
  */
 
+function esc(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 interface LeadFormEmailParams {
   freelancerName: string;
   prospectName: string;
@@ -13,7 +21,7 @@ interface LeadFormEmailParams {
 
 export function leadFormEmail(p: LeadFormEmailParams): { subject: string; html: string } {
   return {
-    subject: `Nouvelle demande de devis de ${p.prospectName}`,
+    subject: `Nouvelle demande de devis de ${esc(p.prospectName)}`,
     html: `
 <!DOCTYPE html>
 <html lang="fr">
@@ -44,21 +52,21 @@ export function leadFormEmail(p: LeadFormEmailParams): { subject: string; html: 
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td style="font-size:14px;color:#64748B;padding-bottom:8px;">Nom</td>
-                  <td style="font-size:14px;color:#0F172A;font-weight:600;text-align:right;padding-bottom:8px;">${p.prospectName}</td>
+                  <td style="font-size:14px;color:#0F172A;font-weight:600;text-align:right;padding-bottom:8px;">${esc(p.prospectName)}</td>
                 </tr>
                 <tr>
                   <td style="font-size:14px;color:#64748B;padding-bottom:8px;">Email</td>
-                  <td style="font-size:14px;color:#0F172A;font-weight:500;text-align:right;padding-bottom:8px;">${p.prospectEmail}</td>
+                  <td style="font-size:14px;color:#0F172A;font-weight:500;text-align:right;padding-bottom:8px;">${esc(p.prospectEmail)}</td>
                 </tr>
                 ${p.prospectPhone ? `<tr>
                   <td style="font-size:14px;color:#64748B;padding-bottom:8px;">Téléphone</td>
-                  <td style="font-size:14px;color:#0F172A;font-weight:500;text-align:right;padding-bottom:8px;">${p.prospectPhone}</td>
+                  <td style="font-size:14px;color:#0F172A;font-weight:500;text-align:right;padding-bottom:8px;">${esc(p.prospectPhone)}</td>
                 </tr>` : ""}
                 ${p.message ? `<tr>
                   <td colspan="2" style="font-size:14px;color:#64748B;border-top:1px solid #E2E8F0;padding-top:12px;">Message</td>
                 </tr>
                 <tr>
-                  <td colspan="2" style="font-size:14px;color:#0F172A;padding-top:4px;line-height:1.5;">${p.message}</td>
+                  <td colspan="2" style="font-size:14px;color:#0F172A;padding-top:4px;line-height:1.5;">${esc(p.message)}</td>
                 </tr>` : ""}
               </table>
             </td>

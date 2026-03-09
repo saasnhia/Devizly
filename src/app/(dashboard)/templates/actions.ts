@@ -20,12 +20,15 @@ export interface UpdateTemplateInput extends Partial<CreateTemplateInput> {
 async function getUserId() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("Non authentifié");
-  return { supabase, userId: user.id };
+  if (!user) return { supabase: null, userId: null, error: "Non authentifié" } as const;
+  return { supabase, userId: user.id, error: null } as const;
 }
 
 export async function createTemplate(data: CreateTemplateInput) {
-  const { supabase, userId } = await getUserId();
+  const auth = await getUserId();
+  if (auth.error) throw new Error(auth.error);
+  const { supabase, userId } = auth;
+
   const { data: template, error } = await supabase
     .from("quote_templates")
     .insert({
@@ -46,7 +49,9 @@ export async function createTemplate(data: CreateTemplateInput) {
 }
 
 export async function updateTemplate(id: string, data: UpdateTemplateInput) {
-  const { supabase } = await getUserId();
+  const auth = await getUserId();
+  if (auth.error) throw new Error(auth.error);
+  const { supabase } = auth;
 
   const update: Record<string, unknown> = { updated_at: new Date().toISOString() };
   if (data.name !== undefined) update.name = data.name;
@@ -70,13 +75,18 @@ export async function updateTemplate(id: string, data: UpdateTemplateInput) {
 }
 
 export async function deleteTemplate(id: string) {
-  const { supabase } = await getUserId();
-  const { error } = await supabase.from("quote_templates").delete().eq("id", id);
+  const auth = await getUserId();
+  if (auth.error) throw new Error(auth.error);
+
+  const { error } = await auth.supabase.from("quote_templates").delete().eq("id", id);
   if (error) throw new Error(error.message);
 }
 
 export async function duplicateTemplate(id: string) {
-  const { supabase, userId } = await getUserId();
+  const auth = await getUserId();
+  if (auth.error) throw new Error(auth.error);
+  const { supabase, userId } = auth;
+
   const { data: original, error: fetchError } = await supabase
     .from("quote_templates")
     .select("*")
@@ -105,7 +115,9 @@ export async function duplicateTemplate(id: string) {
 }
 
 export async function useTemplate(id: string) {
-  const { supabase } = await getUserId();
+  const auth = await getUserId();
+  if (auth.error) throw new Error(auth.error);
+  const { supabase } = auth;
 
   const { data: template, error } = await supabase
     .from("quote_templates")
@@ -115,17 +127,20 @@ export async function useTemplate(id: string) {
 
   if (error || !template) throw new Error("Template introuvable");
 
-  // Increment times_used
-  await supabase
+  // Increment times_used (fire-and-forget, non-critical)
+  supabase
     .from("quote_templates")
     .update({ times_used: (template.times_used || 0) + 1 })
-    .eq("id", id);
+    .eq("id", id)
+    .then(() => {});
 
   return template as QuoteTemplate;
 }
 
 export async function getUserTemplates(category?: string) {
-  const { supabase } = await getUserId();
+  const auth = await getUserId();
+  if (auth.error) throw new Error(auth.error);
+  const { supabase } = auth;
 
   let query = supabase
     .from("quote_templates")
@@ -143,9 +158,10 @@ export async function getUserTemplates(category?: string) {
 }
 
 export async function createTemplateFromQuote(quoteId: string, name: string, category: string) {
-  const { supabase, userId } = await getUserId();
+  const auth = await getUserId();
+  if (auth.error) throw new Error(auth.error);
+  const { supabase, userId } = auth;
 
-  // Fetch quote + items
   const { data: quote, error: quoteError } = await supabase
     .from("quotes")
     .select("*, quote_items(*)")

@@ -9,7 +9,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Check, Copy } from "lucide-react";
-import { getSiteUrl } from "@/lib/url";
 
 interface EmbedModalProps {
   open: boolean;

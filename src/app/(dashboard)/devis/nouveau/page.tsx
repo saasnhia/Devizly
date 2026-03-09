@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -108,9 +108,11 @@ export default function NouveauDevisPage() {
     loadQuote();
   }, [editId]);
 
-  // Load template if ?template=ID
+  // Load template if ?template=ID (run once)
+  const templateLoaded = useRef(false);
   useEffect(() => {
-    if (!templateId) return;
+    if (!templateId || templateLoaded.current) return;
+    templateLoaded.current = true;
     async function loadTemplate() {
       try {
         const tpl = await useTemplate(templateId!);

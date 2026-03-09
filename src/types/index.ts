@@ -59,6 +59,12 @@ export interface Quote {
   stripe_checkout_session: string | null;
   stripe_payment_intent: string | null;
   paid_at: string | null;
+  is_recurring: boolean;
+  recurring_frequency: RecurringFrequency | null;
+  recurring_start_date: string | null;
+  recurring_end_date: string | null;
+  recurring_next_date: string | null;
+  recurring_invoice_count: number;
   created_at: string;
   updated_at: string;
 }
@@ -89,6 +95,30 @@ export interface StripeSubscription {
   status: 'active' | 'canceled' | 'past_due' | 'trialing';
   plan: 'starter' | 'pro';
   current_period_end: string;
+}
+
+export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'overdue';
+export type RecurringFrequency = 'monthly' | 'quarterly' | 'yearly';
+
+export interface Invoice {
+  id: string;
+  user_id: string;
+  quote_id: string | null;
+  client_id: string | null;
+  invoice_number: string;
+  amount: number;
+  currency: string;
+  status: InvoiceStatus;
+  due_date: string | null;
+  paid_at: string | null;
+  stripe_checkout_url: string | null;
+  stripe_payment_intent_id: string | null;
+  pdf_url: string | null;
+  created_at: string;
+}
+
+export interface InvoiceWithClient extends Invoice {
+  clients: Client | null;
 }
 
 export interface QuoteItemDraft {

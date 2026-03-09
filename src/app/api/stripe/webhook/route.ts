@@ -44,6 +44,22 @@ export async function POST(request: Request) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
 
+      // Invoice payment
+      if (session.metadata?.invoice_payment === "true") {
+        const invoiceNumber = session.metadata.invoice_number;
+        if (invoiceNumber) {
+          await supabase
+            .from("invoices")
+            .update({
+              status: "paid",
+              paid_at: new Date().toISOString(),
+              stripe_payment_intent_id: (session.payment_intent as string) || null,
+            })
+            .eq("invoice_number", invoiceNumber);
+        }
+        break;
+      }
+
       // Connect payment for a quote
       if (session.metadata?.devizly_payment === "true") {
         const quoteId = session.metadata.quote_id;

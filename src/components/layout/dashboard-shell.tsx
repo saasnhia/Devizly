@@ -14,6 +14,7 @@ import {
   Settings,
   CreditCard,
   Brain,
+  Kanban,
   LogOut,
   Menu,
   X,
@@ -23,6 +24,7 @@ import type { User } from "@supabase/supabase-js";
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/dashboard/briefing", label: "Briefing IA", icon: Brain },
+  { href: "/dashboard/pipeline", label: "Pipeline", icon: Kanban },
   { href: "/devis", label: "Devis", icon: FileText },
   { href: "/clients", label: "Clients", icon: Users },
   { href: "/pricing", label: "Tarifs", icon: CreditCard },

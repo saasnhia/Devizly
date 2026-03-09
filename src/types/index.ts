@@ -1,4 +1,16 @@
-export type QuoteStatus = 'brouillon' | 'envoyé' | 'signé' | 'accepté' | 'refusé' | 'payé';
+export type QuoteStatus = 'prospect' | 'brouillon' | 'envoyé' | 'signé' | 'accepté' | 'refusé' | 'payé';
+
+export interface Prospect {
+  id: string;
+  user_id: string;
+  name: string;
+  email: string | null;
+  company: string | null;
+  notes: string | null;
+  estimated_amount: number;
+  created_at: string;
+  converted_quote_id: string | null;
+}
 
 export interface Client {
   id: string;

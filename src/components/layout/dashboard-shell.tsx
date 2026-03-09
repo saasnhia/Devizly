@@ -13,6 +13,7 @@ import {
   Users,
   Settings,
   CreditCard,
+  Brain,
   LogOut,
   Menu,
   X,
@@ -21,6 +22,7 @@ import type { User } from "@supabase/supabase-js";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/dashboard/briefing", label: "Briefing IA", icon: Brain },
   { href: "/devis", label: "Devis", icon: FileText },
   { href: "/clients", label: "Clients", icon: Users },
   { href: "/pricing", label: "Tarifs", icon: CreditCard },

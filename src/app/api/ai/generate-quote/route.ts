@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { openai } from "@/lib/openai";
+import { getMistral } from "@/lib/mistral";
+import { checkRateLimit } from "@/lib/ratelimit";
 
 export async function POST(request: Request) {
+  // Rate limit check
+  const rateLimitResponse = await checkRateLimit(request);
+  if (rateLimitResponse) return rateLimitResponse;
+
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -17,8 +22,9 @@ export async function POST(request: Request) {
   }
 
   try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+    const mistral = getMistral();
+    const completion = await mistral.chat.complete({
+      model: "mistral-medium-latest",
       messages: [
         {
           role: "system",
@@ -33,11 +39,11 @@ Les prix doivent être en euros HT, réalistes pour le marché français.`,
         },
       ],
       temperature: 0.7,
-      max_tokens: 1000,
+      maxTokens: 1000,
     });
 
-    const content = completion.choices[0]?.message?.content;
-    if (!content) {
+    const content = completion.choices?.[0]?.message?.content;
+    if (!content || typeof content !== "string") {
       return NextResponse.json({ error: "Réponse vide de l'IA" }, { status: 500 });
     }
 

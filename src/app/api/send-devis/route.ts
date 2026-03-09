@@ -3,10 +3,15 @@ import { createClient } from "@/lib/supabase/server";
 import { resend } from "@/lib/resend";
 import { devisEmail } from "@/lib/emails/devis";
 import { getSiteUrl } from "@/lib/url";
+import { checkRateLimit } from "@/lib/ratelimit";
 
 const FROM_EMAIL = "Devizly <noreply@devizly.fr>";
 
 export async function POST(request: Request) {
+  // Rate limit check
+  const rateLimitResponse = await checkRateLimit(request);
+  if (rateLimitResponse) return rateLimitResponse;
+
   // Auth check
   const supabase = await createClient();
   const {

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { getStripe } from "@/lib/stripe";
 import { getSiteUrl } from "@/lib/url";
+import { checkRateLimit } from "@/lib/ratelimit";
 import type Stripe from "stripe";
 
 function createServiceClient() {
@@ -16,6 +17,10 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Rate limit check
+  const rateLimitResponse = await checkRateLimit(request);
+  if (rateLimitResponse) return rateLimitResponse;
+
   const { id } = await params;
   const body = await request.json();
   const { share_token } = body;

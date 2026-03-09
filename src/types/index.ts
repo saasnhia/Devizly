@@ -179,13 +179,24 @@ export interface LeadFormFields {
   deadline: boolean;
 }
 
+export interface CustomField {
+  name: string;
+  label: string;
+  type: 'text' | 'textarea' | 'number' | 'url' | 'select' | 'date';
+  options?: string[];
+  required?: boolean;
+}
+
 export interface LeadForm {
   id: string;
-  user_id: string;
+  user_id: string | null;
   name: string;
   slug: string;
   is_active: boolean;
+  is_system: boolean;
   fields: LeadFormFields;
+  custom_fields: CustomField[] | null;
+  suggested_template_id: string | null;
   title: string;
   subtitle: string;
   button_text: string;
@@ -202,7 +213,7 @@ export type LeadStatus = 'new' | 'contacted' | 'qualified' | 'converted' | 'lost
 
 export interface Lead {
   id: string;
-  user_id: string;
+  user_id: string | null;
   form_id: string | null;
   name: string;
   email: string;
@@ -212,6 +223,7 @@ export interface Lead {
   budget_range: string | null;
   message: string | null;
   deadline: string | null;
+  responses: Record<string, string | number> | null;
   source: string;
   ip_address: string | null;
   user_agent: string | null;

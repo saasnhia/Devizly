@@ -61,6 +61,7 @@ export async function submitLead(
     budget_range?: string;
     message?: string;
     deadline?: string;
+    responses?: Record<string, string>;
   }
 ) {
   // Rate limit
@@ -100,9 +101,21 @@ export async function submitLead(
   const message = data.message ? sanitize(data.message, 5000) : null;
   const deadline = data.deadline || null;
 
-  // Insert lead
-  const { error: insertError } = await supabase.from("leads").insert({
-    user_id: form.user_id,
+  // Sanitize custom field responses
+  let responses: Record<string, string> | null = null;
+  if (data.responses && Object.keys(data.responses).length > 0) {
+    responses = {};
+    for (const [key, val] of Object.entries(data.responses)) {
+      const sKey = sanitize(key, 100);
+      const sVal = sanitize(String(val), 2000);
+      if (sKey && sVal) {
+        responses[sKey] = sVal;
+      }
+    }
+  }
+
+  // Build insert data (user_id can be null for system forms)
+  const insertData: Record<string, unknown> = {
     form_id: formId,
     name,
     email,
@@ -114,16 +127,26 @@ export async function submitLead(
     deadline,
     pipeline_stage: form.auto_pipeline_stage || "nouveau",
     source: "form",
-  });
+  };
+
+  if (form.user_id) {
+    insertData.user_id = form.user_id;
+  }
+
+  if (responses) {
+    insertData.responses = responses;
+  }
+
+  const { error: insertError } = await supabase.from("leads").insert(insertData);
 
   if (insertError) {
     console.error("[Lead form] Insert error:", insertError);
     return { error: "Erreur lors de l'enregistrement" };
   }
 
-  // Send notification email (fire-and-forget)
+  // Send notification email (fire-and-forget, only for user-owned forms)
   const notifEmail = form.notification_email;
-  if (notifEmail) {
+  if (notifEmail && form.user_id) {
     try {
       const { data: profile } = await supabase
         .from("profiles")

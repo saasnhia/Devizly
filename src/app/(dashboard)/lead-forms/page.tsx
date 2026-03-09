@@ -29,6 +29,7 @@ import {
   createLeadForm,
   updateLeadForm,
   deleteLeadForm,
+  duplicateSystemForm,
 } from "./actions";
 import { toast } from "sonner";
 
@@ -111,6 +112,16 @@ export default function LeadFormsPage() {
     }
   }
 
+  async function handleDuplicateSystem(formId: string) {
+    try {
+      await duplicateSystemForm(formId);
+      toast.success("Formulaire copié dans vos formulaires");
+      fetchForms();
+    } catch {
+      toast.error("Erreur lors de la copie");
+    }
+  }
+
   function handleCopyUrl(slug: string) {
     const url = `${window.location.origin}/f/${slug}`;
     navigator.clipboard.writeText(url);
@@ -137,7 +148,8 @@ export default function LeadFormsPage() {
         <div className="py-12 text-center text-muted-foreground">
           Chargement...
         </div>
-      ) : forms.length === 0 ? (
+      ) : forms.filter((f) => !f.is_system).length === 0 &&
+        forms.filter((f) => f.is_system).length === 0 ? (
         <div className="py-16 text-center text-muted-foreground">
           <FileInput className="mx-auto mb-4 h-16 w-16 opacity-30" />
           <p className="text-lg font-medium">Aucun formulaire</p>
@@ -149,99 +161,196 @@ export default function LeadFormsPage() {
           </Button>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {forms.map((form) => (
-            <Card key={form.id}>
-              <CardContent className="p-5">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold truncate">{form.name}</h3>
-                      <Badge
-                        variant={form.is_active ? "default" : "secondary"}
-                        className="shrink-0 cursor-pointer"
-                        onClick={() => handleToggleActive(form)}
-                      >
-                        {form.is_active ? "Actif" : "Inactif"}
-                      </Badge>
-                    </div>
-                  </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="shrink-0">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        onClick={() => handleCopyUrl(form.slug)}
-                      >
-                        <Link2 className="mr-2 h-4 w-4" />
-                        Copier le lien
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => setEmbedSlug(form.slug)}
-                      >
-                        <Code className="mr-2 h-4 w-4" />
-                        Code embed
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleEdit(form)}>
-                        <Pencil className="mr-2 h-4 w-4" />
-                        Modifier
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleDelete(form.id)}
-                        className="text-red-600"
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Supprimer
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
+        <div className="space-y-8">
+          {/* User's own forms */}
+          {forms.filter((f) => !f.is_system).length > 0 && (
+            <div>
+              <h2 className="mb-4 text-lg font-semibold">Mes formulaires</h2>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {forms
+                  .filter((f) => !f.is_system)
+                  .map((form) => (
+                    <Card key={form.id}>
+                      <CardContent className="p-5">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-semibold truncate">
+                                {form.name}
+                              </h3>
+                              <Badge
+                                variant={
+                                  form.is_active ? "default" : "secondary"
+                                }
+                                className="shrink-0 cursor-pointer"
+                                onClick={() => handleToggleActive(form)}
+                              >
+                                {form.is_active ? "Actif" : "Inactif"}
+                              </Badge>
+                              {form.suggested_template_id && (
+                                <Badge
+                                  variant="outline"
+                                  className="shrink-0 text-xs text-emerald-600 border-emerald-200"
+                                >
+                                  Template lié
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="shrink-0"
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() => handleCopyUrl(form.slug)}
+                              >
+                                <Link2 className="mr-2 h-4 w-4" />
+                                Copier le lien
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => setEmbedSlug(form.slug)}
+                              >
+                                <Code className="mr-2 h-4 w-4" />
+                                Code embed
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleEdit(form)}
+                              >
+                                <Pencil className="mr-2 h-4 w-4" />
+                                Modifier
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleDelete(form.id)}
+                                className="text-red-600"
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Supprimer
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
 
-                {/* Public URL */}
-                <div className="mt-3 flex items-center gap-2">
-                  <code className="flex-1 truncate rounded bg-slate-100 px-2 py-1 text-xs text-muted-foreground">
-                    /f/{form.slug}
-                  </code>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="shrink-0 h-7 w-7"
-                    onClick={() => handleCopyUrl(form.slug)}
-                  >
-                    {copiedSlug === form.slug ? (
-                      <Check className="h-3 w-3 text-green-600" />
-                    ) : (
-                      <Copy className="h-3 w-3" />
-                    )}
-                  </Button>
-                </div>
+                        {/* Public URL */}
+                        <div className="mt-3 flex items-center gap-2">
+                          <code className="flex-1 truncate rounded bg-slate-100 px-2 py-1 text-xs text-muted-foreground">
+                            /f/{form.slug}
+                          </code>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="shrink-0 h-7 w-7"
+                            onClick={() => handleCopyUrl(form.slug)}
+                          >
+                            {copiedSlug === form.slug ? (
+                              <Check className="h-3 w-3 text-green-600" />
+                            ) : (
+                              <Copy className="h-3 w-3" />
+                            )}
+                          </Button>
+                        </div>
 
-                <div className="mt-3 flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1"
-                    onClick={() => setEmbedSlug(form.slug)}
-                  >
-                    <Code className="mr-2 h-4 w-4" />
-                    Code embed
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1"
-                    onClick={() => handleEdit(form)}
-                  >
-                    <Pencil className="mr-2 h-4 w-4" />
-                    Modifier
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                        <div className="mt-3 flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => setEmbedSlug(form.slug)}
+                          >
+                            <Code className="mr-2 h-4 w-4" />
+                            Code embed
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => handleEdit(form)}
+                          >
+                            <Pencil className="mr-2 h-4 w-4" />
+                            Modifier
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+              </div>
+            </div>
+          )}
+
+          {/* System forms (Devizly) */}
+          {forms.filter((f) => f.is_system).length > 0 && (
+            <div>
+              <h2 className="mb-2 text-lg font-semibold">
+                Formulaires Devizly
+              </h2>
+              <p className="mb-4 text-sm text-muted-foreground">
+                Formulaires prêts à l&apos;emploi avec champs personnalisés par
+                secteur. Copiez-les pour les utiliser avec vos leads.
+              </p>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {forms
+                  .filter((f) => f.is_system)
+                  .map((form) => (
+                    <Card
+                      key={form.id}
+                      className="border-dashed border-primary/30"
+                    >
+                      <CardContent className="p-5">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-semibold truncate">
+                                {form.name}
+                              </h3>
+                              <Badge
+                                variant="outline"
+                                className="shrink-0 text-xs text-primary border-primary/30"
+                              >
+                                Devizly
+                              </Badge>
+                            </div>
+                            <p className="mt-1 text-sm text-muted-foreground line-clamp-1">
+                              {form.subtitle}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="mt-4 flex gap-2">
+                          <Button
+                            variant="default"
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => handleDuplicateSystem(form.id)}
+                          >
+                            <Copy className="mr-2 h-4 w-4" />
+                            Utiliser
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1"
+                            onClick={() =>
+                              window.open(
+                                `/f/${form.slug}`,
+                                "_blank"
+                              )
+                            }
+                          >
+                            Aperçu
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 

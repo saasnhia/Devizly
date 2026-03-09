@@ -126,11 +126,13 @@ export default function LeadsPage() {
     }
   }
 
-  async function handleCreateQuote(lead: LeadWithForm) {
-    // Navigate to quote creation with pre-filled client info
-    router.push(
-      `/devis/nouveau?lead_name=${encodeURIComponent(lead.name)}&lead_email=${encodeURIComponent(lead.email)}`
-    );
+  async function handleCreateQuote(lead: LeadWithForm, templateId?: string) {
+    // Navigate to quote creation with pre-filled client info (and template if available)
+    let url = `/devis/nouveau?lead_name=${encodeURIComponent(lead.name)}&lead_email=${encodeURIComponent(lead.email)}`;
+    if (templateId) {
+      url += `&template=${templateId}`;
+    }
+    router.push(url);
   }
 
   async function handleDelete(id: string) {
@@ -222,7 +224,7 @@ export default function LeadsPage() {
 
                     {/* Content */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-medium">{lead.name}</span>
                         <Badge
                           variant="secondary"
@@ -230,6 +232,20 @@ export default function LeadsPage() {
                         >
                           {statusConf.label}
                         </Badge>
+                        {lead.lead_forms?.suggested_template_id && (
+                          <Badge
+                            variant="outline"
+                            className="text-xs text-emerald-600 border-emerald-200 cursor-pointer hover:bg-emerald-50"
+                            onClick={() =>
+                              handleCreateQuote(
+                                lead,
+                                lead.lead_forms!.suggested_template_id!
+                              )
+                            }
+                          >
+                            Template suggéré
+                          </Badge>
+                        )}
                       </div>
 
                       <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
@@ -256,6 +272,30 @@ export default function LeadsPage() {
                           {lead.message}
                         </p>
                       )}
+
+                      {/* Custom field responses */}
+                      {lead.responses &&
+                        Object.keys(lead.responses).length > 0 && (
+                          <div className="mt-1.5 flex flex-wrap gap-1.5">
+                            {Object.entries(lead.responses)
+                              .slice(0, 4)
+                              .map(([key, val]) => (
+                                <span
+                                  key={key}
+                                  className="inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-xs text-muted-foreground"
+                                  title={`${key}: ${val}`}
+                                >
+                                  {String(val).slice(0, 30)}
+                                  {String(val).length > 30 ? "…" : ""}
+                                </span>
+                              ))}
+                            {Object.keys(lead.responses).length > 4 && (
+                              <span className="text-xs text-muted-foreground">
+                                +{Object.keys(lead.responses).length - 4}
+                              </span>
+                            )}
+                          </div>
+                        )}
 
                       <div className="mt-1.5 flex items-center gap-3 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
@@ -291,10 +331,20 @@ export default function LeadsPage() {
                           </DropdownMenuItem>
                         )}
                         <DropdownMenuItem
-                          onClick={() => handleCreateQuote(lead)}
+                          onClick={() =>
+                            handleCreateQuote(
+                              lead,
+                              lead.lead_forms?.suggested_template_id || undefined
+                            )
+                          }
                         >
                           <FileText className="mr-2 h-4 w-4" />
                           Créer devis
+                          {lead.lead_forms?.suggested_template_id && (
+                            <span className="ml-1 text-xs text-emerald-600">
+                              (template)
+                            </span>
+                          )}
                         </DropdownMenuItem>
                         <DropdownMenuSub>
                           <DropdownMenuSubTrigger>

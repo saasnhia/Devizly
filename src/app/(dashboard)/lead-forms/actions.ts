@@ -15,14 +15,54 @@ async function getUserId() {
 }
 
 export async function getUserForms() {
-  const { supabase } = await getUserId();
+  const { supabase, userId } = await getUserId();
   const { data, error } = await supabase
     .from("lead_forms")
     .select("*")
+    .or(`user_id.eq.${userId},is_system.eq.true`)
     .order("created_at", { ascending: false });
 
   if (error) throw new Error(error.message);
   return (data || []) as LeadForm[];
+}
+
+export async function duplicateSystemForm(systemFormId: string) {
+  const { supabase, userId } = await getUserId();
+
+  // Fetch the system form
+  const { data: systemForm, error: fetchError } = await supabase
+    .from("lead_forms")
+    .select("*")
+    .eq("id", systemFormId)
+    .eq("is_system", true)
+    .single();
+
+  if (fetchError || !systemForm) throw new Error("Formulaire système introuvable");
+
+  const slug = generateSlug();
+
+  const { data: newForm, error } = await supabase
+    .from("lead_forms")
+    .insert({
+      user_id: userId,
+      name: systemForm.name,
+      slug,
+      is_active: true,
+      is_system: false,
+      title: systemForm.title,
+      subtitle: systemForm.subtitle,
+      button_text: systemForm.button_text,
+      accent_color: systemForm.accent_color,
+      fields: systemForm.fields,
+      custom_fields: systemForm.custom_fields,
+      suggested_template_id: systemForm.suggested_template_id,
+      auto_pipeline_stage: systemForm.auto_pipeline_stage || "nouveau",
+    })
+    .select()
+    .single();
+
+  if (error) throw new Error(error.message);
+  return newForm as LeadForm;
 }
 
 export async function createLeadForm(data: {

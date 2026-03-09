@@ -33,6 +33,7 @@ import {
   Share2,
   Eye,
   EyeOff,
+  Save,
 } from "lucide-react";
 import {
   formatCurrency,
@@ -43,6 +44,7 @@ import {
 import type { QuoteWithClient, QuoteStatus } from "@/types";
 import { ShareModal } from "@/components/quotes/ShareModal";
 import { RelanceModal } from "@/components/quotes/relance-modal";
+import { SaveTemplateModal } from "@/components/templates/save-template-modal";
 import { toast } from "sonner";
 
 const statusTabs: { label: string; value: QuoteStatus | "all" }[] = [
@@ -58,6 +60,7 @@ export default function DevisPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<QuoteStatus | "all">("all");
   const [loading, setLoading] = useState(true);
+  const [templateModalQuote, setTemplateModalQuote] = useState<QuoteWithClient | null>(null);
 
   const fetchQuotes = useCallback(async () => {
     const supabase = createClient();
@@ -295,6 +298,12 @@ export default function DevisPage() {
                             <Copy className="mr-2 h-4 w-4" />
                             Dupliquer
                           </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => setTemplateModalQuote(quote)}
+                          >
+                            <Save className="mr-2 h-4 w-4" />
+                            Sauvegarder comme template
+                          </DropdownMenuItem>
                           {quote.status === "brouillon" && (
                             <DropdownMenuItem
                               onClick={() =>
@@ -331,6 +340,17 @@ export default function DevisPage() {
           )}
         </CardContent>
       </Card>
+
+      {templateModalQuote && (
+        <SaveTemplateModal
+          open={!!templateModalQuote}
+          onOpenChange={(open) => {
+            if (!open) setTemplateModalQuote(null);
+          }}
+          quoteId={templateModalQuote.id}
+          quoteTitle={templateModalQuote.title}
+        />
+      )}
     </div>
   );
 }

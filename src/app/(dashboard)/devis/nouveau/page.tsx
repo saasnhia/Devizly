@@ -28,6 +28,8 @@ import {
 import { calculateItemTotal, calculateTotals, formatCurrency } from "@/lib/utils/quote";
 import { CURRENCIES } from "@/lib/currencies";
 import type { Client, QuoteItemDraft } from "@/types";
+import { TemplatePicker } from "@/components/templates/template-picker";
+import { useTemplate } from "@/app/(dashboard)/templates/actions";
 import { toast } from "sonner";
 
 const TVA_RATES = [
@@ -48,6 +50,7 @@ export default function NouveauDevisPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get("edit");
+  const templateId = searchParams.get("template");
 
   const [title, setTitle] = useState("");
   const [clientId, setClientId] = useState<string>("");
@@ -104,6 +107,37 @@ export default function NouveauDevisPage() {
     }
     loadQuote();
   }, [editId]);
+
+  // Load template if ?template=ID
+  useEffect(() => {
+    if (!templateId) return;
+    async function loadTemplate() {
+      try {
+        const tpl = await useTemplate(templateId!);
+        const tplItems = Array.isArray(tpl.items) ? tpl.items : [];
+        if (tplItems.length > 0) {
+          setItems(
+            tplItems.map((item: { description: string; quantity: number; unit_price: number }) => ({
+              description: item.description,
+              quantity: item.quantity,
+              unit_price: item.unit_price,
+              total: calculateItemTotal(item.quantity, item.unit_price),
+            }))
+          );
+        }
+        if (tpl.default_notes) setNotes(tpl.default_notes);
+        if (tpl.default_validity_days) {
+          const d = new Date();
+          d.setDate(d.getDate() + tpl.default_validity_days);
+          setValidUntil(d.toISOString().split("T")[0]);
+        }
+        toast.success(`Template "${tpl.name}" chargé`);
+      } catch {
+        toast.error("Impossible de charger le template");
+      }
+    }
+    loadTemplate();
+  }, [templateId]);
 
   function updateItem(index: number, field: keyof QuoteItemDraft, value: string | number) {
     setItems((prev) => {
@@ -320,7 +354,16 @@ export default function NouveauDevisPage() {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Lignes du devis</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle>Lignes du devis</CardTitle>
+                <TemplatePicker
+                  onApply={(data) => {
+                    setItems(data.items);
+                    if (data.notes) setNotes(data.notes);
+                    if (data.validUntil) setValidUntil(data.validUntil);
+                  }}
+                />
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               {items.map((item, index) => (

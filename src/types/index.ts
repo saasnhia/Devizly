@@ -134,3 +134,90 @@ export interface AIGeneratedQuote {
   items: { description: string; quantity: number; unit_price: number }[];
   notes: string;
 }
+
+// ── Quote Templates ──────────────────────────────────────────
+
+export interface QuoteTemplateItem {
+  description: string;
+  quantity: number;
+  unit_price: number;
+  unit?: string;
+}
+
+export interface QuoteTemplate {
+  id: string;
+  user_id: string;
+  name: string;
+  description: string | null;
+  category: string;
+  is_default: boolean;
+  items: QuoteTemplateItem[];
+  default_validity_days: number;
+  default_payment_terms: string | null;
+  default_notes: string | null;
+  times_used: number;
+  created_at: string;
+  updated_at: string;
+}
+
+// ── Lead Forms ───────────────────────────────────────────────
+
+export interface LeadFormFields {
+  name: boolean;
+  email: boolean;
+  phone: boolean;
+  company: boolean;
+  project_type: boolean;
+  budget_range: boolean;
+  message: boolean;
+  deadline: boolean;
+}
+
+export interface LeadForm {
+  id: string;
+  user_id: string;
+  name: string;
+  slug: string;
+  is_active: boolean;
+  fields: LeadFormFields;
+  title: string;
+  subtitle: string;
+  button_text: string;
+  accent_color: string;
+  auto_pipeline_stage: string;
+  notification_email: string | null;
+  redirect_url: string | null;
+  created_at: string;
+}
+
+// ── Leads ────────────────────────────────────────────────────
+
+export type LeadStatus = 'new' | 'contacted' | 'qualified' | 'converted' | 'lost';
+
+export interface Lead {
+  id: string;
+  user_id: string;
+  form_id: string | null;
+  name: string;
+  email: string;
+  phone: string | null;
+  company: string | null;
+  project_type: string | null;
+  budget_range: string | null;
+  message: string | null;
+  deadline: string | null;
+  source: string;
+  ip_address: string | null;
+  user_agent: string | null;
+  converted_to_client_id: string | null;
+  converted_to_quote_id: string | null;
+  pipeline_stage: string;
+  status: LeadStatus;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface LeadWithForm extends Lead {
+  lead_forms: LeadForm | null;
+}

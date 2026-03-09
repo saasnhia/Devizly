@@ -19,6 +19,9 @@ import {
   LogOut,
   Menu,
   X,
+  LayoutTemplate,
+  FileInput,
+  Inbox,
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
@@ -28,7 +31,10 @@ const navItems = [
   { href: "/dashboard/pipeline", label: "Pipeline", icon: Kanban },
   { href: "/dashboard/factures", label: "Factures", icon: Receipt },
   { href: "/devis", label: "Devis", icon: FileText },
+  { href: "/templates", label: "Templates", icon: LayoutTemplate },
   { href: "/clients", label: "Clients", icon: Users },
+  { href: "/lead-forms", label: "Formulaires", icon: FileInput },
+  { href: "/leads", label: "Leads", icon: Inbox },
   { href: "/pricing", label: "Tarifs", icon: CreditCard },
   { href: "/parametres", label: "Paramètres", icon: Settings },
 ];

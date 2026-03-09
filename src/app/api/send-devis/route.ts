@@ -27,6 +27,7 @@ export async function POST(request: Request) {
     to: string;
     devis: {
       id: string | number;
+      uuid?: string;
       client: string;
       montant: number;
       titre?: string;
@@ -73,6 +74,10 @@ export async function POST(request: Request) {
     ? `${appUrl}/devis/${devis.share_token}`
     : undefined;
 
+  const trackingPixelUrl = devis.uuid
+    ? `${appUrl}/api/track/${devis.uuid}`
+    : undefined;
+
   const { subject, html } = devisEmail({
     clientName: devis.client,
     quoteRef,
@@ -81,6 +86,7 @@ export async function POST(request: Request) {
     shareUrl: shareUrl || `${appUrl}/dashboard`,
     stripeUrl: devis.stripe_url,
     companyName,
+    trackingPixelUrl,
   });
 
   const { data, error } = await resend.emails.send({

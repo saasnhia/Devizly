@@ -23,7 +23,10 @@ export async function POST(
 
   const { id } = await params;
   const body = await request.json();
-  const { share_token } = body;
+  const { share_token, deposit_percent } = body as {
+    share_token: string;
+    deposit_percent?: number;
+  };
 
   if (!share_token) {
     return NextResponse.json({ error: "Token requis" }, { status: 400 });
@@ -51,10 +54,88 @@ export async function POST(
     );
   }
 
+  // Validate deposit_percent if provided
+  const validDepositPercents = [30, 50];
+  const isDeposit =
+    deposit_percent !== undefined &&
+    validDepositPercents.includes(deposit_percent);
+
   const stripe = getStripe();
   const appUrl = getSiteUrl();
   const stripeCurrency = (quote.currency || "EUR").toLowerCase();
 
+  if (isDeposit) {
+    // Deposit: single line item for the acompte amount
+    const depositAmount = Math.round(
+      Number(quote.total_ttc) * (deposit_percent / 100) * 100
+    );
+
+    const lineItems = [
+      {
+        price_data: {
+          currency: stripeCurrency,
+          product_data: {
+            name: `Acompte ${deposit_percent}% — ${quote.title || "Devis"}`,
+          },
+          unit_amount: depositAmount,
+        },
+        quantity: 1,
+      },
+    ];
+
+    // Check if owner has Stripe Connect
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("stripe_account_id, stripe_connect_status")
+      .eq("id", quote.user_id)
+      .single();
+
+    const hasConnect =
+      profile?.stripe_account_id &&
+      profile.stripe_connect_status === "connected";
+
+    const sessionConfig: Stripe.Checkout.SessionCreateParams = {
+      payment_method_types: ["card"],
+      line_items: lineItems,
+      mode: "payment",
+      success_url: `${appUrl}/devis/${share_token}?paid=deposit`,
+      cancel_url: `${appUrl}/devis/${share_token}`,
+      metadata: {
+        quote_id: quote.id,
+        devizly_payment: "true",
+        deposit_percent: String(deposit_percent),
+      },
+      payment_intent_data: {
+        metadata: {
+          quote_id: quote.id,
+          deposit_percent: String(deposit_percent),
+        },
+      },
+    };
+
+    if (quote.clients?.email) {
+      sessionConfig.customer_email = quote.clients.email;
+    }
+
+    const session = hasConnect
+      ? await stripe.checkout.sessions.create(sessionConfig, {
+          stripeAccount: profile!.stripe_account_id!,
+        })
+      : await stripe.checkout.sessions.create(sessionConfig);
+
+    // Save deposit info
+    await supabase
+      .from("quotes")
+      .update({
+        stripe_checkout_session: session.id,
+        deposit_percent: deposit_percent,
+      })
+      .eq("id", quote.id);
+
+    return NextResponse.json({ url: session.url });
+  }
+
+  // Full payment flow
   // Build line items from quote
   const items = (quote.quote_items || []).sort(
     (a: { position: number }, b: { position: number }) => a.position - b.position

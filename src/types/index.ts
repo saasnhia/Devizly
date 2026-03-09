@@ -66,6 +66,11 @@ export interface Quote {
   recurring_next_date: string | null;
   recurring_invoice_count: number;
   currency: string;
+  view_count: number;
+  deposit_percent: number | null;
+  deposit_paid_at: string | null;
+  version: number;
+  parent_quote_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -146,11 +151,12 @@ export interface QuoteTemplateItem {
 
 export interface QuoteTemplate {
   id: string;
-  user_id: string;
+  user_id: string | null;
   name: string;
   description: string | null;
   category: string;
   is_default: boolean;
+  is_system: boolean;
   items: QuoteTemplateItem[];
   default_validity_days: number;
   default_payment_terms: string | null;

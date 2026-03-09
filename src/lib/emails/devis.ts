@@ -11,6 +11,7 @@ interface DevisEmailParams {
   shareUrl: string;
   stripeUrl?: string;
   companyName: string;
+  trackingPixelUrl?: string;
 }
 
 export function devisEmail(p: DevisEmailParams): { subject: string; html: string } {
@@ -93,7 +94,7 @@ export function devisEmail(p: DevisEmailParams): { subject: string; html: string
         </p>
       </td>
     </tr>
-  </table>
+  </table>${p.trackingPixelUrl ? `\n  <img src="${p.trackingPixelUrl}" width="1" height="1" alt="" style="display:none;" />` : ""}
 </body>
 </html>`,
   };

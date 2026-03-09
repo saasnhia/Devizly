@@ -25,6 +25,8 @@ import {
   Loader2,
   PenLine,
   CreditCard,
+  QrCode,
+  Calendar,
 } from "lucide-react";
 import {
   formatCurrency,
@@ -33,6 +35,7 @@ import {
   getStatusLabel,
 } from "@/lib/utils/quote";
 import { SignatureCanvas } from "@/components/signature-canvas";
+import { QRCodeSVG } from "qrcode.react";
 import type { QuoteWithItems } from "@/types";
 import { toast } from "sonner";
 
@@ -54,6 +57,7 @@ export default function PublicQuotePage({
   const [signatureData, setSignatureData] = useState<string | null>(null);
   const [signerName, setSignerName] = useState("");
   const [payLoading, setPayLoading] = useState(false);
+  const [calendlyUrl, setCalendlyUrl] = useState<string | null>(null);
 
   const fetchQuote = useCallback(async () => {
     const response = await fetch(`/api/quotes/share/${token}`);
@@ -64,6 +68,9 @@ export default function PublicQuotePage({
     }
     const result = await response.json();
     setQuote(result.data);
+    if (result.calendly_url) {
+      setCalendlyUrl(result.calendly_url);
+    }
     setLoading(false);
   }, [token]);
 
@@ -73,9 +80,14 @@ export default function PublicQuotePage({
 
   // Handle return from Stripe Checkout
   useEffect(() => {
-    if (searchParams.get("paid") === "true") {
+    const paidParam = searchParams.get("paid");
+    if (paidParam === "true" || paidParam === "deposit") {
       setPaidSuccess(true);
-      toast.success("Paiement effectué avec succès !");
+      toast.success(
+        paidParam === "deposit"
+          ? "Acompte payé avec succès !"
+          : "Paiement effectué avec succès !"
+      );
       // Refetch to get updated status from webhook
       const timer = setTimeout(() => fetchQuote(), 2000);
       return () => clearTimeout(timer);
@@ -142,14 +154,18 @@ export default function PublicQuotePage({
     setResponding(false);
   }
 
-  async function handlePayment() {
+  async function handlePayment(depositPercent?: number) {
     if (!quote) return;
     setPayLoading(true);
     try {
+      const bodyPayload: Record<string, unknown> = { share_token: token };
+      if (depositPercent) {
+        bodyPayload.deposit_percent = depositPercent;
+      }
       const res = await fetch(`/api/quotes/${quote.id}/checkout`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ share_token: token }),
+        body: JSON.stringify(bodyPayload),
       });
       const data = await res.json();
       if (data.url) {
@@ -192,11 +208,6 @@ export default function PublicQuotePage({
     (a, b) => a.position - b.position
   );
   const tvaAmount = Number(quote.total_ttc) - Number(quote.total_ht);
-  const alreadyResponded =
-    quote.status === "accepté" ||
-    quote.status === "refusé" ||
-    quote.status === "signé" ||
-    quote.status === "payé";
 
   return (
     <div className="min-h-screen bg-slate-50 py-8">
@@ -367,16 +378,28 @@ export default function PublicQuotePage({
 
             {/* Action buttons */}
             <div className="flex flex-col gap-3">
-              <Button
-                variant="outline"
-                className="w-full sm:w-auto"
-                onClick={() =>
-                  window.open(`/api/quotes/share/${token}/pdf`, "_blank")
-                }
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Télécharger PDF
-              </Button>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() =>
+                    window.open(`/api/quotes/share/${token}/pdf`, "_blank")
+                  }
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Télécharger PDF
+                </Button>
+                {calendlyUrl && (
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => window.open(calendlyUrl, "_blank")}
+                  >
+                    <Calendar className="mr-2 h-4 w-4" />
+                    Prendre rendez-vous
+                  </Button>
+                )}
+              </div>
 
               {/* Paid state */}
               {quote.status === "payé" ? (
@@ -462,10 +485,10 @@ export default function PublicQuotePage({
               ) : (
                 /* Main actions: Pay + Sign + Refuse */
                 <div className="flex flex-col gap-3">
-                  {/* Pay button — always visible for envoyé/signé */}
+                  {/* Full payment */}
                   <Button
                     className="w-full bg-green-600 hover:bg-green-700 text-lg py-6"
-                    onClick={handlePayment}
+                    onClick={() => handlePayment()}
                     disabled={payLoading}
                   >
                     {payLoading ? (
@@ -475,6 +498,26 @@ export default function PublicQuotePage({
                     )}
                     Payer {formatCurrency(Number(quote.total_ttc), quote.currency || "EUR")} maintenant
                   </Button>
+
+                  {/* Deposit options */}
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => handlePayment(30)}
+                      disabled={payLoading}
+                    >
+                      Acompte 30% — {formatCurrency(Number(quote.total_ttc) * 0.3, quote.currency || "EUR")}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => handlePayment(50)}
+                      disabled={payLoading}
+                    >
+                      Acompte 50% — {formatCurrency(Number(quote.total_ttc) * 0.5, quote.currency || "EUR")}
+                    </Button>
+                  </div>
 
                   {/* Sign/Refuse — only for envoyé */}
                   {quote.status === "envoyé" && (
@@ -517,7 +560,31 @@ export default function PublicQuotePage({
           </CardContent>
         </Card>
 
-        <p className="mt-6 text-center text-xs text-muted-foreground">
+        {/* QR Code */}
+        <div className="mt-6 flex flex-col items-center gap-2">
+          <button
+            className="group flex flex-col items-center gap-1 text-xs text-muted-foreground hover:text-slate-600 transition-colors"
+            onClick={() => {
+              const el = document.getElementById("qr-code-section");
+              if (el) el.classList.toggle("hidden");
+            }}
+          >
+            <QrCode className="h-4 w-4" />
+            <span>QR Code</span>
+          </button>
+          <div id="qr-code-section" className="hidden rounded-lg border bg-white p-4">
+            <QRCodeSVG
+              value={typeof window !== "undefined" ? window.location.href : `/devis/${token}`}
+              size={160}
+              level="M"
+            />
+            <p className="mt-2 text-center text-xs text-muted-foreground">
+              Scannez pour ouvrir sur mobile
+            </p>
+          </div>
+        </div>
+
+        <p className="mt-4 text-center text-xs text-muted-foreground">
           Propulsé par Devizly
         </p>
       </div>

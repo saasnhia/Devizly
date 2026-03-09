@@ -34,6 +34,10 @@ import {
   Eye,
   EyeOff,
   Save,
+  Send,
+  PenLine,
+  CreditCard,
+  GitBranch,
 } from "lucide-react";
 import {
   formatCurrency,
@@ -52,6 +56,8 @@ const statusTabs: { label: string; value: QuoteStatus | "all" }[] = [
   { label: "Brouillon", value: "brouillon" },
   { label: "Envoyé", value: "envoyé" },
   { label: "Signé", value: "signé" },
+  { label: "Payé", value: "payé" },
+  { label: "Refusé", value: "refusé" },
 ];
 
 export default function DevisPage() {
@@ -149,6 +155,61 @@ export default function DevisPage() {
     fetchQuotes();
   }
 
+  async function handleNewVersion(quote: QuoteWithClient) {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const newVersion = (quote.version || 1) + 1;
+    const { data: newQuote, error } = await supabase
+      .from("quotes")
+      .insert({
+        user_id: user.id,
+        client_id: quote.client_id,
+        title: quote.title,
+        total_ht: quote.total_ht,
+        tva_rate: quote.tva_rate,
+        discount: quote.discount,
+        total_ttc: quote.total_ttc,
+        currency: quote.currency || "EUR",
+        notes: quote.notes,
+        valid_until: quote.valid_until,
+        version: newVersion,
+        parent_quote_id: quote.parent_quote_id || quote.id,
+      })
+      .select()
+      .single();
+
+    if (error || !newQuote) {
+      toast.error("Erreur lors de la création de version");
+      return;
+    }
+
+    // Copy items
+    const { data: items } = await supabase
+      .from("quote_items")
+      .select("*")
+      .eq("quote_id", quote.id);
+
+    if (items && items.length > 0) {
+      await supabase.from("quote_items").insert(
+        items.map((item) => ({
+          quote_id: newQuote.id,
+          description: item.description,
+          quantity: item.quantity,
+          unit_price: item.unit_price,
+          total: item.total,
+          position: item.position,
+        }))
+      );
+    }
+
+    toast.success(`Version ${newVersion} créée`);
+    router.push(`/devis/nouveau?edit=${newQuote.id}`);
+  }
+
   async function handleStatusChange(id: string, newStatus: QuoteStatus) {
     const supabase = createClient();
     const { error } = await supabase
@@ -174,6 +235,60 @@ export default function DevisPage() {
           </Link>
         </Button>
       </div>
+
+      {/* Analytics bar */}
+      {!loading && quotes.length > 0 && (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {[
+            {
+              label: "Envoyés",
+              count: quotes.filter((q) => q.status === "envoyé").length,
+              icon: Send,
+              color: "text-blue-600 bg-blue-50",
+            },
+            {
+              label: "Ouverts",
+              count: quotes.filter((q) => q.viewed_at).length,
+              icon: Eye,
+              color: "text-emerald-600 bg-emerald-50",
+            },
+            {
+              label: "Signés",
+              count: quotes.filter(
+                (q) => q.status === "signé" || q.status === "accepté"
+              ).length,
+              icon: PenLine,
+              color: "text-green-600 bg-green-50",
+            },
+            {
+              label: "Payés",
+              count: quotes.filter((q) => q.status === "payé").length,
+              amount: quotes
+                .filter((q) => q.status === "payé")
+                .reduce((sum, q) => sum + Number(q.total_ttc), 0),
+              icon: CreditCard,
+              color: "text-violet-600 bg-violet-50",
+            },
+          ].map((stat) => (
+            <Card key={stat.label}>
+              <CardContent className="flex items-center gap-3 py-3 px-4">
+                <div className={`rounded-lg p-2 ${stat.color}`}>
+                  <stat.icon className="h-4 w-4" />
+                </div>
+                <div>
+                  <p className="text-lg font-bold">{stat.count}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {stat.label}
+                    {"amount" in stat && stat.amount
+                      ? ` — ${formatCurrency(stat.amount)}`
+                      : ""}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
 
       <Card>
         <CardHeader className="pb-3">
@@ -234,7 +349,14 @@ export default function DevisPage() {
                     <TableCell className="font-mono text-sm">
                       DEV-{String(quote.number).padStart(4, "0")}
                     </TableCell>
-                    <TableCell className="font-medium">{quote.title}</TableCell>
+                    <TableCell className="font-medium">
+                      <span>{quote.title}</span>
+                      {quote.version > 1 && (
+                        <Badge variant="outline" className="ml-2 text-xs">
+                          v{quote.version}
+                        </Badge>
+                      )}
+                    </TableCell>
                     <TableCell>{quote.clients?.name || "—"}</TableCell>
                     <TableCell>
                       {formatCurrency(Number(quote.total_ttc), quote.currency || "EUR")}
@@ -249,14 +371,19 @@ export default function DevisPage() {
                         </Badge>
                         {quote.status === "envoyé" && (
                           quote.viewed_at ? (
-                            <span className="inline-flex items-center gap-1 text-xs text-emerald-600" title={`Consulte le ${formatDate(quote.viewed_at)}`}>
-                              <Eye className="h-3 w-3" /> Vu
+                            <span className="inline-flex items-center gap-1 text-xs text-emerald-600" title={`Consulté le ${formatDate(quote.viewed_at)}`}>
+                              <Eye className="h-3 w-3" /> Vu{quote.view_count > 1 ? ` ${quote.view_count}x` : ""}
                             </span>
                           ) : (
                             <span className="inline-flex items-center gap-1 text-xs text-slate-400">
                               <EyeOff className="h-3 w-3" /> Non lu
                             </span>
                           )
+                        )}
+                        {quote.deposit_percent && quote.deposit_paid_at && (
+                          <Badge variant="outline" className="text-xs text-violet-600 border-violet-200">
+                            Acompte {quote.deposit_percent}%
+                          </Badge>
                         )}
                       </div>
                     </TableCell>
@@ -297,6 +424,12 @@ export default function DevisPage() {
                           >
                             <Copy className="mr-2 h-4 w-4" />
                             Dupliquer
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleNewVersion(quote)}
+                          >
+                            <GitBranch className="mr-2 h-4 w-4" />
+                            Nouvelle version
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => setTemplateModalQuote(quote)}

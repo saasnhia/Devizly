@@ -16,7 +16,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Save, Loader2, CreditCard, Building, ExternalLink, Upload, Trash2, ImageIcon, Wallet, CheckCircle2, Zap, Globe, Copy, Check } from "lucide-react";
+import { Save, Loader2, CreditCard, Building, ExternalLink, Upload, Trash2, ImageIcon, Wallet, CheckCircle2, Zap, Globe, Copy, Check, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
 
@@ -42,6 +42,7 @@ export default function ParametresPage() {
   const [leadFormSaving, setLeadFormSaving] = useState(false);
   const [snippetCopied, setSnippetCopied] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [calendlyUrl, setCalendlyUrl] = useState("");
   const [profile, setProfile] = useState({
     full_name: "",
     company_name: "",
@@ -71,7 +72,7 @@ export default function ParametresPage() {
 
       const { data } = await supabase
         .from("profiles")
-        .select("subscription_status, logo_url, stripe_connect_status")
+        .select("subscription_status, logo_url, stripe_connect_status, calendly_url")
         .eq("id", user.id)
         .single();
       if (data?.subscription_status) {
@@ -82,6 +83,9 @@ export default function ParametresPage() {
       }
       if (data?.stripe_connect_status) {
         setStripeConnectStatus(data.stripe_connect_status);
+      }
+      if (data?.calendly_url) {
+        setCalendlyUrl(data.calendly_url);
       }
     }
     loadProfile();
@@ -172,9 +176,20 @@ export default function ParametresPage() {
     const { error } = await supabase.auth.updateUser({ data: profile });
     if (error) {
       toast.error(error.message);
-    } else {
-      toast.success("Paramètres sauvegardés");
+      setLoading(false);
+      return;
     }
+
+    // Save calendly_url to profiles table
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await supabase
+        .from("profiles")
+        .update({ calendly_url: calendlyUrl || null })
+        .eq("id", user.id);
+    }
+
+    toast.success("Paramètres sauvegardés");
     setLoading(false);
   }
 
@@ -415,6 +430,23 @@ export default function ParametresPage() {
                   <SelectItem value="0">0%</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                Lien Calendly (prise de RDV)
+              </Label>
+              <Input
+                value={calendlyUrl}
+                onChange={(e) => setCalendlyUrl(e.target.value)}
+                placeholder="https://calendly.com/votre-nom/30min"
+              />
+              <p className="text-xs text-muted-foreground">
+                Affiché sur vos devis publics pour permettre la prise de RDV.
+              </p>
             </div>
 
             <Button onClick={handleSave} disabled={loading} className="w-full">

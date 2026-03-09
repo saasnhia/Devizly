@@ -127,12 +127,14 @@ export async function useTemplate(id: string) {
 
   if (error || !template) throw new Error("Template introuvable");
 
-  // Increment times_used (fire-and-forget, non-critical)
-  supabase
-    .from("quote_templates")
-    .update({ times_used: (template.times_used || 0) + 1 })
-    .eq("id", id)
-    .then(() => {});
+  // Increment times_used (fire-and-forget, non-critical — skip for system templates)
+  if (!template.is_system) {
+    supabase
+      .from("quote_templates")
+      .update({ times_used: (template.times_used || 0) + 1 })
+      .eq("id", id)
+      .then(() => {});
+  }
 
   return template as QuoteTemplate;
 }
@@ -140,11 +142,13 @@ export async function useTemplate(id: string) {
 export async function getUserTemplates(category?: string) {
   const auth = await getUserId();
   if (auth.error) throw new Error(auth.error);
-  const { supabase } = auth;
+  const { supabase, userId } = auth;
 
   let query = supabase
     .from("quote_templates")
     .select("*")
+    .or(`user_id.eq.${userId},is_system.eq.true`)
+    .order("is_system", { ascending: true })
     .order("times_used", { ascending: false });
 
   if (category && category !== "all") {
@@ -155,6 +159,40 @@ export async function getUserTemplates(category?: string) {
   if (error) throw new Error(error.message);
 
   return (data || []) as QuoteTemplate[];
+}
+
+export async function duplicateSystemTemplate(id: string) {
+  const auth = await getUserId();
+  if (auth.error) throw new Error(auth.error);
+  const { supabase, userId } = auth;
+
+  const { data: original, error: fetchError } = await supabase
+    .from("quote_templates")
+    .select("*")
+    .eq("id", id)
+    .eq("is_system", true)
+    .single();
+
+  if (fetchError || !original) throw new Error("Template système introuvable");
+
+  const { data: copy, error } = await supabase
+    .from("quote_templates")
+    .insert({
+      user_id: userId,
+      name: original.name,
+      description: original.description,
+      category: original.category,
+      is_system: false,
+      items: original.items,
+      default_validity_days: original.default_validity_days,
+      default_payment_terms: original.default_payment_terms,
+      default_notes: original.default_notes,
+    })
+    .select()
+    .single();
+
+  if (error) throw new Error(error.message);
+  return copy as QuoteTemplate;
 }
 
 export async function createTemplateFromQuote(quoteId: string, name: string, category: string) {

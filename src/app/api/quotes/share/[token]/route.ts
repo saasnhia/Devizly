@@ -21,7 +21,7 @@ function createServiceClient() {
 const MAX_SIGNATURE_SIZE = 500_000; // 500KB
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ token: string }> }
 ) {
   const { token } = await params;
@@ -46,7 +46,29 @@ export async function GET(
   }
   await supabase.from("quotes").update(updates).eq("id", quote.id);
 
-  return NextResponse.json({ success: true, data: quote });
+  // Log detailed view (non-blocking)
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    "unknown";
+  const ua = request.headers.get("user-agent") || "unknown";
+  supabase
+    .from("quote_views")
+    .insert({ quote_id: quote.id, ip_address: ip, user_agent: ua })
+    .then(() => {});
+
+  // Fetch owner profile for calendly link
+  const { data: ownerProfile } = await supabase
+    .from("profiles")
+    .select("calendly_url")
+    .eq("id", quote.user_id)
+    .single();
+
+  return NextResponse.json({
+    success: true,
+    data: quote,
+    calendly_url: ownerProfile?.calendly_url || null,
+  });
 }
 
 export async function POST(

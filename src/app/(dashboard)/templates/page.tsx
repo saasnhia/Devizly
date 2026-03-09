@@ -31,6 +31,7 @@ import {
   updateTemplate,
   deleteTemplate,
   duplicateTemplate,
+  duplicateSystemTemplate,
 } from "./actions";
 import { toast } from "sonner";
 
@@ -114,10 +115,15 @@ export default function TemplatesPage() {
     }
   }
 
-  async function handleDuplicate(id: string) {
+  async function handleDuplicate(id: string, isSystem?: boolean) {
     try {
-      await duplicateTemplate(id);
-      toast.success("Template dupliqué");
+      if (isSystem) {
+        await duplicateSystemTemplate(id);
+        toast.success("Template copié dans vos templates");
+      } else {
+        await duplicateTemplate(id);
+        toast.success("Template dupliqué");
+      }
       fetchTemplates();
     } catch {
       toast.error("Erreur lors de la duplication");
@@ -174,86 +180,180 @@ export default function TemplatesPage() {
           </Button>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {templates.map((template) => {
-            const items = Array.isArray(template.items) ? template.items : [];
-            const total = getTemplateTotal(items);
+        <div className="space-y-8">
+          {/* Personal templates */}
+          {templates.filter((t) => !t.is_system).length > 0 && (
+            <div>
+              <h2 className="text-lg font-semibold mb-3">Mes templates</h2>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {templates
+                  .filter((t) => !t.is_system)
+                  .map((template) => {
+                    const items = Array.isArray(template.items) ? template.items : [];
+                    const total = getTemplateTotal(items);
 
-            return (
-              <Card key={template.id} className="group relative">
-                <CardContent className="p-5">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold truncate">
-                        {template.name}
-                      </h3>
-                      {template.description && (
-                        <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
-                          {template.description}
-                        </p>
-                      )}
-                    </div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="shrink-0">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleUse(template)}>
-                          <Play className="mr-2 h-4 w-4" />
-                          Utiliser
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleEdit(template)}>
-                          <Pencil className="mr-2 h-4 w-4" />
-                          Modifier
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleDuplicate(template.id)}
-                        >
-                          <Copy className="mr-2 h-4 w-4" />
-                          Dupliquer
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleDelete(template.id)}
-                          className="text-red-600"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Supprimer
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
+                    return (
+                      <Card key={template.id} className="group relative">
+                        <CardContent className="p-5">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold truncate">
+                                {template.name}
+                              </h3>
+                              {template.description && (
+                                <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
+                                  {template.description}
+                                </p>
+                              )}
+                            </div>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="shrink-0">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => handleUse(template)}>
+                                  <Play className="mr-2 h-4 w-4" />
+                                  Utiliser
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleEdit(template)}>
+                                  <Pencil className="mr-2 h-4 w-4" />
+                                  Modifier
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleDuplicate(template.id)}
+                                >
+                                  <Copy className="mr-2 h-4 w-4" />
+                                  Dupliquer
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleDelete(template.id)}
+                                  className="text-red-600"
+                                >
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  Supprimer
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
 
-                  <div className="mt-3 flex items-center gap-2">
-                    <Badge variant="secondary">
-                      {getCategoryLabel(template.category)}
-                    </Badge>
-                  </div>
+                          <div className="mt-3 flex items-center gap-2">
+                            <Badge variant="secondary">
+                              {getCategoryLabel(template.category)}
+                            </Badge>
+                          </div>
 
-                  <div className="mt-3 flex items-center justify-between text-sm text-muted-foreground">
-                    <span>
-                      {items.length} ligne{items.length > 1 ? "s" : ""} ·{" "}
-                      {formatCurrency(total, "EUR")}
-                    </span>
-                    <span>
-                      Utilisé {template.times_used} fois
-                    </span>
-                  </div>
+                          <div className="mt-3 flex items-center justify-between text-sm text-muted-foreground">
+                            <span>
+                              {items.length} ligne{items.length > 1 ? "s" : ""} ·{" "}
+                              {formatCurrency(total, "EUR")}
+                            </span>
+                            <span>
+                              Utilisé {template.times_used} fois
+                            </span>
+                          </div>
 
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="mt-3 w-full"
-                    onClick={() => handleUse(template)}
-                  >
-                    <FileText className="mr-2 h-4 w-4" />
-                    Utiliser ce template
-                  </Button>
-                </CardContent>
-              </Card>
-            );
-          })}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="mt-3 w-full"
+                            onClick={() => handleUse(template)}
+                          >
+                            <FileText className="mr-2 h-4 w-4" />
+                            Utiliser ce template
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+              </div>
+            </div>
+          )}
+
+          {/* System templates */}
+          {templates.filter((t) => t.is_system).length > 0 && (
+            <div>
+              <h2 className="text-lg font-semibold mb-1">Templates Devizly</h2>
+              <p className="text-sm text-muted-foreground mb-3">
+                Modèles prêts à l&apos;emploi — dupliquez-les pour les personnaliser
+              </p>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {templates
+                  .filter((t) => t.is_system)
+                  .map((template) => {
+                    const items = Array.isArray(template.items) ? template.items : [];
+                    const total = getTemplateTotal(items);
+
+                    return (
+                      <Card key={template.id} className="group relative border-dashed">
+                        <CardContent className="p-5">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <h3 className="font-semibold truncate">
+                                  {template.name}
+                                </h3>
+                                <Badge variant="outline" className="shrink-0 text-xs">
+                                  Devizly
+                                </Badge>
+                              </div>
+                              {template.description && (
+                                <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
+                                  {template.description}
+                                </p>
+                              )}
+                            </div>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="shrink-0">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => handleUse(template)}>
+                                  <Play className="mr-2 h-4 w-4" />
+                                  Utiliser
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleDuplicate(template.id, true)}
+                                >
+                                  <Copy className="mr-2 h-4 w-4" />
+                                  Copier dans mes templates
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+
+                          <div className="mt-3 flex items-center gap-2">
+                            <Badge variant="secondary">
+                              {getCategoryLabel(template.category)}
+                            </Badge>
+                          </div>
+
+                          <div className="mt-3 flex items-center justify-between text-sm text-muted-foreground">
+                            <span>
+                              {items.length} ligne{items.length > 1 ? "s" : ""} ·{" "}
+                              {formatCurrency(total, "EUR")}
+                            </span>
+                          </div>
+
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="mt-3 w-full"
+                            onClick={() => handleUse(template)}
+                          >
+                            <FileText className="mr-2 h-4 w-4" />
+                            Utiliser ce template
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+              </div>
+            </div>
+          )}
         </div>
       )}
 

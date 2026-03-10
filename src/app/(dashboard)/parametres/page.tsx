@@ -180,12 +180,20 @@ export default function ParametresPage() {
       return;
     }
 
-    // Save calendly_url to profiles table
+    // Sync profile fields to profiles table (used by API routes)
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       await supabase
         .from("profiles")
-        .update({ calendly_url: calendlyUrl || null })
+        .update({
+          full_name: profile.full_name || null,
+          company_name: profile.company_name || null,
+          company_address: profile.company_address || null,
+          company_siret: profile.company_siret || null,
+          company_phone: profile.company_phone || null,
+          default_tva_rate: parseFloat(profile.default_tva_rate) || 20,
+          calendly_url: calendlyUrl || null,
+        })
         .eq("id", user.id);
     }
 

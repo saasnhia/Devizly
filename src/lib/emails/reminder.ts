@@ -92,7 +92,7 @@ export function reminderSign(p: ReminderParams): ReminderTemplate {
 
 /** J+7 — Acompte sécurisé */
 export function reminderDeposit(p: ReminderParams): ReminderTemplate {
-  const depositPct = p.depositPercent || 30;
+  const depositPct = p.depositPercent ?? 30;
   return {
     subject: `Dernier rappel : Acompte ${depositPct}% sécurisé — ${p.quoteRef}`,
     html: baseLayout(

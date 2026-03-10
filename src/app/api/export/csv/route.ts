@@ -156,6 +156,10 @@ function fmtNum(n: number): string {
 }
 
 function escapeCSV(value: string): string {
+  // Prevent CSV injection: prefix formula-like values to block Excel execution
+  if (/^[=+\-@\t\r]/.test(value)) {
+    value = "'" + value;
+  }
   if (value.includes(";") || value.includes('"') || value.includes("\n")) {
     return `"${value.replace(/"/g, '""')}"`;
   }

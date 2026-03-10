@@ -17,6 +17,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "priceId requis" }, { status: 400 });
   }
 
+  // Whitelist valid price IDs to prevent arbitrary subscription creation
+  const validPriceIds = [
+    process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO,
+    process.env.NEXT_PUBLIC_STRIPE_PRICE_BUSINESS,
+  ].filter(Boolean);
+
+  if (!validPriceIds.includes(priceId)) {
+    return NextResponse.json({ error: "priceId invalide" }, { status: 400 });
+  }
+
   // Get or create Stripe customer
   const { data: profile } = await supabase
     .from("profiles")

@@ -38,6 +38,7 @@ import {
   PenLine,
   CreditCard,
   GitBranch,
+  Bell,
 } from "lucide-react";
 import {
   formatCurrency,
@@ -68,10 +69,11 @@ export default function DevisPage() {
   const [loading, setLoading] = useState(true);
   const [templateModalQuote, setTemplateModalQuote] = useState<QuoteWithClient | null>(null);
   const [quota, setQuota] = useState<{ plan: string; used: number; limit: number } | null>(null);
+  const [reminderCounts, setReminderCounts] = useState<Record<string, number>>({});
 
   const fetchQuotes = useCallback(async () => {
     const supabase = createClient();
-    const [quotesRes, profileRes] = await Promise.all([
+    const [quotesRes, profileRes, remindersRes] = await Promise.all([
       supabase
         .from("quotes")
         .select("*, clients(*)")
@@ -80,6 +82,9 @@ export default function DevisPage() {
         .from("profiles")
         .select("subscription_status, devis_used")
         .single(),
+      supabase
+        .from("quote_reminders")
+        .select("quote_id"),
     ]);
     setQuotes((quotesRes.data || []) as QuoteWithClient[]);
     if (profileRes.data) {
@@ -87,6 +92,14 @@ export default function DevisPage() {
       const used = profileRes.data.devis_used || 0;
       const limit = plan === "free" ? 5 : -1;
       setQuota({ plan, used, limit });
+    }
+    // Count reminders per quote
+    if (remindersRes.data) {
+      const counts: Record<string, number> = {};
+      for (const r of remindersRes.data) {
+        counts[r.quote_id] = (counts[r.quote_id] || 0) + 1;
+      }
+      setReminderCounts(counts);
     }
     setLoading(false);
   }, []);
@@ -395,6 +408,7 @@ export default function DevisPage() {
                   <TableHead>Client</TableHead>
                   <TableHead>Montant TTC</TableHead>
                   <TableHead>Statut</TableHead>
+                  <TableHead>Relances</TableHead>
                   <TableHead>Date</TableHead>
                   <TableHead className="w-28" />
                 </TableRow>
@@ -442,6 +456,28 @@ export default function DevisPage() {
                           </Badge>
                         )}
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      {quote.status === "envoyé" || quote.status === "signé" ? (
+                        <div className="flex items-center gap-1.5">
+                          <Bell className={`h-3.5 w-3.5 ${
+                            (reminderCounts[quote.id] || 0) > 0
+                              ? "text-indigo-500"
+                              : "text-slate-300"
+                          }`} />
+                          <span className={`text-xs font-medium ${
+                            (reminderCounts[quote.id] || 0) >= 3
+                              ? "text-emerald-600"
+                              : (reminderCounts[quote.id] || 0) > 0
+                                ? "text-indigo-600"
+                                : "text-slate-400"
+                          }`}>
+                            {reminderCounts[quote.id] || 0}/3
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-slate-300">—</span>
+                      )}
                     </TableCell>
                     <TableCell>{formatDate(quote.created_at)}</TableCell>
                     <TableCell>

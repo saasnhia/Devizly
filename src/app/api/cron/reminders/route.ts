@@ -6,12 +6,19 @@ import { formatCurrency } from "@/lib/utils/quote";
 import { getSiteUrl } from "@/lib/url";
 
 /**
- * Cron endpoint: auto-send reminders for "envoyé" quotes at J+3, J+7, J+14.
+ * Cron endpoint: auto-send reminders for "envoyé" quotes.
+ * Sequence: J+2 after first view → J+5 signature push → J+7 deposit nudge.
  * Vercel Cron runs daily at 9:00 AM (vercel.json).
  * Protected by CRON_SECRET header.
+ * Pro/Business users only — max 3 reminders per quote.
  */
 
-const REMINDER_DAYS = [3, 7, 14] as const;
+const REMINDER_SCHEDULE = [
+  { day: 2, type: "view" as const },
+  { day: 5, type: "sign" as const },
+  { day: 7, type: "deposit" as const },
+] as const;
+
 const FROM_EMAIL = "Devizly <noreply@devizly.fr>";
 
 function createServiceClient() {
@@ -39,7 +46,8 @@ export async function GET(request: Request) {
   const { data: quotes } = await supabase
     .from("quotes")
     .select(`
-      id, title, number, total_ttc, share_token, created_at, user_id, client_id,
+      id, title, number, total_ttc, share_token, created_at, viewed_at,
+      user_id, client_id, deposit_percent,
       clients(name, email),
       profiles!quotes_user_id_fkey(subscription_status, company_name, full_name)
     `)
@@ -64,21 +72,32 @@ export async function GET(request: Request) {
     } | null;
     if (!client?.email) continue;
 
+    // J+2 is based on first view date; J+5 and J+7 based on creation date
     const createdAt = new Date(quote.created_at);
+    const viewedAt = quote.viewed_at ? new Date(quote.viewed_at) : null;
     const daysSinceCreated = Math.floor(
       (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24)
     );
+    const daysSinceViewed = viewedAt
+      ? Math.floor((now.getTime() - viewedAt.getTime()) / (1000 * 60 * 60 * 24))
+      : null;
 
     const quoteRef = `DEV-${String(quote.number).padStart(4, "0")}`;
     const shareUrl = `${appUrl}/devis/${quote.share_token}`;
     const companyName =
       profile.company_name || profile.full_name || "Votre prestataire";
 
-    for (let i = 0; i < REMINDER_DAYS.length; i++) {
-      const reminderDay = REMINDER_DAYS[i];
+    for (let i = 0; i < REMINDER_SCHEDULE.length; i++) {
+      const { day, type } = REMINDER_SCHEDULE[i];
       const reminderNumber = i + 1;
 
-      if (daysSinceCreated < reminderDay) continue;
+      // J+2 (view): only if the quote has been viewed and 2+ days since first view
+      if (type === "view") {
+        if (!viewedAt || daysSinceViewed === null || daysSinceViewed < day) continue;
+      } else {
+        // J+5 and J+7: based on creation date
+        if (daysSinceCreated < day) continue;
+      }
 
       // Check if already sent
       const { data: existing } = await supabase
@@ -100,6 +119,7 @@ export async function GET(request: Request) {
         totalTTC: formatCurrency(Number(quote.total_ttc)),
         shareUrl,
         companyName,
+        depositPercent: quote.deposit_percent ?? undefined,
       });
 
       // Send via Resend
@@ -112,15 +132,15 @@ export async function GET(request: Request) {
 
       if (sendError) {
         console.error(
-          `[Reminder] Failed J+${reminderDay} for ${quoteRef}:`,
+          `[Reminder] Failed ${type} (J+${day}) for ${quoteRef}:`,
           sendError
         );
-        errors.push(`${quoteRef} J+${reminderDay}: ${sendError.message}`);
+        errors.push(`${quoteRef} ${type}: ${sendError.message}`);
         continue;
       }
 
       console.log(
-        `[Reminder] Sent J+${reminderDay} for ${quoteRef} → ${client.email}`
+        `[Reminder] Sent ${type} (J+${day}) for ${quoteRef} → ${client.email}`
       );
 
       // Record reminder as sent

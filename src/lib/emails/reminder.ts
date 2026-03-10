@@ -1,6 +1,6 @@
 /**
- * Reminder email templates — J+3 / J+7 / J+14 sequence.
- * Inspired by QuickBooks/Jobber automated reminders.
+ * Reminder email templates — J+2 (vu) / J+5 (signature) / J+7 (acompte).
+ * Inspired by HoneyBook/Bonsai automated follow-ups.
  */
 
 interface ReminderParams {
@@ -10,6 +10,7 @@ interface ReminderParams {
   totalTTC: string;
   shareUrl: string;
   companyName: string;
+  depositPercent?: number;
 }
 
 interface ReminderTemplate {
@@ -53,17 +54,17 @@ function baseLayout(content: string, ctaUrl: string, ctaText: string): string {
 </html>`;
 }
 
-/** J+3 — Friendly nudge */
-export function reminderJ3(p: ReminderParams): ReminderTemplate {
+/** J+2 — Devis consulté, relance douce */
+export function reminderView(p: ReminderParams): ReminderTemplate {
   return {
-    subject: `Rappel : Votre devis ${p.quoteRef} attend votre réponse`,
+    subject: `Votre devis ${p.quoteRef} (consulté récemment)`,
     html: baseLayout(
       `<p style="margin:0 0 16px;font-size:16px;color:#0F172A;">Bonjour ${p.clientName},</p>
        <p style="margin:0 0 16px;font-size:15px;color:#334155;line-height:1.6;">
-         ${p.companyName} vous a envoyé le devis <strong>${p.quoteRef} — ${p.quoteTitle}</strong> d'un montant de <strong>${p.totalTTC}</strong>.
+         Nous avons vu que vous avez consulté le devis <strong>${p.quoteRef} — ${p.quoteTitle}</strong> d'un montant de <strong>${p.totalTTC}</strong>.
        </p>
        <p style="margin:0 0 16px;font-size:15px;color:#334155;line-height:1.6;">
-         Ce devis est en attente de votre réponse. Vous pouvez le consulter, le signer et le payer en un clic.
+         Des questions ? ${p.companyName} reste disponible. Sinon, vous pouvez le valider en un clic.
        </p>`,
       p.shareUrl,
       `Consulter le devis — ${p.totalTTC}`
@@ -71,43 +72,44 @@ export function reminderJ3(p: ReminderParams): ReminderTemplate {
   };
 }
 
-/** J+7 — Urgency */
-export function reminderJ7(p: ReminderParams): ReminderTemplate {
+/** J+5 — Pousse vers la signature */
+export function reminderSign(p: ReminderParams): ReminderTemplate {
   return {
-    subject: `${p.quoteRef} : Devis en attente depuis 7 jours`,
+    subject: `${p.quoteRef} : Toujours intéressé ? Signez en 1 clic`,
     html: baseLayout(
       `<p style="margin:0 0 16px;font-size:16px;color:#0F172A;">Bonjour ${p.clientName},</p>
        <p style="margin:0 0 16px;font-size:15px;color:#334155;line-height:1.6;">
-         Le devis <strong>${p.quoteRef} — ${p.quoteTitle}</strong> (${p.totalTTC}) est en attente depuis 7 jours.
+         Le devis <strong>${p.quoteRef} — ${p.quoteTitle}</strong> (${p.totalTTC}) est toujours en attente de votre signature.
        </p>
        <p style="margin:0 0 16px;font-size:15px;color:#334155;line-height:1.6;">
-         Pour ne pas retarder votre projet, nous vous invitons à le valider rapidement. Signez et payez directement en ligne.
+         Pour ne pas retarder votre projet, signez directement en ligne — c'est rapide et sécurisé.
        </p>`,
       p.shareUrl,
-      `Signer et payer maintenant`
+      `Signer le devis maintenant`
     ),
   };
 }
 
-/** J+14 — Last chance */
-export function reminderJ14(p: ReminderParams): ReminderTemplate {
+/** J+7 — Acompte sécurisé */
+export function reminderDeposit(p: ReminderParams): ReminderTemplate {
+  const depositPct = p.depositPercent || 30;
   return {
-    subject: `Dernier rappel : ${p.quoteRef} expire bientôt`,
+    subject: `Dernier rappel : Acompte ${depositPct}% sécurisé — ${p.quoteRef}`,
     html: baseLayout(
       `<p style="margin:0 0 16px;font-size:16px;color:#0F172A;">Bonjour ${p.clientName},</p>
        <p style="margin:0 0 16px;font-size:15px;color:#334155;line-height:1.6;">
          C'est notre dernier rappel concernant le devis <strong>${p.quoteRef} — ${p.quoteTitle}</strong> d'un montant de <strong>${p.totalTTC}</strong>.
        </p>
-       <p style="margin:0 0 8px;font-size:15px;color:#DC2626;line-height:1.6;font-weight:600;">
-         Ce devis expirera sous peu si aucune action n'est effectuée.
+       <p style="margin:0 0 8px;font-size:15px;color:#6366F1;line-height:1.6;font-weight:600;">
+         Sécurisez votre place avec un acompte de ${depositPct}% — paiement en ligne simple et rapide.
        </p>
        <p style="margin:0 0 16px;font-size:15px;color:#334155;line-height:1.6;">
-         Signez-le maintenant pour confirmer votre accord.
+         Signez et payez maintenant pour démarrer votre projet sans attendre.
        </p>`,
       p.shareUrl,
-      `Dernière chance — Signer le devis`
+      `Signer et payer l'acompte`
     ),
   };
 }
 
-export const REMINDER_TEMPLATES = [reminderJ3, reminderJ7, reminderJ14] as const;
+export const REMINDER_TEMPLATES = [reminderView, reminderSign, reminderDeposit] as const;

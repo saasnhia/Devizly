@@ -14,6 +14,17 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
+  // Redirect new users to onboarding wizard
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("onboarding_completed")
+    .eq("id", user.id)
+    .single();
+
+  if (profile && !profile.onboarding_completed) {
+    redirect("/wizard");
+  }
+
   return (
     <DashboardShell user={user}>
       {children}

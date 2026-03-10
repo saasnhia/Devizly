@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSiteUrl } from "@/lib/url";
 
-export async function GET() {
+export async function GET(request: Request) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -21,19 +21,27 @@ export async function GET() {
     return NextResponse.redirect(`${appUrl}/parametres?stripe=error&reason=no_client_id`);
   }
 
+  // Check if coming from onboarding wizard
+  const { searchParams } = new URL(request.url);
+  const fromWizard = searchParams.get("from") === "wizard";
+
   const redirectUri = `${appUrl}/api/stripe/connect/callback`;
   console.log("[Stripe Connect] Authorize →", {
     clientId: clientId.substring(0, 10) + "...",
     redirectUri,
     userId: user.id,
+    fromWizard,
   });
+
+  // Encode wizard flag in state: "userId|wizard" or just "userId"
+  const stateValue = fromWizard ? `${user.id}|wizard` : user.id;
 
   const params = new URLSearchParams({
     response_type: "code",
     client_id: clientId,
     scope: "read_write",
     redirect_uri: redirectUri,
-    state: user.id,
+    state: stateValue,
     "stripe_user[email]": user.email || "",
     "stripe_user[country]": "FR",
   });

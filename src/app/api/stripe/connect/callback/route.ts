@@ -14,10 +14,15 @@ function createServiceClient() {
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
-  const state = searchParams.get("state"); // supabase user id
+  const rawState = searchParams.get("state"); // "userId" or "userId|wizard"
   const errorParam = searchParams.get("error");
   const errorDesc = searchParams.get("error_description");
   const appUrl = getSiteUrl();
+
+  // Parse state: may contain "|wizard" suffix for onboarding flow
+  const fromWizard = rawState?.includes("|wizard") ?? false;
+  const state = rawState?.split("|")[0] ?? null;
+  const defaultRedirect = fromWizard ? "/wizard?step=2" : "/parametres";
 
   console.log("[Stripe Callback] Params:", {
     code: code ? code.substring(0, 10) + "..." : null,
@@ -108,10 +113,12 @@ export async function GET(request: Request) {
     }
 
     return NextResponse.redirect(
-      `${appUrl}/parametres?stripe=${isReady ? "success" : "pending"}`
+      `${appUrl}${defaultRedirect}${fromWizard ? "" : `?stripe=${isReady ? "success" : "pending"}`}`
     );
   } catch (err) {
     console.error("[Stripe Callback] Exception:", err);
-    return NextResponse.redirect(`${appUrl}/parametres?stripe=error&reason=exception`);
+    return NextResponse.redirect(
+      `${appUrl}${fromWizard ? "/wizard?step=1" : "/parametres?stripe=error&reason=exception"}`
+    );
   }
 }

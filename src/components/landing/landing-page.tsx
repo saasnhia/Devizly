@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
@@ -26,6 +27,8 @@ import {
   CreditCard,
   Bot,
   Send,
+  Play,
+  MessageCircle,
 } from "lucide-react";
 
 /* ══════════════════════════════════════════════════
@@ -257,6 +260,19 @@ const faqs = [
 ];
 
 /* ══════════════════════════════════════════════════
+   SEGMENT CTA MAPPING (A4)
+   ══════════════════════════════════════════════════ */
+
+const segmentCopy: Record<string, { hero: string; badge: string }> = {
+  graphiste: { hero: "Devis pros pour graphistes", badge: "Designers & créatifs" },
+  dev: { hero: "Devis pros pour développeurs", badge: "Développeurs web" },
+  consultant: { hero: "Devis pros pour consultants", badge: "Consultants & coachs" },
+  artisan: { hero: "Devis pros pour artisans", badge: "Artisans & BTP" },
+  photographe: { hero: "Devis pros pour photographes", badge: "Photographes" },
+  formateur: { hero: "Devis pros pour formateurs", badge: "Formateurs & coachs" },
+};
+
+/* ══════════════════════════════════════════════════
    SUB-COMPONENTS
    ══════════════════════════════════════════════════ */
 
@@ -300,12 +316,31 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
    ══════════════════════════════════════════════════ */
 
 export function LandingPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#0A0A0F]" />}>
+      <LandingPageInner />
+    </Suspense>
+  );
+}
+
+function LandingPageInner() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [quotesCount, setQuotesCount] = useState(0);
+  const [videoOpen, setVideoOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatShown, setChatShown] = useState(false);
+
+  // Segment personalization (A4)
+  const searchParams = useSearchParams();
+  const segment = searchParams.get("for") || "";
+  const copy = segmentCopy[segment] || null;
 
   // Stats section intersection observer
   const [statsRef, statsInView] = useInView({ triggerOnce: true, threshold: 0.3 });
+
+  // Pricing section observer for proactive chat (A2)
+  const [pricingRef, pricingInView] = useInView({ triggerOnce: true, threshold: 0.3 });
 
   // Scroll detection for navbar
   useEffect(() => {
@@ -323,6 +358,15 @@ export function LandingPage() {
       .then((d: { quotes_count: number }) => setQuotesCount(d.quotes_count))
       .catch(() => {});
   }, []);
+
+  // Proactive chat: show after 30s on pricing section
+  useEffect(() => {
+    if (!pricingInView || chatShown) return;
+    const timer = setTimeout(() => {
+      setChatShown(true);
+    }, 30000);
+    return () => clearTimeout(timer);
+  }, [pricingInView, chatShown]);
 
   const fireConfetti = useCallback(() => {
     confetti({
@@ -470,7 +514,7 @@ export function LandingPage() {
             <motion.div variants={fadeUp}>
               <span className="inline-flex items-center gap-2 rounded-full border border-violet-500/30 bg-violet-500/10 px-4 py-1.5 text-sm text-violet-300">
                 <Sparkles className="h-3.5 w-3.5" />
-                Propulsé par l&apos;IA Mistral — hébergée en France
+                {copy ? copy.badge : "Propulsé par l\u2019IA Mistral — hébergée en France"}
               </span>
             </motion.div>
 
@@ -479,12 +523,24 @@ export function LandingPage() {
               variants={fadeUp}
               className="mx-auto mt-8 max-w-4xl text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-6xl lg:text-7xl"
             >
-              Créez des devis.{" "}
-              <br className="hidden sm:block" />
-              Signez. Encaissez.{" "}
-              <span className="bg-gradient-to-r from-violet-400 via-indigo-400 to-emerald-400 bg-clip-text text-transparent">
-                En 2 minutes.
-              </span>
+              {copy ? (
+                <>
+                  {copy.hero}.{" "}
+                  <br className="hidden sm:block" />
+                  <span className="bg-gradient-to-r from-violet-400 via-indigo-400 to-emerald-400 bg-clip-text text-transparent">
+                    Signez. Encaissez.
+                  </span>
+                </>
+              ) : (
+                <>
+                  Créez des devis.{" "}
+                  <br className="hidden sm:block" />
+                  Signez. Encaissez.{" "}
+                  <span className="bg-gradient-to-r from-violet-400 via-indigo-400 to-emerald-400 bg-clip-text text-transparent">
+                    En 2 minutes.
+                  </span>
+                </>
+              )}
             </motion.h1>
 
             {/* Sub-headline */}
@@ -510,12 +566,13 @@ export function LandingPage() {
                 Commencer gratuit
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
-              <a
-                href="#tarifs"
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/5 px-8 py-3.5 text-base font-medium text-white transition-all hover:border-white/25 hover:bg-white/10"
+              <button
+                onClick={() => setVideoOpen(true)}
+                className="group inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/5 px-8 py-3.5 text-base font-medium text-white transition-all hover:border-violet-400/40 hover:bg-white/10"
               >
-                Voir les tarifs — 19€/mois
-              </a>
+                <Play className="h-4 w-4 text-violet-400 transition-transform group-hover:scale-110" />
+                Voir la démo (90s)
+              </button>
             </motion.div>
 
             {/* Trust indicators */}
@@ -900,7 +957,7 @@ export function LandingPage() {
       {/* ══════════════════════════════════════════════
           PRICING
           ══════════════════════════════════════════════ */}
-      <section id="tarifs" className="border-t border-white/5 py-20 sm:py-28">
+      <section id="tarifs" ref={pricingRef} className="border-t border-white/5 py-20 sm:py-28">
         <div className="mx-auto max-w-5xl px-4 sm:px-6">
           <motion.div
             variants={stagger}
@@ -1175,6 +1232,155 @@ export function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* ══════════════════════════════════════════════
+          VIDEO DEMO MODAL (A1)
+          ══════════════════════════════════════════════ */}
+      <AnimatePresence>
+        {videoOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm"
+            onClick={() => setVideoOpen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="relative mx-4 w-full max-w-4xl overflow-hidden rounded-2xl border border-violet-500/30 bg-[#0A0A0F] shadow-2xl shadow-violet-500/20"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setVideoOpen(false)}
+                className="absolute right-3 top-3 z-10 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
+                aria-label="Fermer"
+              >
+                <X className="h-5 w-5" />
+              </button>
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                controls
+                className="w-full"
+              >
+                <source src="/marketing/@remotion - R⤓Download.mp4" type="video/mp4" />
+              </video>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ══════════════════════════════════════════════
+          PROACTIVE CHAT WIDGET (A2)
+          ══════════════════════════════════════════════ */}
+      <AnimatePresence>
+        {chatShown && !chatOpen && (
+          <motion.button
+            initial={{ opacity: 0, y: 20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.9 }}
+            onClick={() => setChatOpen(true)}
+            className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-2xl border border-violet-500/30 bg-[#0F0F1A] px-5 py-3 shadow-xl shadow-violet-500/20 transition-all hover:border-violet-400/50 hover:shadow-violet-500/30"
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-violet-500/20">
+              <MessageCircle className="h-5 w-5 text-violet-400" />
+            </div>
+            <div className="text-left">
+              <p className="text-sm font-medium text-white">Une question sur les tarifs ?</p>
+              <p className="text-xs text-slate-400">Je réponds en 2min</p>
+            </div>
+            <button
+              onClick={(e) => { e.stopPropagation(); setChatShown(false); }}
+              className="ml-1 rounded-full p-1 text-slate-500 hover:text-white"
+              aria-label="Fermer"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {chatOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            className="fixed bottom-6 right-6 z-50 w-[360px] overflow-hidden rounded-2xl border border-white/10 bg-[#0F0F1A] shadow-2xl shadow-violet-500/10"
+          >
+            <div className="flex items-center justify-between border-b border-white/10 bg-violet-500/10 px-5 py-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-500/20">
+                  <MessageCircle className="h-4 w-4 text-violet-400" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-white">Devizly</p>
+                  <p className="text-xs text-slate-400">Support en ligne</p>
+                </div>
+              </div>
+              <button
+                onClick={() => { setChatOpen(false); setChatShown(false); }}
+                className="rounded-full p-1.5 text-slate-400 hover:bg-white/10 hover:text-white"
+                aria-label="Fermer"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="p-5">
+              <div className="mb-4 rounded-xl bg-white/5 px-4 py-3">
+                <p className="text-sm text-slate-300">
+                  Bonjour ! Une question sur les tarifs ou les fonctionnalités ? Envoyez-nous un message, on répond en moins de 2 minutes.
+                </p>
+              </div>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const form = e.target as HTMLFormElement;
+                  const input = form.elements.namedItem("message") as HTMLInputElement;
+                  const email = form.elements.namedItem("email") as HTMLInputElement;
+                  if (!input.value.trim() || !email.value.trim()) return;
+                  fetch("/api/contact", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email: email.value, message: input.value }),
+                  }).then(() => {
+                    form.reset();
+                    setChatOpen(false);
+                    setChatShown(false);
+                  }).catch(() => {});
+                }}
+                className="space-y-3"
+              >
+                <input
+                  name="email"
+                  type="email"
+                  required
+                  placeholder="Votre email"
+                  className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-slate-500 outline-none focus:border-violet-500/50"
+                />
+                <textarea
+                  name="message"
+                  required
+                  rows={3}
+                  placeholder="Votre question..."
+                  className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-slate-500 outline-none focus:border-violet-500/50"
+                />
+                <button
+                  type="submit"
+                  className="w-full rounded-lg bg-gradient-to-r from-violet-600 to-indigo-500 py-2.5 text-sm font-semibold text-white transition-all hover:brightness-110"
+                >
+                  Envoyer
+                </button>
+              </form>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

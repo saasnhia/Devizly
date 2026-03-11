@@ -32,6 +32,7 @@ import {
 import { PLANS } from "@/lib/stripe";
 import { SeedButton } from "@/components/seed-button";
 import { DashboardCharts } from "@/components/dashboard-charts";
+import { OnboardingProgress } from "@/components/onboarding-progress";
 import type { QuoteWithClient } from "@/types";
 import type { PlanId } from "@/lib/stripe";
 
@@ -68,7 +69,7 @@ export default async function DashboardPage() {
         .order("created_at", { ascending: false }),
       supabase
         .from("profiles")
-        .select("subscription_status, devis_used")
+        .select("subscription_status, devis_used, onboarding_completed, company_name, company_siret, stripe_account_id, stripe_connect_status")
         .eq("id", user.id)
         .single(),
       supabase
@@ -246,8 +247,25 @@ export default async function DashboardPage() {
     },
   ];
 
+  // Onboarding progress data
+  const hasProfile = !!(profile?.company_name && profile?.company_siret);
+  const hasQuote = allQuotes.length > 0;
+  const hasStripe = profile?.stripe_connect_status === "active" || !!profile?.stripe_account_id;
+  const hasSentQuote = allQuotes.some((q) => q.status !== "brouillon");
+  const showOnboarding = !profile?.onboarding_completed || (!hasProfile || !hasQuote || !hasStripe || !hasSentQuote);
+
   return (
     <div className="space-y-6">
+      {/* Onboarding Progress (A3) */}
+      {showOnboarding && (
+        <OnboardingProgress
+          hasProfile={hasProfile}
+          hasQuote={hasQuote}
+          hasStripe={hasStripe}
+          hasSentQuote={hasSentQuote}
+        />
+      )}
+
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-bold">Dashboard</h1>

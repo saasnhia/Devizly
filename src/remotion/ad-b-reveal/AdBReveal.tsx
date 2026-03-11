@@ -103,7 +103,7 @@ const HookScene: React.FC = () => {
           transform: `translateY(${subY}px)`,
         }}
       >
-        Pendant que tu dormais.
+        Pendant que vous dormiez.
       </div>
     </AbsoluteFill>
   );
@@ -250,7 +250,7 @@ const RevealScene: React.FC = () => {
           opacity: subOpacity,
         }}
       >
-        Pour tous tes clients.
+        Pour tous vos clients.
       </div>
     </AbsoluteFill>
   );

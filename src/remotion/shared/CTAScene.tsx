@@ -65,7 +65,7 @@ export const CTAScene: React.FC = () => {
           transform: `scale(${titleScale})`,
         }}
       >
-        Essaie
+        Essayez
         <br />
         gratuitement
       </div>

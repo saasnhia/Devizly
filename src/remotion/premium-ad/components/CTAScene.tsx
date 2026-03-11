@@ -86,7 +86,7 @@ export const CTAScene: React.FC = () => {
             transform: `translateY(${titleY}px)`,
           }}
         >
-          Essaie gratuitement
+          Essayez gratuitement
         </div>
 
         <div

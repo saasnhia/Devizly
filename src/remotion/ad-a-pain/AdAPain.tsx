@@ -73,7 +73,7 @@ const HookScene: React.FC = () => {
           transform: `translateX(${w1x}px)`,
         }}
       >
-        Tu perds
+        Vous perdez
       </div>
       <div
         style={{
@@ -192,7 +192,7 @@ const FlashTransition: React.FC = () => {
    ═══════════════════════════════════════════ */
 
 const solutionLines = [
-  "IA génère ton devis",
+  "IA génère votre devis",
   "Client signe en ligne",
   "Facture créée auto",
 ];

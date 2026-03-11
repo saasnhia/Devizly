@@ -80,7 +80,7 @@ const HookScene: React.FC = () => {
           transform: `translateY(${line2Y}px)`,
         }}
       >
-        Regarde ça. 👇
+        Regardez ça. 👇
       </div>
     </AbsoluteFill>
   );

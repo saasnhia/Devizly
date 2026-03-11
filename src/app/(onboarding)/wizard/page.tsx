@@ -27,26 +27,26 @@ interface StepConfig {
 const STEPS: StepConfig[] = [
   {
     icon: <CreditCard className="h-8 w-8 text-white" />,
-    title: "Active les paiements",
-    desc: "Connecte Stripe pour encaisser tes clients directement depuis tes devis",
+    title: "Activez les paiements",
+    desc: "Connectez Stripe pour encaisser vos clients directement depuis vos devis",
     gradient: "from-violet-500 to-indigo-600",
   },
   {
     icon: <Calendar className="h-8 w-8 text-white" />,
-    title: "Ajoute ton Calendly",
-    desc: "Tes clients pourront prendre RDV directement depuis le devis partagé",
+    title: "Ajoutez votre Calendly",
+    desc: "Vos clients pourront prendre RDV directement depuis le devis partagé",
     gradient: "from-blue-500 to-cyan-600",
   },
   {
     icon: <UserPlus className="h-8 w-8 text-white" />,
-    title: "Crée ton 1er client",
-    desc: "Un client demo pour tester immédiatement le parcours complet",
+    title: "Créez votre 1er client",
+    desc: "Un client démo pour tester immédiatement le parcours complet",
     gradient: "from-emerald-500 to-teal-600",
   },
   {
     icon: <FileText className="h-8 w-8 text-white" />,
-    title: "Envoie ton 1er devis",
-    desc: "Utilise un template pro pour créer ton premier devis en 30 secondes",
+    title: "Envoyez votre 1er devis",
+    desc: "Utilisez un template pro pour créer votre premier devis en 30 secondes",
     gradient: "from-orange-500 to-rose-600",
   },
 ];
@@ -411,10 +411,10 @@ export default function OnboardingWizard() {
                     <FileText className="h-6 w-6 text-orange-600" />
                   </div>
                   <p className="font-medium text-slate-900">
-                    Choisis un template et crée ton 1er devis
+                    Choisissez un template et créez votre 1er devis
                   </p>
                   <p className="mt-1 text-sm text-slate-500">
-                    Tu pourras le personnaliser, l&apos;envoyer et le faire
+                    Vous pourrez le personnaliser, l&apos;envoyer et le faire
                     signer
                   </p>
                 </div>

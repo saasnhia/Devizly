@@ -45,7 +45,7 @@ function HookScene() {
 
   const lines = [
     {
-      text: "Tu passes encore",
+      text: "Vous passez encore",
       delay: 5,
       size: 52,
       weight: 700 as const,
@@ -453,7 +453,7 @@ function StatScene() {
           zIndex: 1,
         }}
       >
-        Pendant que tes concurrents ouvrent Excel.
+        Pendant que vos concurrents ouvrent Excel.
       </div>
     </AbsoluteFill>
   );

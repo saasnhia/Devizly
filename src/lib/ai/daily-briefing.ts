@@ -161,7 +161,7 @@ Reponds UNIQUEMENT en JSON valide, sans markdown ni backticks.`;
         {
           role: "system",
           content:
-            "Tu es l'assistant IA de Devizly. Tu generes des briefings matinaux concis et actionnables pour des independants et freelancers francais. Ton role : les aider a prioriser leur journee. Sois direct, pas de formules de politesse inutiles.",
+            "Vous etes l'assistant IA de Devizly. Vous generez des briefings matinaux concis et actionnables pour des independants et freelancers francais. Votre role : les aider a prioriser leur journee. Soyez direct, vouvoyez l'utilisateur, pas de formules de politesse inutiles.",
         },
         { role: "user", content: contextPrompt },
       ],

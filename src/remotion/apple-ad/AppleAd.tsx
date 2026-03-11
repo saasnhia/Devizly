@@ -448,7 +448,7 @@ function StatScene() {
           marginTop: 10,
         }}
       >
-        Pendant que tu passes 2h sur Excel.
+        Pendant que vous passez 2h sur Excel.
       </div>
     </AbsoluteFill>
   );
@@ -515,7 +515,7 @@ function CTAScene() {
           transform: `translateY(${titleY}px)`,
         }}
       >
-        Essaie
+        Essayez
         <br />
         gratuitement
       </div>

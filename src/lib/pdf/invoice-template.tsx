@@ -35,6 +35,8 @@ interface PdfCompany {
   logo_url?: string | null;
   tva_number?: string | null;
   is_micro_entrepreneur?: boolean;
+  legal_form?: string | null;
+  rcs_number?: string | null;
 }
 
 export interface InvoicePdfProps {
@@ -317,6 +319,12 @@ export function InvoicePdf(props: InvoicePdfProps) {
             {company.siret && (
               <Text style={s.companyInfo}>SIRET : {company.siret}</Text>
             )}
+            {company.legal_form && (
+              <Text style={s.companyInfo}>{company.legal_form}</Text>
+            )}
+            {company.rcs_number && (
+              <Text style={s.companyInfo}>RCS : {company.rcs_number}</Text>
+            )}
             {company.tva_number && !company.is_micro_entrepreneur && (
               <Text style={s.companyInfo}>N° TVA : {company.tva_number}</Text>
             )}
@@ -453,7 +461,9 @@ export function InvoicePdf(props: InvoicePdfProps) {
         <View style={s.footer} fixed>
           <Text style={s.footerText}>
             {company.name || "Devizly"}
+            {company.legal_form ? ` — ${company.legal_form}` : ""}
             {company.siret ? ` — SIRET ${company.siret}` : ""}
+            {company.rcs_number ? ` — RCS ${company.rcs_number}` : ""}
             {company.address ? ` — ${company.address}` : ""}
           </Text>
           <Text style={s.footerText}>

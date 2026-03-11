@@ -58,7 +58,11 @@ export default function NouveauDevisPage() {
   const [discount, setDiscount] = useState("0");
   const [currency, setCurrency] = useState("EUR");
   const [notes, setNotes] = useState("");
-  const [validUntil, setValidUntil] = useState("");
+  const [validUntil, setValidUntil] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 30);
+    return d.toISOString().split("T")[0];
+  });
   const [items, setItems] = useState<QuoteItemDraft[]>([{ ...emptyItem }]);
   const [clients, setClients] = useState<Client[]>([]);
   const [aiPrompt, setAiPrompt] = useState("");

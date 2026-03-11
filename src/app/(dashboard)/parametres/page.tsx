@@ -55,6 +55,8 @@ export default function ParametresPage() {
     default_tva_rate: "20",
     tva_number: "",
     is_micro_entrepreneur: false,
+    legal_form: "",
+    rcs_number: "",
   });
 
   useEffect(() => {
@@ -74,6 +76,8 @@ export default function ParametresPage() {
           default_tva_rate: user.user_metadata.default_tva_rate || "20",
           tva_number: user.user_metadata.tva_number || "",
           is_micro_entrepreneur: user.user_metadata.is_micro_entrepreneur || false,
+          legal_form: user.user_metadata.legal_form || "",
+          rcs_number: user.user_metadata.rcs_number || "",
         });
       }
 
@@ -209,6 +213,8 @@ export default function ParametresPage() {
           tva_number: profile.tva_number || null,
           tva_applicable: !profile.is_micro_entrepreneur,
           is_micro_entrepreneur: profile.is_micro_entrepreneur,
+          legal_form: profile.legal_form || null,
+          rcs_number: profile.rcs_number || null,
           slug: slug.toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 50) || null,
           brand_color: brandColor || "#8B5CF6",
         })
@@ -435,6 +441,43 @@ export default function ParametresPage() {
                     setProfile({ ...profile, company_phone: e.target.value })
                   }
                   placeholder="01 23 45 67 89"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Forme juridique</Label>
+                <Select
+                  value={profile.legal_form}
+                  onValueChange={(v) =>
+                    setProfile({ ...profile, legal_form: v })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionner..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Auto-entrepreneur">Auto-entrepreneur</SelectItem>
+                    <SelectItem value="EI">EI (Entreprise Individuelle)</SelectItem>
+                    <SelectItem value="EIRL">EIRL</SelectItem>
+                    <SelectItem value="EURL">EURL</SelectItem>
+                    <SelectItem value="SARL">SARL</SelectItem>
+                    <SelectItem value="SAS">SAS</SelectItem>
+                    <SelectItem value="SASU">SASU</SelectItem>
+                    <SelectItem value="SA">SA</SelectItem>
+                    <SelectItem value="SCI">SCI</SelectItem>
+                    <SelectItem value="SNC">SNC</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>RCS</Label>
+                <Input
+                  value={profile.rcs_number}
+                  onChange={(e) =>
+                    setProfile({ ...profile, rcs_number: e.target.value })
+                  }
+                  placeholder="RCS Paris B 123 456 789"
                 />
               </div>
             </div>

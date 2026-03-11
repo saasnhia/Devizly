@@ -69,7 +69,7 @@ export async function POST(request: Request) {
       tva_rate: tva_rate ?? 20,
       discount: discount ?? 0,
       notes: notes || null,
-      valid_until: valid_until || null,
+      valid_until: valid_until || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
       ai_prompt: ai_prompt || null,
       total_ht: total_ht ?? 0,
       total_ttc: total_ttc ?? 0,

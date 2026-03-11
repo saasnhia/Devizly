@@ -62,7 +62,7 @@ const plans = [
     annualPrice: "0",
     description: "Pour tester sans engagement",
     highlight: null,
-    cta: "Commencer gratuit",
+    cta: "Commencer gratuitement",
     priceId: null,
     popular: false,
   },

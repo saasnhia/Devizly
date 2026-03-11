@@ -185,7 +185,7 @@ const plans = [
       "QR Code + liens publics",
       "Versioning devis",
     ],
-    cta: "Commencer gratuit",
+    cta: "Commencer gratuitement",
     popular: false,
   },
   {
@@ -427,7 +427,7 @@ function LandingPageInner() {
               href="/signup"
               className="rounded-lg bg-gradient-to-r from-violet-600 to-indigo-500 px-5 py-2 text-sm font-medium text-white shadow-lg shadow-violet-500/25 transition-all hover:shadow-violet-500/40 hover:brightness-110"
             >
-              Essayer gratuit
+              Essayer gratuitement
             </Link>
           </div>
 
@@ -486,7 +486,7 @@ function LandingPageInner() {
                   href="/signup"
                   className="rounded-lg bg-gradient-to-r from-violet-600 to-indigo-500 px-5 py-2.5 text-center text-sm font-medium text-white"
                 >
-                  Essayer gratuit
+                  Essayer gratuitement
                 </Link>
               </div>
             </motion.div>
@@ -563,7 +563,7 @@ function LandingPageInner() {
                 onClick={fireConfetti}
                 className="group inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-500 px-8 py-3.5 text-base font-semibold text-white shadow-xl shadow-violet-500/25 transition-all hover:shadow-violet-500/40 hover:brightness-110"
               >
-                Commencer gratuit
+                Commencer gratuitement
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
               <button
@@ -1136,7 +1136,7 @@ function LandingPageInner() {
                   onClick={fireConfetti}
                   className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-500 px-8 py-4 text-base font-semibold text-white shadow-xl shadow-violet-500/25 transition-all hover:shadow-violet-500/40 hover:brightness-110"
                 >
-                  Commencer gratuitement
+                  Commencer gratuitementement
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Link>
               </div>

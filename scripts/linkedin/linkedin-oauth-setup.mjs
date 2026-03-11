@@ -16,6 +16,7 @@
  */
 
 import { readFileSync, writeFileSync, existsSync } from "fs";
+import { exec } from "child_process";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import { createRequire } from "module";
@@ -24,7 +25,34 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
 
 const express = require("express");
-const open = require("open");
+
+/**
+ * Open URL in browser — cross-platform with fallbacks
+ */
+async function openBrowser(url) {
+  // Try ESM `open` package first
+  try {
+    const mod = await import("open");
+    const openFn = mod.default || mod;
+    await openFn(url);
+    return;
+  } catch {
+    // fallback
+  }
+
+  // Windows fallback via start command
+  if (process.platform === "win32") {
+    exec(`start "" "${url}"`);
+    return;
+  }
+  // macOS
+  if (process.platform === "darwin") {
+    exec(`open "${url}"`);
+    return;
+  }
+  // Linux
+  exec(`xdg-open "${url}"`);
+}
 
 // ═══════════════════════════════════════════════════
 // CONFIG
@@ -310,21 +338,27 @@ async function main() {
       res.send("LinkedIn OAuth callback server running. Waiting for authorization...");
     });
 
-    server = app.listen(PORT, () => {
+    server = app.listen(PORT, async () => {
+      const url = authUrl.toString();
+
       console.log(`🌐 Serveur callback démarré sur http://localhost:${PORT}`);
       console.log("");
-      console.log("📱 Ouverture du navigateur...");
-      console.log("   Connectez-vous à LinkedIn et autorisez l'application.");
+      console.log("🔗 URL d'autorisation LinkedIn :");
       console.log("");
+      console.log(`   ${url}`);
+      console.log("");
+      console.log("📱 Ouverture du navigateur...");
 
-      // Open browser
-      open(authUrl.toString()).catch(() => {
-        console.log("⚠️  Impossible d'ouvrir le navigateur automatiquement.");
-        console.log("   Ouvrez manuellement cette URL :");
-        console.log("");
-        console.log(`   ${authUrl.toString()}`);
-        console.log("");
-      });
+      try {
+        await openBrowser(url);
+        console.log("   ✅ Navigateur ouvert !");
+      } catch {
+        console.log("   ⚠️  Impossible d'ouvrir le navigateur automatiquement.");
+        console.log("   Copiez l'URL ci-dessus dans votre navigateur.");
+      }
+
+      console.log("");
+      console.log("⏳ En attente de l'autorisation LinkedIn...");
     });
 
     // Timeout after 5 minutes

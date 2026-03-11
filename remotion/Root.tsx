@@ -1,10 +1,21 @@
 import { Composition } from "remotion";
 import { DevizlyAd } from "./DevizlyAd";
+import { DevizlyDemo } from "./DevizlyDemo";
 import { LinkedInBanner, LinkedInBannerPreview, LinkedInProfilePic } from "./LinkedInAssets";
 
 export const RemotionRoot: React.FC = () => {
   return (
     <>
+      {/* 90-second full product demo (1920x1080 landscape) */}
+      <Composition
+        id="DevizlyDemo"
+        component={DevizlyDemo}
+        durationInFrames={2700}
+        fps={30}
+        width={1920}
+        height={1080}
+      />
+      {/* Original 15s ad (1080x1080 square) */}
       <Composition
         id="DevizlyAd"
         component={DevizlyAd}

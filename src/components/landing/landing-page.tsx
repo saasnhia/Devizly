@@ -1262,13 +1262,11 @@ function LandingPageInner() {
               </button>
               <video
                 autoPlay
-                muted
-                loop
                 playsInline
                 controls
                 className="w-full"
               >
-                <source src="/marketing/@remotion - R⤓Download.mp4" type="video/mp4" />
+                <source src="/marketing/demo-devizly-90s.mp4" type="video/mp4" />
               </video>
             </motion.div>
           </motion.div>

@@ -10,6 +10,7 @@ scripts/linkedin/
 ├── posts.json                  # 30 posts (5 slides chacun)
 ├── buffer-api-poster.mjs       # Scheduler via Buffer API (recommandé)
 ├── get-buffer-profile-id.mjs   # Helper pour trouver le BUFFER_PROFILE_ID
+├── linkedin-oauth-setup.mjs    # OAuth 2.0 — obtenir un token LinkedIn en 2min
 ├── auto-poster.mjs             # Post direct via LinkedIn API (avancé)
 ├── export-buffer-csv.mjs       # Export CSV (obsolète — Buffer ne supporte pas bien)
 ├── .env.linkedin.example       # Template variables d'environnement
@@ -111,12 +112,58 @@ Le script formate automatiquement les slides en texte LinkedIn optimisé
 
 ## Méthode alternative : LinkedIn API directe
 
-Pour poster directement sans Buffer (avancé) :
+Pour poster directement sans Buffer via l'API LinkedIn native.
 
-1. Créer une app sur LinkedIn Developer Portal
-2. Obtenir un access token OAuth 2.0
-3. Configurer `LINKEDIN_ACCESS_TOKEN` et `LINKEDIN_PERSON_URN`
-4. `node scripts/linkedin/auto-poster.mjs --dry-run`
+### 1. Créer une app LinkedIn
+
+1. Aller sur **https://www.linkedin.com/developers/apps**
+2. Cliquer **Create App**
+3. Remplir : nom, logo, page LinkedIn associée
+4. Onglet **Products** → activer **Share on LinkedIn**
+5. Onglet **Auth** :
+   - Copier **Client ID** et **Client Secret**
+   - Ajouter `http://localhost:3456/callback` dans **Authorized redirect URLs**
+
+### 2. Configurer les variables
+
+Ajouter dans `.env.linkedin` :
+```env
+LINKEDIN_CLIENT_ID=votre_client_id
+LINKEDIN_CLIENT_SECRET=votre_client_secret
+```
+
+### 3. Obtenir le token (automatique)
+
+```bash
+node scripts/linkedin/linkedin-oauth-setup.mjs
+```
+
+Le script :
+1. Démarre un serveur local sur `localhost:3456`
+2. Ouvre LinkedIn dans le navigateur
+3. Vous vous connectez et autorisez l'app
+4. Le code est capturé automatiquement
+5. Le token (60 jours) est sauvegardé dans `.env.linkedin`
+
+### 4. Tester
+
+```bash
+# Preview
+node scripts/linkedin/auto-poster.mjs --dry-run
+
+# Poster le jour 1
+node scripts/linkedin/auto-poster.mjs --day 1
+
+# Mode cron continu
+node scripts/linkedin/auto-poster.mjs --cron
+```
+
+### Renouveler le token
+
+Le token expire après 60 jours. Relancez simplement :
+```bash
+node scripts/linkedin/linkedin-oauth-setup.mjs
+```
 
 ## Notes
 

@@ -24,6 +24,7 @@ import {
   Inbox,
   FileSignature,
   UsersRound,
+  Timer,
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import { NotificationBell } from "@/components/layout/notification-bell";
@@ -38,6 +39,7 @@ const navItems = [
   { href: "/devis", label: "Devis", icon: FileText },
   { href: "/templates", label: "Templates", icon: LayoutTemplate },
   { href: "/clients", label: "Clients", icon: Users },
+  { href: "/timer", label: "Temps", icon: Timer },
   { href: "/lead-forms", label: "Formulaires", icon: FileInput },
   { href: "/leads", label: "Leads", icon: Inbox },
   { href: "/equipe", label: "Équipe", icon: UsersRound },

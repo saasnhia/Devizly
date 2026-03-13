@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Mentions légales",
   description: "Mentions légales de Devizly — informations sur l'éditeur du site.",
+  alternates: { canonical: "https://devizly.fr/mentions-legales" },
 };
 
 export default function MentionsLegalesPage() {

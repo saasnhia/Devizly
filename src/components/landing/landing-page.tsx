@@ -10,6 +10,7 @@ import { useInView } from "react-intersection-observer";
 import CountUp from "react-countup";
 import confetti from "canvas-confetti";
 import { DevizlyLogo } from "@/components/devizly-logo";
+import { BetaBanner } from "@/components/landing/beta-banner";
 import {
   Sparkles,
   Check,
@@ -377,8 +378,15 @@ function LandingPageInner() {
     });
   }, []);
 
+  const isBeta = process.env.NEXT_PUBLIC_BETA_MODE === "true";
+
   return (
     <div className="min-h-screen bg-[#0A0A0F] text-white">
+      {/* ══════════════════════════════════════════════
+          BETA BANNER
+          ══════════════════════════════════════════════ */}
+      <BetaBanner />
+
       {/* ══════════════════════════════════════════════
           NAVBAR
           ══════════════════════════════════════════════ */}
@@ -390,8 +398,13 @@ function LandingPageInner() {
         }`}
       >
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-          <Link href="/" className="transition-transform hover:scale-105">
+          <Link href="/" className="flex items-center gap-2 transition-transform hover:scale-105">
             <DevizlyLogo width={130} height={34} className="text-white" />
+            {isBeta && (
+              <span className="rounded-full bg-violet-500 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                bêta
+              </span>
+            )}
           </Link>
 
           {/* Desktop nav */}
@@ -1181,6 +1194,17 @@ function LandingPageInner() {
               >
                 Connexion
               </Link>
+            </div>
+
+            {/* Solutions SEO */}
+            <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-600">
+              <span className="font-medium text-slate-500">Solutions :</span>
+              <Link href="/logiciel-devis-artisan" className="transition-colors hover:text-slate-400">Logiciel devis artisan</Link>
+              <Link href="/devis-auto-entrepreneur" className="transition-colors hover:text-slate-400">Devis auto-entrepreneur</Link>
+              <Link href="/logiciel-facturation-freelance" className="transition-colors hover:text-slate-400">Facturation freelance</Link>
+              <Link href="/devis-batiment-gratuit" className="transition-colors hover:text-slate-400">Devis bâtiment</Link>
+              <Link href="/creer-devis-en-ligne" className="transition-colors hover:text-slate-400">Créer devis en ligne</Link>
+              <Link href="/generateur-devis-ia" className="transition-colors hover:text-slate-400">Générateur devis IA</Link>
             </div>
 
             <div className="flex items-center gap-2 text-xs text-slate-500">

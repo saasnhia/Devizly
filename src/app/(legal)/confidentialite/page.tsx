@@ -4,6 +4,7 @@ export const metadata: Metadata = {
   title: "Politique de confidentialité",
   description:
     "Politique de confidentialité de Devizly — traitement des données personnelles conforme RGPD.",
+  alternates: { canonical: "https://devizly.fr/confidentialite" },
 };
 
 export default function ConfidentialitePage() {

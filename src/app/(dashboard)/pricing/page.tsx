@@ -115,6 +115,8 @@ const guarantees = [
   { icon: Star, text: "Satisfait ou remboursé 30j" },
 ];
 
+const IS_BETA = process.env.NEXT_PUBLIC_BETA_MODE === "true";
+
 /* ── Component ───────────────────────────────────── */
 
 export default function PricingPage() {
@@ -195,6 +197,15 @@ export default function PricingPage() {
         </p>
       </div>
 
+      {/* ── Beta notice ── */}
+      {IS_BETA && (
+        <div className="rounded-lg border border-violet-200 bg-violet-50 p-4 text-center text-sm text-violet-900">
+          🚀 Devizly est en accès anticipé gratuit. Les plans Pro et Business
+          seront disponibles prochainement — profitez dès maintenant du plan
+          gratuit sans limitation de durée.
+        </div>
+      )}
+
       {/* ── Annual/Monthly toggle ── */}
       <div className="flex items-center justify-center gap-3">
         <span
@@ -240,26 +251,45 @@ export default function PricingPage() {
                     100
                 )
               : 0;
+          const isBetaPaid = IS_BETA && plan.id !== "free";
 
           return (
             <Card
               key={plan.id}
               className={`relative flex flex-col transition-shadow hover:shadow-md ${
-                plan.popular
-                  ? "border-primary shadow-lg ring-1 ring-primary/20"
-                  : isCurrent
-                    ? "border-green-400 ring-1 ring-green-200"
-                    : ""
+                isBetaPaid
+                  ? "opacity-75"
+                  : plan.popular
+                    ? "border-primary shadow-lg ring-1 ring-primary/20"
+                    : isCurrent
+                      ? "border-green-400 ring-1 ring-green-200"
+                      : ""
               }`}
             >
-              {plan.popular && (
+              {/* Beta badges */}
+              {IS_BETA && plan.id === "free" && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <Badge className="bg-green-500 px-3 py-1 text-white shadow-sm">
+                    DISPONIBLE
+                  </Badge>
+                </div>
+              )}
+              {isBetaPaid && (
+                <div className="absolute -top-3 right-3">
+                  <Badge className="bg-gray-400 px-3 py-1 text-white shadow-sm">
+                    BIENTÔT
+                  </Badge>
+                </div>
+              )}
+              {/* Normal badges (hidden in beta) */}
+              {!IS_BETA && plan.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <Badge className="bg-primary px-3 py-1 text-primary-foreground shadow-sm">
                     {plan.highlight}
                   </Badge>
                 </div>
               )}
-              {isCurrent && !plan.popular && (
+              {!IS_BETA && isCurrent && !plan.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <Badge className="bg-green-500 px-3 py-1 text-white shadow-sm">
                     Votre plan actuel
@@ -329,7 +359,16 @@ export default function PricingPage() {
 
                 {/* CTA */}
                 <div className="mt-8">
-                  {isCurrent ? (
+                  {isBetaPaid ? (
+                    <Button
+                      variant="outline"
+                      className="w-full cursor-not-allowed opacity-50"
+                      size="lg"
+                      disabled
+                    >
+                      Bientôt disponible
+                    </Button>
+                  ) : isCurrent ? (
                     currentPlan !== "free" ? (
                       <Button
                         variant="outline"
@@ -379,7 +418,7 @@ export default function PricingPage() {
                       {plan.cta}
                     </Button>
                   )}
-                  {plan.priceId && !isCurrent && (
+                  {!IS_BETA && plan.priceId && !isCurrent && (
                     <p className="mt-2 text-center text-xs text-muted-foreground">
                       Sans engagement — annulez à tout moment
                     </p>
@@ -403,6 +442,14 @@ export default function PricingPage() {
           </div>
         ))}
       </div>
+
+      {/* ── Stripe test mode notice ── */}
+      {IS_BETA && (
+        <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-center text-sm text-blue-800">
+          🔒 Les paiements sont en mode test. Aucun prélèvement réel ne sera
+          effectué.
+        </div>
+      )}
 
       {/* ── Feature comparison table ── */}
       <div>

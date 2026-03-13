@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Conditions Générales de Vente",
-  description: "CGV de Devizly — conditions applicables aux abonnements et services.",
+  title: "CGV",
+  description: "Conditions Générales de Vente de Devizly — conditions applicables aux abonnements et services.",
+  alternates: { canonical: "https://devizly.fr/cgv" },
 };
 
 export default function CGVPage() {

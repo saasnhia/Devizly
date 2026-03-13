@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Conditions Générales d'Utilisation",
-  description: "CGU de Devizly — règles d'utilisation de la plateforme.",
+  title: "CGU",
+  description: "Conditions Générales d'Utilisation de Devizly — règles d'utilisation de la plateforme.",
+  alternates: { canonical: "https://devizly.fr/cgu" },
 };
 
 export default function CGUPage() {

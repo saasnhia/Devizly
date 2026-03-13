@@ -56,7 +56,7 @@ export default async function BriefingPage() {
   const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString();
   const { data: overdueQuotes } = await supabase
     .from("quotes")
-    .select("id, title, number, total_ttc, created_at, viewed_at, view_count, clients(name, email)")
+    .select("id, title, number, total_ttc, currency, created_at, viewed_at, view_count, clients(name, email)")
     .eq("user_id", user.id)
     .eq("status", "envoyé")
     .lt("created_at", twoDaysAgo)
@@ -68,6 +68,7 @@ export default async function BriefingPage() {
     title: string;
     number: number;
     total_ttc: number;
+    currency: string;
     created_at: string;
     viewed_at: string | null;
     view_count: number;
@@ -270,7 +271,7 @@ export default async function BriefingPage() {
                           </div>
                           <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
                             <span>{q.clients?.name || "—"}</span>
-                            <span>{formatCurrency(Number(q.total_ttc))}</span>
+                            <span>{formatCurrency(Number(q.total_ttc), q.currency || "EUR")}</span>
                             <span className="text-amber-600">
                               {daysSince}j sans reponse
                             </span>

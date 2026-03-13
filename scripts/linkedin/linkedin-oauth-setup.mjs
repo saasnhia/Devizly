@@ -7,7 +7,9 @@
  *
  * Prérequis :
  *   1. Créer une app sur https://www.linkedin.com/developers/apps
- *   2. Ajouter le produit "Share on LinkedIn" (scope w_member_social)
+ *   2. Ajouter les produits :
+ *      - "Share on LinkedIn" (scope w_member_social)
+ *      - "Sign In with LinkedIn using OpenID Connect" (scope openid profile)
  *   3. Ajouter http://localhost:3456/callback dans Redirect URLs
  *   4. Remplir LINKEDIN_CLIENT_ID et LINKEDIN_CLIENT_SECRET dans .env.linkedin
  *
@@ -61,7 +63,11 @@ async function openBrowser(url) {
 const ENV_PATH = join(__dirname, ".env.linkedin");
 const PORT = 3456;
 const REDIRECT_URI = `http://localhost:${PORT}/callback`;
-const SCOPES = ["w_member_social"];
+
+// openid + profile → gives id_token JWT with "sub" (person ID)
+// w_member_social → allows posting as yourself
+// w_organization_social → allows posting as company page
+const SCOPES = ["openid", "profile", "w_member_social", "w_organization_social"];
 
 // ═══════════════════════════════════════════════════
 // LOAD ENV
@@ -86,33 +92,34 @@ function loadEnv() {
   return env;
 }
 
-function saveTokenToEnv(accessToken, expiresIn, personUrn) {
+function updateEnvVar(content, key, value) {
+  const regex = new RegExp(`^${key}=.*`, "m");
+  if (regex.test(content)) {
+    return content.replace(regex, `${key}=${value}`);
+  }
+  // Remove commented version if exists
+  const commentRegex = new RegExp(`^#\\s*${key}=.*`, "m");
+  if (commentRegex.test(content)) {
+    return content.replace(commentRegex, `${key}=${value}`);
+  }
+  return content + `\n${key}=${value}`;
+}
+
+function saveTokenToEnv(accessToken, expiresIn, personUrn, orgUrn) {
   let content = "";
 
   if (existsSync(ENV_PATH)) {
     content = readFileSync(ENV_PATH, "utf-8");
   }
 
-  // Update or add LINKEDIN_ACCESS_TOKEN
-  if (content.includes("LINKEDIN_ACCESS_TOKEN=")) {
-    content = content.replace(
-      /LINKEDIN_ACCESS_TOKEN=.*/,
-      `LINKEDIN_ACCESS_TOKEN=${accessToken}`
-    );
-  } else {
-    content += `\nLINKEDIN_ACCESS_TOKEN=${accessToken}`;
+  content = updateEnvVar(content, "LINKEDIN_ACCESS_TOKEN", accessToken);
+
+  if (personUrn) {
+    content = updateEnvVar(content, "LINKEDIN_PERSON_URN", personUrn);
   }
 
-  // Update or add LINKEDIN_PERSON_URN
-  if (personUrn) {
-    if (content.includes("LINKEDIN_PERSON_URN=")) {
-      content = content.replace(
-        /LINKEDIN_PERSON_URN=.*/,
-        `LINKEDIN_PERSON_URN=${personUrn}`
-      );
-    } else {
-      content += `\nLINKEDIN_PERSON_URN=${personUrn}`;
-    }
+  if (orgUrn) {
+    content = updateEnvVar(content, "LINKEDIN_ORG_URN", orgUrn);
   }
 
   // Add expiry comment
@@ -130,6 +137,21 @@ function saveTokenToEnv(accessToken, expiresIn, personUrn) {
   }
 
   writeFileSync(ENV_PATH, content.trim() + "\n", "utf-8");
+}
+
+// ═══════════════════════════════════════════════════
+// DECODE id_token JWT (no verification needed — just extract sub)
+// ═══════════════════════════════════════════════════
+
+function decodeJwtPayload(jwt) {
+  const parts = jwt.split(".");
+  if (parts.length !== 3) return null;
+  try {
+    const payload = Buffer.from(parts[1], "base64url").toString("utf-8");
+    return JSON.parse(payload);
+  } catch {
+    return null;
+  }
 }
 
 // ═══════════════════════════════════════════════════
@@ -160,29 +182,50 @@ async function exchangeCodeForToken(code, clientId, clientSecret) {
 }
 
 async function getProfileInfo(accessToken) {
-  // Try /v2/userinfo first (OpenID Connect), fallback to /v2/me (r_liteprofile)
-  for (const endpoint of [
-    "https://api.linkedin.com/v2/userinfo",
-    "https://api.linkedin.com/v2/me",
-  ]) {
-    const res = await fetch(endpoint, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-    if (res.ok) {
-      const data = await res.json();
-      // Normalize response shape
-      return {
-        id: data.sub || data.id,
-        name:
-          data.name ||
-          [data.localizedFirstName, data.localizedLastName]
-            .filter(Boolean)
-            .join(" ") ||
-          "Inconnu",
-      };
-    }
+  // Try /v2/userinfo (OpenID Connect — available with openid+profile scopes)
+  const res = await fetch("https://api.linkedin.com/v2/userinfo", {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (res.ok) {
+    const data = await res.json();
+    return {
+      id: data.sub,
+      name: data.name || "Inconnu",
+    };
   }
-  throw new Error("Profile fetch failed on both /v2/userinfo and /v2/me");
+  throw new Error(`Profile fetch failed: ${res.status} ${await res.text()}`);
+}
+
+async function getOrganizations(accessToken) {
+  // Get organizations where user is admin
+  const res = await fetch(
+    "https://api.linkedin.com/v2/organizationalEntityAcls?q=roleAssignee&role=ADMINISTRATOR&state=APPROVED",
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "X-Restli-Protocol-Version": "2.0.0",
+      },
+    }
+  );
+  if (!res.ok) return [];
+  const data = await res.json();
+  return (data.elements || []).map((el) => el.organizationalTarget);
+}
+
+async function getOrgName(accessToken, orgUrn) {
+  const orgId = orgUrn.replace("urn:li:organization:", "");
+  const res = await fetch(
+    `https://api.linkedin.com/v2/organizations/${orgId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "X-Restli-Protocol-Version": "2.0.0",
+      },
+    }
+  );
+  if (!res.ok) return orgUrn;
+  const data = await res.json();
+  return data.localizedName || orgUrn;
 }
 
 // ═══════════════════════════════════════════════════
@@ -207,7 +250,9 @@ async function main() {
     console.log("  2. Créez une app (ou sélectionnez l'existante)");
     console.log("  3. Onglet 'Auth' → copiez Client ID et Client Secret");
     console.log(`  4. Onglet 'Auth' → ajoutez ${REDIRECT_URI} aux Redirect URLs`);
-    console.log("  5. Onglet 'Products' → activez 'Share on LinkedIn'");
+    console.log("  5. Onglet 'Products' → activez :");
+    console.log("     • 'Share on LinkedIn'");
+    console.log("     • 'Sign In with LinkedIn using OpenID Connect'");
     console.log("  6. Ajoutez dans .env.linkedin :");
     console.log("");
     console.log("     LINKEDIN_CLIENT_ID=votre_client_id");
@@ -242,6 +287,18 @@ async function main() {
           </body></html>
         `);
         console.error(`\n❌ LinkedIn a refusé : ${error_description || error}`);
+        console.error(`\n❌ ${error}`);
+
+        if (error === "unauthorized_scope_error") {
+          console.log("");
+          console.log("💡 Solution :");
+          console.log("   1. Allez sur https://www.linkedin.com/developers/apps");
+          console.log("   2. Sélectionnez votre app");
+          console.log("   3. Onglet 'Products'");
+          console.log("   4. Activez 'Sign In with LinkedIn using OpenID Connect'");
+          console.log("   5. Attendez l'approbation (instant) puis relancez ce script");
+        }
+
         server.close();
         reject(new Error(error));
         return;
@@ -268,24 +325,63 @@ async function main() {
         const tokenData = await exchangeCodeForToken(code, clientId, clientSecret);
         const accessToken = tokenData.access_token;
         const expiresIn = tokenData.expires_in; // seconds (typically 5184000 = 60 days)
+        const idToken = tokenData.id_token; // JWT with "sub" claim = person ID
 
         console.log(`✅ Access token obtenu ! (expire dans ${Math.round(expiresIn / 86400)} jours)`);
 
-        // Get profile info
+        // Extract person URN from id_token JWT or /v2/userinfo
         let personUrn = null;
         let profileName = "Inconnu";
+
+        // Method 1: Decode id_token JWT (no network call needed)
+        if (idToken) {
+          const payload = decodeJwtPayload(idToken);
+          if (payload && payload.sub) {
+            personUrn = `urn:li:person:${payload.sub}`;
+            profileName = payload.name || payload.given_name || "Inconnu";
+            console.log(`👤 Profil (id_token) : ${profileName} (${personUrn})`);
+          }
+        }
+
+        // Method 2: Try /v2/userinfo as fallback
+        if (!personUrn) {
+          try {
+            const profile = await getProfileInfo(accessToken);
+            personUrn = `urn:li:person:${profile.id}`;
+            profileName = profile.name;
+            console.log(`👤 Profil (userinfo) : ${profileName} (${personUrn})`);
+          } catch (profileErr) {
+            console.warn(`⚠️  Profil non récupérable : ${profileErr.message}`);
+            console.log("   Ajoutez LINKEDIN_PERSON_URN manuellement dans .env.linkedin");
+          }
+        }
+
+        // Detect organization pages where user is admin
+        let orgUrn = null;
+        let orgName = null;
         try {
-          const profile = await getProfileInfo(accessToken);
-          personUrn = `urn:li:person:${profile.id}`;
-          profileName = profile.name;
-          console.log(`👤 Profil : ${profileName} (${personUrn})`);
-        } catch (profileErr) {
-          console.warn(`⚠️  Impossible de récupérer le profil : ${profileErr.message}`);
-          console.log("   Vous devrez ajouter LINKEDIN_PERSON_URN manuellement.");
+          const orgs = await getOrganizations(accessToken);
+          if (orgs.length > 0) {
+            orgUrn = orgs[0]; // First org where user is admin
+            orgName = await getOrgName(accessToken, orgUrn);
+            console.log(`🏢 Page entreprise : ${orgName} (${orgUrn})`);
+            if (orgs.length > 1) {
+              console.log(`   (${orgs.length} pages trouvées, utilisation de la première)`);
+              for (const org of orgs) {
+                const name = await getOrgName(accessToken, org);
+                console.log(`   - ${name} (${org})`);
+              }
+            }
+          } else {
+            console.log("ℹ️  Aucune page entreprise trouvée (vous posterez en tant que personne)");
+          }
+        } catch (orgErr) {
+          console.warn(`⚠️  Détection page entreprise échouée : ${orgErr.message}`);
+          console.log("   Ajoutez LINKEDIN_ORG_URN manuellement ou activez 'Community Management API'");
         }
 
         // Save to .env.linkedin
-        saveTokenToEnv(accessToken, expiresIn, personUrn);
+        saveTokenToEnv(accessToken, expiresIn, personUrn, orgUrn);
         console.log(`\n💾 Token sauvegardé dans ${ENV_PATH}`);
 
         const expiryDate = new Date(Date.now() + expiresIn * 1000);
@@ -298,7 +394,8 @@ async function main() {
               <h2 style="color:#22D3A5">Token LinkedIn obtenu !</h2>
               <div style="background:#1E293B;border-radius:12px;padding:24px;text-align:left;margin:24px 0">
                 <p style="margin:8px 0"><strong style="color:#94A3B8">Profil :</strong> ${profileName}</p>
-                <p style="margin:8px 0"><strong style="color:#94A3B8">URN :</strong> <code style="color:#22D3A5">${personUrn || "N/A"}</code></p>
+                <p style="margin:8px 0"><strong style="color:#94A3B8">Person URN :</strong> <code style="color:#22D3A5">${personUrn || "N/A"}</code></p>
+                ${orgUrn ? `<p style="margin:8px 0"><strong style="color:#94A3B8">Page :</strong> ${orgName} <code style="color:#22D3A5">${orgUrn}</code></p>` : ""}
                 <p style="margin:8px 0"><strong style="color:#94A3B8">Expire :</strong> ${expiryDate.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}</p>
               </div>
               <p style="color:#64748B">Token sauvegardé dans <code>.env.linkedin</code></p>
@@ -306,7 +403,7 @@ async function main() {
               <div style="margin-top:24px">
                 <p style="color:#94A3B8">Testez maintenant :</p>
                 <code style="color:#22D3A5;background:#1E293B;padding:8px 16px;border-radius:6px;display:inline-block">
-                  node auto-poster.mjs --dry-run
+                  node auto-poster.mjs --dry-run --day 1
                 </code>
               </div>
             </div>
@@ -320,13 +417,10 @@ async function main() {
         console.log("🎉 Setup terminé ! Prochaines étapes :");
         console.log("");
         console.log("   # Test dry-run");
-        console.log("   node scripts/linkedin/auto-poster.mjs --dry-run");
+        console.log("   node scripts/linkedin/auto-poster.mjs --dry-run --day 1");
         console.log("");
         console.log("   # Poster le jour 1");
         console.log("   node scripts/linkedin/auto-poster.mjs --day 1");
-        console.log("");
-        console.log("   # Mode cron (tourne en continu)");
-        console.log("   node scripts/linkedin/auto-poster.mjs --cron");
         console.log("");
         console.log(`⚠️  Token expire le ${expiryDate.toLocaleDateString("fr-FR")} — relancez ce script pour renouveler.`);
 

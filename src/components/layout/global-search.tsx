@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Search, FileText, Users, Receipt, X } from "lucide-react";
+import { formatCurrency } from "@/lib/utils/quote";
 
 interface SearchResult {
   id: string;
@@ -106,7 +107,7 @@ export function GlobalSearch() {
         mapped.push({
           id: inv.id as string,
           label: inv.invoice_number as string,
-          sublabel: `Facture · ${typeof inv.amount === "number" ? inv.amount.toFixed(2) + " €" : ""}`,
+          sublabel: `Facture · ${typeof inv.amount === "number" ? formatCurrency(inv.amount as number) : ""}`,
           type: "invoice",
           href: `/dashboard/factures`,
         });

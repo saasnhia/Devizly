@@ -4,6 +4,7 @@ import { resend } from "@/lib/resend";
 import { REMINDER_TEMPLATES } from "@/lib/emails/reminder";
 import { formatCurrency } from "@/lib/utils/quote";
 import { getSiteUrl } from "@/lib/url";
+import { sendSms, canSendSms } from "@/lib/twilio";
 
 /**
  * Cron endpoint: auto-send reminders for "envoyé" quotes.
@@ -40,6 +41,7 @@ export async function GET(request: Request) {
   const appUrl = getSiteUrl();
   const now = new Date();
   let totalSent = 0;
+  let smsSent = 0;
   const errors: string[] = [];
 
   // Find all "envoyé" quotes with client + owner profile (exclude opted-out)
@@ -48,8 +50,8 @@ export async function GET(request: Request) {
     .select(`
       id, title, number, total_ttc, share_token, created_at, viewed_at,
       user_id, client_id, deposit_percent, relance_opt_out,
-      clients(name, email),
-      profiles!quotes_user_id_fkey(subscription_status, company_name, full_name, relance_enabled, relance_delays)
+      clients(name, email, phone),
+      profiles!quotes_user_id_fkey(subscription_status, company_name, full_name, relance_enabled, relance_delays, sms_reminders_enabled, sms_used, sms_reset_at)
     `)
     .eq("status", "envoyé")
     .neq("relance_opt_out", true);
@@ -66,6 +68,9 @@ export async function GET(request: Request) {
       full_name: string | null;
       relance_enabled: boolean | null;
       relance_delays: number[] | null;
+      sms_reminders_enabled: boolean | null;
+      sms_used: number | null;
+      sms_reset_at: string | null;
     } | null;
     if (!profile || profile.subscription_status === "free") continue;
     if (profile.relance_enabled === false) continue;
@@ -76,6 +81,7 @@ export async function GET(request: Request) {
     const client = quote.clients as unknown as {
       name: string;
       email: string | null;
+      phone: string | null;
     } | null;
     if (!client?.email) continue;
 
@@ -165,11 +171,69 @@ export async function GET(request: Request) {
       });
 
       totalSent++;
+
+      // ── SMS reminder (if enabled + client has phone) ──
+      if (
+        profile.sms_reminders_enabled &&
+        client.phone &&
+        process.env.TWILIO_ACCOUNT_SID
+      ) {
+        // Reset monthly counter if needed
+        const smsUsed = profile.sms_used ?? 0;
+        const smsResetAt = profile.sms_reset_at
+          ? new Date(profile.sms_reset_at)
+          : null;
+        const needsReset =
+          !smsResetAt ||
+          smsResetAt.getMonth() !== now.getMonth() ||
+          smsResetAt.getFullYear() !== now.getFullYear();
+        const currentSmsUsed = needsReset ? 0 : smsUsed;
+
+        if (canSendSms(profile.subscription_status, currentSmsUsed)) {
+          // Check if SMS already sent for this reminder
+          const { data: existingSms } = await supabase
+            .from("quote_reminders")
+            .select("id")
+            .eq("quote_id", quote.id)
+            .eq("reminder_number", reminderNumber)
+            .eq("type", "sms")
+            .single();
+
+          if (!existingSms) {
+            const smsBody = `${companyName}: Rappel pour le devis ${quoteRef} (${formatCurrency(Number(quote.total_ttc))}). Consultez-le ici: ${shareUrl}`;
+            const sent = await sendSms(client.phone, smsBody);
+            if (sent) {
+              await supabase.from("quote_reminders").insert({
+                quote_id: quote.id,
+                user_id: quote.user_id,
+                type: "sms",
+                reminder_number: reminderNumber,
+              });
+
+              // Update SMS counter
+              const newCount = currentSmsUsed + 1;
+              await supabase
+                .from("profiles")
+                .update({
+                  sms_used: newCount,
+                  ...(needsReset ? { sms_reset_at: now.toISOString() } : {}),
+                })
+                .eq("id", quote.user_id);
+
+              smsSent++;
+              console.log(
+                `[SMS] Sent ${type} (J+${day}) for ${quoteRef} → ${client.phone}`
+              );
+            }
+          }
+        }
+      }
     }
   }
 
   return NextResponse.json({
     sent: totalSent,
+    smsSent,
     errors: errors.length > 0 ? errors : undefined,
   });
 }

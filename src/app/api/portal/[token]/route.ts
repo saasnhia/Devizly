@@ -46,7 +46,7 @@ export async function GET(
   const { data: quotes } = await supabase
     .from("quotes")
     .select(
-      "id, number, title, total_ht, tva_rate, total_ttc, status, share_token, created_at, signed_at, paid_at"
+      "id, number, title, total_ht, tva_rate, total_ttc, currency, status, share_token, created_at, signed_at, paid_at"
     )
     .eq("client_id", client.id)
     .eq("user_id", client.user_id)

@@ -27,6 +27,7 @@ interface PortalQuote {
   total_ht: number;
   tva_rate: number;
   total_ttc: number;
+  currency: string;
   status: string;
   share_token: string | null;
   created_at: string;
@@ -254,7 +255,7 @@ export default function PortalPage({
                       <p className="mt-1 font-medium">{quote.title}</p>
                       <p className="text-sm text-muted-foreground">
                         {formatDate(quote.created_at)} —{" "}
-                        {formatCurrency(Number(quote.total_ttc))} TTC
+                        {formatCurrency(Number(quote.total_ttc), quote.currency || "EUR")} TTC
                       </p>
                     </div>
 

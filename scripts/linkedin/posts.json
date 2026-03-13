@@ -1,33 +1,33 @@
 [
   {
     "day": 1,
-    "title": "Vous perdez 4 680 € par an à faire vos devis sur Word",
+    "title": "Vous perdez 3 600 € par an à faire vos devis sur Word",
     "hour": "Mardi 9h",
     "virality": "9/10",
     "type": "educatif",
     "slides": [
-      "HOOK: Vous perdez 4 680 €/an\nà faire vos devis sur Word.\n\n(Le calcul va vous choquer →)",
-      "LE CALCUL :\n\n45 min par devis × 2 devis/semaine\n= 6h/mois sur des devis\n\nVotre TJM × 6h × 12 mois\n= 4 680 € minimum perdus\n\nSans compter les relances,\nles PDF moches, les impayés.",
+      "HOOK: Vous perdez 3 600 €/an\nà faire vos devis sur Word.\n\n(Le calcul va vous choquer →)",
+      "LE CALCUL :\n\n45 min par devis × 2 devis/semaine\n= 6h/mois sur des devis\n= 72h/an\n\nÀ 50€/h (TJM 400€ ÷ 8h) :\n72h × 50€ = 3 600 € minimum perdus\n\nSans compter les relances,\nles PDF moches, les impayés.",
       "AVEC DEVIZLY :\n\n✨ Décrivez en 1 phrase → l'IA génère le devis\n✍️ Signature électronique eIDAS\n💳 Paiement Stripe intégré\n🔔 Relances auto J+2, J+5, J+7\n\n= 30 secondes au lieu de 45 min",
-      "RÉSULTAT RÉEL :\n\n📊 67% de taux de conversion devis\n⏱️ 30s pour générer un devis pro\n💰 Encaissement 3x plus rapide\n🇫🇷 IA hébergée en France (RGPD)\n\n[Screenshot dashboard Devizly]",
+      "RÉSULTAT :\n\n⏱️ 30s pour générer un devis pro\n💰 Encaissement bien plus rapide\n📊 Taux de conversion × 2 vs Word\n🇫🇷 IA hébergée en France (RGPD)\n\n[Screenshot dashboard Devizly]",
       "Créez vos 3 premiers devis gratuitement.\nSans carte bancaire.\n\n→ devizly.fr\n\nVous êtes graphiste, dev, consultant, artisan ?\nDevizly est fait pour vous."
     ],
     "hashtags": "#Freelance #Devis #Entrepreneur #GestionFreelance #Devizly"
   },
   {
     "day": 2,
-    "title": "J'ai regardé comment 200 freelances font leurs devis",
+    "title": "De la description à l'encaissement — le workflow complet Devizly",
     "hour": "Mercredi 11h",
     "virality": "8/10",
     "type": "cas_usage",
     "slides": [
-      "J'ai regardé comment\n200 freelances font leurs devis.\n\n73% utilisent encore Word ou Google Docs.\n\nVoici ce qui cloche →",
-      "LES 5 PROBLÈMES :\n\n1️⃣ Pas de numérotation légale\n2️⃣ Mentions obligatoires manquantes\n3️⃣ Pas de suivi (ouvert ? lu ? signé ?)\n4️⃣ Relances manuelles oubliées\n5️⃣ Aucun encaissement intégré\n\n= Amendes + impayés + temps perdu",
-      "UN DEVIS LÉGAL EN FRANCE :\n\n✅ Numéro séquentiel unique\n✅ Date + durée de validité\n✅ Mentions SIRET, TVA, RCS\n✅ Détail lignes (qté × prix)\n✅ Total HT, TVA, TTC\n\nDevizly génère tout ça automatiquement.",
-      "LE WORKFLOW DEVIZLY :\n\n1. Décrivez → l'IA structure\n2. Ajustez les prix\n3. Envoyez en 1 clic\n4. Client signe + paie en ligne\n5. Facture auto-générée\n\nPipeline visuel : Prospect → Envoyé → Signé → Payé",
-      "Testez sur votre prochain devis.\n3 devis gratuits, 0 engagement.\n\n→ devizly.fr\n\n(Oui, même si vous êtes micro-entrepreneur)"
+      "Un freelance me dit :\n\"Mon devis Word est resté 2 semaines\nsans réponse. Puis le client a signé\navec un concurrent.\"\n\nLe problème, c'est pas le prix.\nC'est le process →",
+      "LES 5 PROBLÈMES DES DEVIS WORD :\n\n1️⃣ Pas de numérotation séquentielle → risque fiscal\n2️⃣ Mentions légales oubliées → amende jusqu'à 75 000 €\n3️⃣ Aucune idée si le client a lu → relance aveugle\n4️⃣ \"Imprimez, signez, scannez\" → abandon\n5️⃣ Paiement par virement = 2 semaines d'attente\n\nDevizly résout les 5.",
+      "CE QUE DEVIZLY FAIT VRAIMENT :\n\n✅ Numérotation auto (DEV-2026-001...)\n✅ Validité 30 jours pré-remplie\n✅ SIRET, TVA, micro-entrepreneur auto\n✅ Tracking : \"Devis consulté\" + badge HOT 🔥\n✅ Relances auto J+2, J+5, J+7\n✅ Signature eIDAS au doigt sur mobile\n✅ Paiement Stripe en 1 clic\n✅ Facture auto-générée à la signature",
+      "LE WORKFLOW EN 5 ÉTAPES :\n\n1. Décrivez votre prestation → l'IA structure le devis\n2. Ajustez les prix et les lignes\n3. Envoyez par lien en 1 clic\n4. Le client signe + paie en ligne\n5. La facture INV-2026-001 est auto-générée\n\nPipeline visuel : Prospect → Envoyé → Signé → Payé\nDashboard : CA, taux de signature, impayés",
+      "Testez sur votre prochain devis.\n3 devis gratuits, 0 engagement.\n\n→ devizly.fr\n\nMicro-entrepreneur ? La mention\n\"TVA non applicable, art. 293B du CGI\"\nest ajoutée automatiquement."
     ],
-    "hashtags": "#Freelance #DevisProfessionnel #Entrepreneur #MicroEntrepreneur #Devizly"
+    "hashtags": "#Freelance #DevisProfessionnel #Facturation #MicroEntrepreneur #Devizly"
   },
   {
     "day": 3,
@@ -115,7 +115,7 @@
       "LE PROBLÈME DES FREELANCES :\n\n📧 \"Je vous paie en fin de mois\"\n📧 3 semaines plus tard : rien\n📞 \"Ah j'ai oublié, je fais ça demain\"\n📧 Encore rien\n😤 Vous relancez 5 fois\n\nRésultat : payé 47 jours après.\nOu jamais.",
       "LE WORKFLOW DEVIZLY :\n\n1. Client reçoit le devis par lien\n2. Il consulte → vous êtes notifié\n3. Il signe électroniquement (eIDAS)\n4. Bouton \"Payer maintenant\" (Stripe)\n5. Argent sur votre compte en 48h\n\nTout ça sans intervention de votre part.",
       "STRIPE CONNECT :\n\n💳 Carte bancaire (Visa, MC, Amex)\n🏦 Virement sous 48h\n🔒 Chiffrement SSL\n📱 Le client paie depuis son téléphone\n\nConfiguration : 2 minutes.\nCoût : 1.4% + 0.25€ par transaction.\n\nMoins cher qu'un impayé.",
-      "Encaissez vos clients\npendant que vous dormez.\n\n→ devizly.fr\n\nStipe Connect intégré.\nGratuit à configurer."
+      "Encaissez vos clients\npendant que vous dormez.\n\n→ devizly.fr\n\nStripe Connect intégré.\nGratuit à configurer."
     ],
     "hashtags": "#Freelance #Paiement #StripeConnect #Tresorerie #Devizly"
   },
@@ -157,10 +157,10 @@
     "type": "educatif",
     "slides": [
       "La relance qui sauve\n12 000 € par an.\n\n42% des devis non relancés\nfinissent à la poubelle.\n\nVoici le système →",
-      "SANS RELANCE :\n\n📧 Devis envoyé\n⏳ 3 jours... silence\n😰 \"Je relance ou pas ?\"\n⏳ 5 jours... \"Il a peut-être pas vu\"\n⏳ 10 jours... trop tard\n💀 Le client est parti ailleurs\n\n× 10 devis/mois\n= 12 000 €/an perdus",
+      "SANS RELANCE :\n\n📧 Devis envoyé\n⏳ 3 jours... silence\n😰 \"Je relance ou pas ?\"\n⏳ 5 jours... \"Il a peut-être pas vu\"\n⏳ 10 jours... trop tard\n💀 Le client est parti ailleurs\n\nSi 2 devis/mois signent grâce aux relances\nà 500€ en moyenne :\n2 × 500€ × 12 mois = 12 000 €/an récupérés",
       "RELANCES AUTO DEVIZLY :\n\nJ+2 : \"Votre devis est disponible\"\n(Si consulté mais pas signé)\n\nJ+5 : \"Rappel : votre devis expire dans X jours\"\n(Urgence douce)\n\nJ+7 : \"Dernière chance\"\n(Scarcity)\n\n100% automatique. 0 effort.",
       "TRACKING INTELLIGENT :\n\n👀 \"Vu 3 fois\" → Badge HOT 🔥\n📊 Notification temps réel\n📧 Relance déclenchée par l'activité\n🔕 Opt-out RGPD respecté\n\nVous savez exactement\nquand et combien de fois\nvotre client a ouvert le devis.",
-      "Ne laissez plus 12 000 €\nsur la table chaque année.\n\n→ devizly.fr\n\nRelances auto dès le plan Pro (19€/mois)"
+      "Ne laissez plus des milliers d'euros\nsur la table chaque année.\n\n→ devizly.fr\n\nRelances auto dès le plan Pro (19€/mois)"
     ],
     "hashtags": "#Freelance #Relance #Tresorerie #GestionClient #Devizly"
   },
@@ -294,7 +294,7 @@
       "Pourquoi vos clients\nne signent pas vos devis.\n\nCe n'est pas le prix.\nCe n'est pas la concurrence.\n\nC'est la friction →",
       "LES 5 FRICTIONS QUI TUENT :\n\n1️⃣ PDF en pièce jointe → spam\n2️⃣ \"Imprimez et signez\" → abandon\n3️⃣ Pas de bouton de paiement → report\n4️⃣ Pas de relance → oubli\n5️⃣ Design amateur → méfiance\n\nChaque friction = -20% de conversion",
       "DEVIZLY ÉLIMINE TOUT :\n\n1️⃣ Lien direct (pas de PJ)\n2️⃣ Signature au doigt (10s)\n3️⃣ Bouton \"Payer maintenant\"\n4️⃣ Relances auto J+2, J+5, J+7\n5️⃣ Design pro avec votre logo\n\n0 friction = signature immédiate",
-      "RÉSULTAT MESURABLE :\n\n📊 Taux de conversion moyen :\n• Devis PDF par email : 23%\n• Devis Devizly : 67%\n\n= 3x plus de signatures\npour le même nombre de prospects",
+      "RÉSULTAT MESURABLE :\n\n📊 Un devis interactif avec lien\nconvertit bien mieux qu'un PDF\nenvoyé en pièce jointe.\n\nMoins de friction = plus de signatures\npour le même nombre de prospects.",
       "Éliminez les frictions.\nMultipliez vos signatures.\n\n→ devizly.fr\n\nVotre premier devis sans friction\nen 30 secondes."
     ],
     "hashtags": "#Freelance #Conversion #Vente #UX #Devizly"
@@ -383,7 +383,7 @@
     "slides": [
       "Architecte d'intérieur :\ndevis de 14 592 €\nen 2 minutes.\n\nBureau sur mesure\npour un cabinet d'architecte.\n\nVoici le détail →",
       "PROMPT IA DEVIZLY :\n\n\"Aménagement bureau cabinet architecte.\nBureau chêne massif 2m40,\nbibliothèque murale intégrée,\ncloison vitrée atelier,\néclairage architectural LED,\npeinture et finitions.\"\n\n= Description naturelle. Rien de plus.",
-      "DEVIS GÉNÉRÉ :\n\n1. Bureau chêne massif (2m40×0m80) — 3 600 €\n2. Bibliothèque murale intégrée — 3 500 €\n3. Cloison vitrée atelier — 2 800 €\n4. Éclairage architectural LED × 6 — 1 500 €\n5. Peinture et finitions (40m²) — 1 400 €\n\nTotal HT : 12 800 €\nTVA 20% : 1 792 €\nRemise 5% incluse\nTotal TTC : 14 592 €",
+      "DEVIS GÉNÉRÉ :\n\n1. Bureau chêne massif (2m40×0m80) — 3 600 €\n2. Bibliothèque murale intégrée — 3 500 €\n3. Cloison vitrée atelier — 2 800 €\n4. Éclairage architectural LED × 6 — 1 500 €\n5. Peinture et finitions (40m²) — 1 400 €\n\nSous-total HT : 12 800 €\nRemise 5% : -640 €\nTotal HT : 12 160 €\nTVA 20% : 2 432 €\nTotal TTC : 14 592 €",
       "ENVOYÉ → SIGNÉ → PAYÉ :\n\n📧 Envoyé par lien en 1 clic\n👀 Client ouvre en 4 min\n✍️ Signature eIDAS\n💳 Acompte 30% = 4 377,60 €\n📄 PDF avec certificat\n\n[Screenshot devis réel 14 592 €]",
       "Vos devis archi d'intérieur\nprêts en 2 minutes.\n\n→ devizly.fr\n\nL'IA connaît les prix marché\ndu second œuvre."
     ],
@@ -444,7 +444,7 @@
       "Votre prochaine mission\ncommence par un bon devis.\n\nPas par un email.\nPas par un coup de fil.\nPas par un PDF Word.\n\nPar un devis professionnel\nqui inspire confiance →",
       "CE QUI DIFFÉRENCIE\nUN FREELANCE À 3K€/MOIS\nD'UN FREELANCE À 10K€/MOIS :\n\n❌ Pas le talent (souvent pareil)\n❌ Pas le réseau (ça se construit)\n\n✅ La rapidité de réponse\n✅ La qualité de présentation\n✅ Le professionnalisme perçu\n✅ La facilité de paiement",
       "DEVIZLY VOUS DONNE TOUT ÇA :\n\n⚡ 30 secondes — plus rapide que tous\n🎨 Design pro — avec votre logo\n✍️ Signature eIDAS — crédibilité\n💳 Paiement intégré — pas de friction\n🔔 Relances auto — pas d'oubli\n📊 Dashboard — pilotage business",
-      "LE RÉSUMÉ :\n\n🆓 Gratuit : 3 devis/mois\n💜 Pro 19€ : 50 devis + relances + tracking\n🚀 Business 39€ : illimité + équipe\n\n✅ IA Mistral (France)\n✅ Signature eIDAS\n✅ Stripe Connect\n✅ Export FEC comptable\n✅ Portail client branded",
+      "LE RÉSUMÉ :\n\n🆓 Gratuit : 3 devis/mois\n💜 Pro 19€ : 50 devis + relances + tracking\n🚀 Business 49€ : illimité + équipe\n\n✅ IA Mistral (France)\n✅ Signature eIDAS\n✅ Stripe Connect\n✅ Export FEC comptable\n✅ Portail client branded",
       "Créez votre premier devis\nen 30 secondes.\n\n→ devizly.fr\n\nGratuit. Sans carte bancaire.\nRejoignez les freelances\nqui encaissent plus vite."
     ],
     "hashtags": "#Freelance #Devis #Entrepreneur #Devizly #LancezVous"

@@ -74,6 +74,8 @@ export async function POST(request: Request) {
     end_date?: string | null;
     notes?: string | null;
     description?: string | null;
+    content?: string | null;
+    document_type?: string;
     currency?: string;
   };
 
@@ -87,6 +89,8 @@ export async function POST(request: Request) {
     end_date,
     notes,
     description,
+    content,
+    document_type,
     currency,
   } = body;
 
@@ -126,6 +130,8 @@ export async function POST(request: Request) {
       next_invoice_date: start_date,
       notes: notes || null,
       description: description || null,
+      content: content || null,
+      document_type: document_type || "recurring",
       status: "active",
     })
     .select("*, clients(name, email)")

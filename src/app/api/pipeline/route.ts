@@ -16,7 +16,7 @@ export async function GET() {
       .from("quotes")
       .select("id, title, number, total_ttc, currency, status, created_at, updated_at, viewed_at, view_count, client_id, clients(name, email)")
       .eq("user_id", user.id)
-      .in("status", ["envoyé", "signé", "accepté", "payé"])
+      .in("status", ["envoyé", "négociation", "signé", "accepté", "payé", "refusé"])
       .order("updated_at", { ascending: false }),
     supabase
       .from("prospects")

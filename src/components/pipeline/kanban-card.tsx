@@ -39,7 +39,7 @@ function computeLeadScore(item: KanbanItem): LeadScore {
   if (item.amount >= 5000 || item.status === "signé" || item.status === "payé") {
     return "HOT";
   }
-  if (item.amount >= 1000 || item.viewedAt !== null || item.status === "envoyé") {
+  if (item.amount >= 1000 || item.viewedAt !== null || item.status === "envoyé" || item.status === "négociation") {
     return "WARM";
   }
   return "COLD";

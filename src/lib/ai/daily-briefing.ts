@@ -29,6 +29,7 @@ interface QuoteRow {
   title: string;
   number: number;
   total_ttc: string | number;
+  currency: string;
   status: string;
   created_at: string;
   updated_at: string;
@@ -43,7 +44,7 @@ export async function generateDailyBriefing(userId: string): Promise<BriefingRes
   // Fetch all user quotes with clients
   const { data: quotes } = await supabase
     .from("quotes")
-    .select("id, title, number, total_ttc, status, created_at, updated_at, valid_until, clients(name, email)")
+    .select("id, title, number, total_ttc, currency, status, created_at, updated_at, valid_until, clients(name, email)")
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
 
@@ -123,7 +124,7 @@ export async function generateDailyBriefing(userId: string): Promise<BriefingRes
     .slice(0, 10)
     .map(
       (q) =>
-        `- DEV-${String(q.number).padStart(4, "0")} "${q.title}" (${formatCurrency(Number(q.total_ttc))}) pour ${q.clients?.[0]?.name || "client inconnu"} — envoye le ${new Date(q.created_at).toLocaleDateString("fr-FR")}`
+        `- DEV-${String(q.number).padStart(4, "0")} "${q.title}" (${formatCurrency(Number(q.total_ttc), q.currency || "EUR")}) pour ${q.clients?.[0]?.name || "client inconnu"} — envoye le ${new Date(q.created_at).toLocaleDateString("fr-FR")}`
     )
     .join("\n");
 

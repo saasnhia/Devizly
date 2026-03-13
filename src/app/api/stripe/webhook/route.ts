@@ -99,8 +99,9 @@ export async function POST(request: Request) {
             });
 
             // In-app notification (non-blocking, fire-and-forget)
+            const sessionCurrency = (session.currency || "eur").toUpperCase();
             const amountTotal = session.amount_total
-              ? `${(session.amount_total / 100).toFixed(2)} €`
+              ? new Intl.NumberFormat("fr-FR", { style: "currency", currency: sessionCurrency }).format(session.amount_total / 100)
               : null;
             createNotification({
               userId: quoteData.user_id,
@@ -115,7 +116,7 @@ export async function POST(request: Request) {
               try {
                 const { data: quote } = await supabase
                   .from("quotes")
-                  .select("number, title, total_ttc, client_id, clients(name)")
+                  .select("number, title, total_ttc, currency, client_id, clients(name)")
                   .eq("id", quoteId)
                   .single();
                 const { data: profile } = await supabase
@@ -126,7 +127,8 @@ export async function POST(request: Request) {
                 if (!profile?.email || !quote) return;
                 const quoteRef = `DEV-${String(quote.number).padStart(4, "0")}`;
                 const clientName = (quote.clients as unknown as { name: string } | null)?.name ?? "votre client";
-                const amount = amountTotal ?? `${Number(quote.total_ttc).toFixed(2)} €`;
+                const quoteCurrency = (quote as Record<string, unknown>).currency as string || "EUR";
+                const amount = amountTotal ?? new Intl.NumberFormat("fr-FR", { style: "currency", currency: quoteCurrency }).format(Number(quote.total_ttc));
                 const appUrl = getSiteUrl();
                 await resend.emails.send({
                   from: "Devizly <noreply@devizly.fr>",

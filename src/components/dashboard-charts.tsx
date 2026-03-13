@@ -33,27 +33,41 @@ interface TopClient {
   total: number;
 }
 
+interface TopClientWithCurrency {
+  name: string;
+  total: number;
+  currency?: string;
+}
+
 interface DashboardChartsProps {
   monthlyRevenue: MonthlyRevenue[];
   funnel: FunnelStep[];
-  topClients: TopClient[];
+  topClients: TopClientWithCurrency[];
+  currency?: string;
 }
 
 /* ── Formatters ── */
 
-function fmtEur(n: number): string {
-  if (n >= 1000) return `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k€`;
-  return `${Math.round(n)}€`;
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  EUR: "€", USD: "$", GBP: "£", CHF: "CHF", CAD: "CA$",
+};
+
+function fmtShort(n: number, currency = "EUR"): string {
+  const sym = CURRENCY_SYMBOLS[currency] || currency;
+  if (n >= 1000) return `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k${sym}`;
+  return `${Math.round(n)}${sym}`;
 }
 
 function CustomTooltip({
   active,
   payload,
   label,
+  currency = "EUR",
 }: {
   active?: boolean;
   payload?: { value: number }[];
   label?: string;
+  currency?: string;
 }) {
   if (!active || !payload?.[0]) return null;
   return (
@@ -62,7 +76,7 @@ function CustomTooltip({
       <p className="text-muted-foreground">
         {new Intl.NumberFormat("fr-FR", {
           style: "currency",
-          currency: "EUR",
+          currency,
         }).format(payload[0].value)}
       </p>
     </div>
@@ -75,6 +89,7 @@ export function DashboardCharts({
   monthlyRevenue,
   funnel,
   topClients,
+  currency = "EUR",
 }: DashboardChartsProps) {
   return (
     <div className="grid gap-6 lg:grid-cols-2">
@@ -102,13 +117,13 @@ export function DashboardCharts({
                   tickLine={false}
                 />
                 <YAxis
-                  tickFormatter={fmtEur}
+                  tickFormatter={(n: number) => fmtShort(n, currency)}
                   tick={{ fontSize: 12, fill: "#64748B" }}
                   axisLine={false}
                   tickLine={false}
                   width={50}
                 />
-                <Tooltip content={<CustomTooltip />} />
+                <Tooltip content={<CustomTooltip currency={currency} />} />
                 <Line
                   type="monotone"
                   dataKey="amount"
@@ -188,7 +203,7 @@ export function DashboardCharts({
                       <span className="ml-2 text-muted-foreground">
                         {new Intl.NumberFormat("fr-FR", {
                           style: "currency",
-                          currency: "EUR",
+                          currency: client.currency || currency,
                         }).format(client.total)}
                       </span>
                     </div>

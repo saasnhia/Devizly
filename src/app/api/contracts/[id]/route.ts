@@ -34,6 +34,8 @@ export async function PATCH(
     amount?: number;
     notes?: string | null;
     description?: string | null;
+    content?: string | null;
+    document_type?: string;
     end_date?: string | null;
     next_invoice_date?: string | null;
     frequency?: string;
@@ -41,7 +43,7 @@ export async function PATCH(
     currency?: string;
   };
 
-  const validStatuses = ["draft", "active", "paused", "ended"];
+  const validStatuses = ["draft", "active", "paused", "ended", "pending_signature", "signed"];
   if (body.status && !validStatuses.includes(body.status)) {
     return NextResponse.json({ error: "Statut invalide" }, { status: 400 });
   }
@@ -67,6 +69,8 @@ export async function PATCH(
   if (body.frequency !== undefined) updates.frequency = body.frequency;
   if (body.client_id !== undefined) updates.client_id = body.client_id;
   if (body.currency !== undefined) updates.currency = body.currency;
+  if (body.content !== undefined) updates.content = body.content;
+  if (body.document_type !== undefined) updates.document_type = body.document_type;
 
   const { data, error } = await supabase
     .from("contracts")

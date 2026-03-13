@@ -400,7 +400,7 @@ export default async function DashboardPage() {
                       {quote.clients?.name || "—"}
                     </TableCell>
                     <TableCell className="text-right">
-                      {formatCurrency(Number(quote.total_ttc))}
+                      {formatCurrency(Number(quote.total_ttc), quote.currency || "EUR")}
                     </TableCell>
                     <TableCell>
                       <Badge

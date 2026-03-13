@@ -33,8 +33,10 @@ interface Column {
 const COLUMNS: Column[] = [
   { id: "prospect", title: "Prospects", color: "bg-slate-500" },
   { id: "envoyé", title: "Envoyés", color: "bg-blue-500" },
+  { id: "négociation", title: "En négociation", color: "bg-purple-500" },
   { id: "signé", title: "Signés", color: "bg-amber-500" },
   { id: "payé", title: "Payés", color: "bg-emerald-500" },
+  { id: "refusé", title: "Perdus", color: "bg-red-500" },
 ];
 
 function KanbanColumn({
@@ -52,7 +54,7 @@ function KanbanColumn({
   const total = items.reduce((sum, item) => sum + item.amount, 0);
 
   return (
-    <div className="flex w-72 shrink-0 flex-col">
+    <div className="flex w-64 shrink-0 flex-col">
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className={`h-2.5 w-2.5 rounded-full ${column.color}`} />
@@ -273,7 +275,7 @@ export function KanbanBoard() {
     return (
       <div className="flex gap-4 overflow-x-auto pb-4">
         {COLUMNS.map((col) => (
-          <div key={col.id} className="w-72 shrink-0">
+          <div key={col.id} className="w-64 shrink-0">
             <div className="mb-3 flex items-center gap-2">
               <div className={`h-2.5 w-2.5 rounded-full ${col.color}`} />
               <div className="h-4 w-20 animate-pulse rounded bg-slate-200" />

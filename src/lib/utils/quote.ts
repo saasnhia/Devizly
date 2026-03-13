@@ -49,6 +49,8 @@ export function getStatusColor(status: string): string {
       return 'bg-gray-100 text-gray-700';
     case 'envoyé':
       return 'bg-blue-100 text-blue-700';
+    case 'négociation':
+      return 'bg-purple-100 text-purple-700';
     case 'signé':
       return 'bg-green-100 text-green-700';
     case 'accepté':
@@ -68,6 +70,8 @@ export function getStatusLabel(status: string): string {
       return 'Brouillon';
     case 'envoyé':
       return 'Envoyé';
+    case 'négociation':
+      return 'En négociation';
     case 'signé':
       return 'Signé';
     case 'accepté':

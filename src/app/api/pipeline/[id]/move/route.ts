@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
-const VALID_STATUSES = ["prospect", "brouillon", "envoyé", "signé", "accepté", "refusé", "payé"];
+const VALID_STATUSES = ["prospect", "brouillon", "envoyé", "négociation", "signé", "accepté", "refusé", "payé"];
 
 export async function PATCH(
   request: Request,

@@ -44,3 +44,5 @@ scripts/linkedin/.post-state.json
 next-env.d.ts
 
 .vercel
+"public/marketing/*.mp4" 
+"public/marketing/*.mov" 

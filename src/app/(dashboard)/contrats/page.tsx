@@ -42,6 +42,7 @@ import {
   CalendarClock,
   FileText,
   Copy,
+  Send,
 } from "lucide-react";
 import type { ContractWithClient, ContractTemplate, Client } from "@/types";
 import { toast } from "sonner";
@@ -88,6 +89,18 @@ function statusBadge(status: string) {
           Terminé
         </Badge>
       );
+    case "pending_signature":
+      return (
+        <Badge className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-50">
+          En attente de signature
+        </Badge>
+      );
+    case "signed":
+      return (
+        <Badge className="bg-green-50 text-green-700 border-green-200 hover:bg-green-50">
+          Signé
+        </Badge>
+      );
     default:
       return <Badge variant="secondary">{status}</Badge>;
   }
@@ -104,6 +117,8 @@ interface ContractFormData {
   end_date: string;
   notes: string;
   description: string;
+  document_type: string;
+  content: string;
 }
 
 const defaultFormData: ContractFormData = {
@@ -115,6 +130,8 @@ const defaultFormData: ContractFormData = {
   end_date: "",
   notes: "",
   description: "",
+  document_type: "recurring",
+  content: "",
 };
 
 function ContractModal({
@@ -146,6 +163,8 @@ function ContractModal({
         end_date: contract.end_date ?? "",
         notes: contract.notes ?? "",
         description: contract.description ?? "",
+        document_type: contract.document_type ?? "recurring",
+        content: contract.content ?? "",
       });
     } else {
       setForm(defaultFormData);
@@ -177,6 +196,8 @@ function ContractModal({
         end_date: form.end_date || null,
         notes: form.notes || null,
         description: form.description || null,
+        document_type: form.document_type || "recurring",
+        content: form.content || null,
       };
 
       let res: Response;
@@ -277,7 +298,7 @@ function ContractModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="amount">Montant (€)</Label>
+              <Label htmlFor="amount">Montant</Label>
               <Input
                 id="amount"
                 type="number"
@@ -348,6 +369,43 @@ function ContractModal({
               rows={2}
             />
           </div>
+
+          <div>
+            <Label htmlFor="doc-type">Type de document</Label>
+            <Select
+              value={form.document_type}
+              onValueChange={(v) =>
+                setForm((p) => ({ ...p, document_type: v }))
+              }
+            >
+              <SelectTrigger id="doc-type">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="recurring">Contrat recurrent</SelectItem>
+                <SelectItem value="cgv">CGV</SelectItem>
+                <SelectItem value="sla">SLA</SelectItem>
+                <SelectItem value="nda">NDA</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {form.document_type !== "recurring" && (
+            <div>
+              <Label htmlFor="content">
+                Contenu du document ({form.document_type.toUpperCase()})
+              </Label>
+              <Textarea
+                id="content"
+                value={form.content}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, content: e.target.value }))
+                }
+                placeholder="Redigez ou collez vos conditions ici…"
+                rows={8}
+              />
+            </div>
+          )}
 
           <div>
             <Label htmlFor="notes">Notes internes</Label>
@@ -519,6 +577,28 @@ export default function ContratsPage() {
     }
   }
 
+  async function handleSendForSignature(c: ContractWithClient) {
+    if (!c.clients?.email) {
+      toast.error("Le client n'a pas d'adresse email");
+      return;
+    }
+    try {
+      const res = await fetch(`/api/contracts/${c.id}/send`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ to: c.clients.email }),
+      });
+      if (!res.ok) {
+        const err = await res.json() as { error?: string };
+        throw new Error(err.error ?? "Erreur");
+      }
+      toast.success("Contrat envoye pour signature !");
+      fetchData();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur d'envoi");
+    }
+  }
+
   async function handleUseTemplate(tpl: ContractTemplate) {
     setEditingContract(null);
     // Pre-fill via template picker in modal; just open modal
@@ -680,6 +760,12 @@ export default function ContratsPage() {
                             <Pencil className="mr-2 h-4 w-4" />
                             Modifier
                           </DropdownMenuItem>
+                          {(c.status === "draft" || c.status === "active") && c.clients?.email && (
+                            <DropdownMenuItem onClick={() => handleSendForSignature(c)}>
+                              <Send className="mr-2 h-4 w-4" />
+                              Envoyer pour signature
+                            </DropdownMenuItem>
+                          )}
                           {c.status === "active" && (
                             <DropdownMenuItem
                               onClick={() => handleStatusChange(c, "paused")}

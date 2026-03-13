@@ -1,4 +1,4 @@
-export type QuoteStatus = 'prospect' | 'brouillon' | 'envoyé' | 'signé' | 'accepté' | 'refusé' | 'payé';
+export type QuoteStatus = 'prospect' | 'brouillon' | 'envoyé' | 'négociation' | 'signé' | 'accepté' | 'refusé' | 'payé';
 
 export interface Prospect {
   id: string;
@@ -242,7 +242,8 @@ export interface LeadWithForm extends Lead {
 
 // ── Contracts ─────────────────────────────────────────────────
 
-export type ContractStatus = 'draft' | 'active' | 'paused' | 'ended';
+export type ContractStatus = 'draft' | 'active' | 'paused' | 'ended' | 'pending_signature' | 'signed';
+export type ContractDocumentType = 'recurring' | 'cgv' | 'sla' | 'nda';
 
 export interface Contract {
   id: string;
@@ -251,6 +252,8 @@ export interface Contract {
   template_id: string | null;
   title: string;
   description: string | null;
+  content: string | null;
+  document_type: ContractDocumentType;
   amount: number;
   currency: string;
   frequency: RecurringFrequency;
@@ -260,6 +263,13 @@ export interface Contract {
   status: ContractStatus;
   invoice_count: number;
   notes: string | null;
+  sign_token: string | null;
+  signature_data: string | null;
+  signer_name: string | null;
+  signed_at: string | null;
+  signer_ip: string | null;
+  document_hash: string | null;
+  sent_at: string | null;
   created_at: string;
   updated_at: string;
 }

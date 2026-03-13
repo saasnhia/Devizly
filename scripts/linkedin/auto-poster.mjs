@@ -1,23 +1,22 @@
 /**
  * LinkedIn Auto-Poster for Devizly
  *
- * Posts carousel content to LinkedIn on a schedule.
- * Uses LinkedIn API v2 (OAuth 2.0 + UGC Posts).
+ * Posts content with images to LinkedIn via UGC API.
+ * Supports posting as company page (LINKEDIN_ORG_URN) or personal profile.
  *
  * Setup:
- *   1. Create a LinkedIn App: https://www.linkedin.com/developers/apps
- *   2. Request "w_member_social" scope (Share on LinkedIn)
- *   3. Get an access token via OAuth 2.0 flow
- *   4. Set env vars in .env.linkedin
+ *   1. Run: node scripts/linkedin/linkedin-oauth-setup.mjs
+ *   2. Verify .env.linkedin has LINKEDIN_ORG_URN for company page posting
  *
  * Usage:
- *   node scripts/linkedin/auto-poster.mjs          # Run once (next scheduled post)
- *   node scripts/linkedin/auto-poster.mjs --cron    # Start cron scheduler
- *   node scripts/linkedin/auto-poster.mjs --dry-run # Preview without posting
- *   node scripts/linkedin/auto-poster.mjs --day 5   # Post a specific day
+ *   node scripts/linkedin/auto-poster.mjs --dry-run --day 1  # Preview
+ *   node scripts/linkedin/auto-poster.mjs --day 1            # Post day 1
+ *   node scripts/linkedin/auto-poster.mjs --post 1           # Alias
+ *   node scripts/linkedin/auto-poster.mjs --no-images --day 1 # Text only
+ *   node scripts/linkedin/auto-poster.mjs --cron             # Scheduler
  */
 
-import { readFileSync, writeFileSync, existsSync } from "fs";
+import { readFileSync, writeFileSync, existsSync, readdirSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 
@@ -29,8 +28,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const POSTS_FILE = join(__dirname, "posts.json");
 const STATE_FILE = join(__dirname, ".post-state.json");
+const MARKETING_DIR = join(__dirname, "..", "..", "public", "marketing");
 
-// Load env from .env.linkedin if exists
+// Load env from .env.linkedin
 const envFile = join(__dirname, ".env.linkedin");
 if (existsSync(envFile)) {
   const envContent = readFileSync(envFile, "utf-8");
@@ -47,8 +47,16 @@ if (existsSync(envFile)) {
 }
 
 const LINKEDIN_ACCESS_TOKEN = process.env.LINKEDIN_ACCESS_TOKEN;
-const LINKEDIN_PERSON_URN = process.env.LINKEDIN_PERSON_URN; // "urn:li:person:XXXXX"
-const LINKEDIN_ORG_URN = process.env.LINKEDIN_ORG_URN; // "urn:li:organization:XXXXX" (optional, for company page)
+let LINKEDIN_PERSON_URN = process.env.LINKEDIN_PERSON_URN;
+const LINKEDIN_ORG_URN = process.env.LINKEDIN_ORG_URN;
+
+// Map post types to real screenshots in public/marketing/
+const POST_IMAGES = {
+  educatif: ["Dashboard final.png", "devis final form .png"],
+  cas_usage: ["devis list.png", "pipeline.png"],
+  storytelling: ["création IA devis .png", "devis client.png"],
+  inspiration: ["Dashboard final.png", "stripe.png"],
+};
 
 // ═══════════════════════════════════════════════════
 // STATE MANAGEMENT
@@ -66,36 +74,155 @@ function saveState(state) {
 }
 
 // ═══════════════════════════════════════════════════
-// LINKEDIN API
+// LINKEDIN API — Person URN resolution
 // ═══════════════════════════════════════════════════
 
-async function getLinkedInProfile() {
-  const res = await fetch("https://api.linkedin.com/v2/userinfo", {
-    headers: { Authorization: `Bearer ${LINKEDIN_ACCESS_TOKEN}` },
-  });
-  if (!res.ok) throw new Error(`LinkedIn API error: ${res.status} ${await res.text()}`);
-  return res.json();
+async function resolvePersonUrn() {
+  if (LINKEDIN_PERSON_URN) return LINKEDIN_PERSON_URN;
+
+  console.log("🔍 LINKEDIN_PERSON_URN non défini — auto-détection...");
+
+  for (const endpoint of [
+    "https://api.linkedin.com/v2/userinfo",
+    "https://api.linkedin.com/v2/me",
+  ]) {
+    try {
+      const res = await fetch(endpoint, {
+        headers: { Authorization: `Bearer ${LINKEDIN_ACCESS_TOKEN}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const id = data.sub || data.id;
+        if (id) {
+          LINKEDIN_PERSON_URN = `urn:li:person:${id}`;
+          console.log(`   ✅ Trouvé: ${LINKEDIN_PERSON_URN}`);
+          return LINKEDIN_PERSON_URN;
+        }
+      }
+    } catch {
+      // try next
+    }
+  }
+
+  throw new Error(
+    "Impossible de détecter votre person URN.\n" +
+    "Relancez: node scripts/linkedin/linkedin-oauth-setup.mjs"
+  );
 }
 
-/**
- * Post text content to LinkedIn using UGC API
- */
-async function postToLinkedIn(text) {
+// ═══════════════════════════════════════════════════
+// LINKEDIN API — Image upload via Assets API
+// ═══════════════════════════════════════════════════
+
+async function uploadImage(authorUrn, imagePath) {
+  // Step 1: Register upload
+  const registerBody = {
+    registerUploadRequest: {
+      recipes: ["urn:li:digitalmediaRecipe:feedshare-image"],
+      owner: authorUrn,
+      serviceRelationships: [
+        {
+          relationshipType: "OWNER",
+          identifier: "urn:li:userGeneratedContent",
+        },
+      ],
+    },
+  };
+
+  const filename = imagePath.split(/[/\\]/).pop();
+  console.log(`   📸 Upload: ${filename}`);
+
+  const regRes = await fetch(
+    "https://api.linkedin.com/v2/assets?action=registerUpload",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LINKEDIN_ACCESS_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(registerBody),
+    }
+  );
+
+  if (!regRes.ok) {
+    const errText = await regRes.text();
+    throw new Error(`Image register failed (${regRes.status}): ${errText}`);
+  }
+
+  const regData = await regRes.json();
+  const uploadUrl =
+    regData.value.uploadMechanism[
+      "com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest"
+    ].uploadUrl;
+  const asset = regData.value.asset;
+
+  // Step 2: Upload binary
+  const imageBuffer = readFileSync(imagePath);
+
+  const uploadRes = await fetch(uploadUrl, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${LINKEDIN_ACCESS_TOKEN}`,
+      "Content-Type": "image/png",
+    },
+    body: imageBuffer,
+  });
+
+  if (!uploadRes.ok) {
+    const errText = await uploadRes.text();
+    throw new Error(`Image upload failed (${uploadRes.status}): ${errText}`);
+  }
+
+  console.log(`   ✅ Uploaded: ${asset}`);
+  return asset;
+}
+
+// ═══════════════════════════════════════════════════
+// LINKEDIN API — Post with images (UGC API)
+// ═══════════════════════════════════════════════════
+
+async function postToLinkedIn(text, imageAssets) {
   const authorUrn = LINKEDIN_ORG_URN || LINKEDIN_PERSON_URN;
+
+  if (!authorUrn) {
+    throw new Error(
+      "Aucun author URN défini.\n" +
+      "Relancez: node scripts/linkedin/linkedin-oauth-setup.mjs"
+    );
+  }
+
+  const hasImages = imageAssets && imageAssets.length > 0;
+
+  const shareContent = hasImages
+    ? {
+        shareCommentary: { text },
+        shareMediaCategory: "IMAGE",
+        media: imageAssets.map((asset, i) => ({
+          status: "READY",
+          media: asset,
+          title: { text: `Devizly ${i + 1}` },
+        })),
+      }
+    : {
+        shareCommentary: { text },
+        shareMediaCategory: "NONE",
+      };
 
   const body = {
     author: authorUrn,
     lifecycleState: "PUBLISHED",
     specificContent: {
-      "com.linkedin.ugc.ShareContent": {
-        shareCommentary: { text },
-        shareMediaCategory: "NONE",
-      },
+      "com.linkedin.ugc.ShareContent": shareContent,
     },
     visibility: {
       "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC",
     },
   };
+
+  console.log(`\n📤 POST /v2/ugcPosts`);
+  console.log(`   author: ${authorUrn}`);
+  console.log(`   images: ${hasImages ? imageAssets.length : 0}`);
+  console.log(`   text: ${text.slice(0, 80)}...`);
 
   const res = await fetch("https://api.linkedin.com/v2/ugcPosts", {
     method: "POST",
@@ -109,10 +236,61 @@ async function postToLinkedIn(text) {
 
   if (!res.ok) {
     const errText = await res.text();
+    console.error(`\n❌ LinkedIn API Error (${res.status}):`);
+    console.error(`   Body: ${errText}`);
+
+    if (res.status === 403) {
+      console.error("\n💡 Vérifiez que :");
+      if (authorUrn.includes("organization")) {
+        console.error("   1. 'Community Management API' est activé dans votre app LinkedIn");
+        console.error("   2. Le scope w_organization_social est autorisé");
+        console.error("   3. Relancez linkedin-oauth-setup.mjs pour obtenir un token avec ce scope");
+      } else {
+        console.error("   1. 'Share on LinkedIn' est activé dans votre app");
+      }
+      console.error("   2. Le token n'est pas expiré");
+      console.error(`   3. L'URN est correct : ${authorUrn}`);
+    }
+
     throw new Error(`LinkedIn post failed: ${res.status} ${errText}`);
   }
 
-  return res.json();
+  const result = await res.json();
+  return { id: result.id || "OK" };
+}
+
+// ═══════════════════════════════════════════════════
+// FIND IMAGES FOR POST
+// ═══════════════════════════════════════════════════
+
+function findImagesForPost(post) {
+  const candidates = POST_IMAGES[post.type] || POST_IMAGES.educatif;
+  const found = [];
+
+  if (!existsSync(MARKETING_DIR)) return found;
+
+  for (const filename of candidates) {
+    const fullPath = join(MARKETING_DIR, filename);
+    if (existsSync(fullPath)) {
+      found.push(fullPath);
+    }
+  }
+
+  // Fallback: first available PNG in marketing root
+  if (found.length === 0) {
+    try {
+      const files = readdirSync(MARKETING_DIR).filter(
+        (f) => f.endsWith(".png") && !f.includes("banner") && !f.includes("header")
+      );
+      if (files.length > 0) {
+        found.push(join(MARKETING_DIR, files[0]));
+      }
+    } catch {
+      // dir not readable
+    }
+  }
+
+  return found;
 }
 
 // ═══════════════════════════════════════════════════
@@ -120,15 +298,13 @@ async function postToLinkedIn(text) {
 // ═══════════════════════════════════════════════════
 
 function formatPostText(post) {
-  // For text-only posts (carrousel images would need separate upload)
-  // Format: Hook + content from slides + hashtags
   const lines = [];
 
-  // Slide 1 = Hook (attention grabber)
+  // Slide 1 = Hook
   lines.push(post.slides[0].replace(/^HOOK:\s*/i, ""));
   lines.push("");
 
-  // Slides 2-4 = Content (abbreviated for text post)
+  // Slides 2-4 = Content
   for (let i = 1; i < post.slides.length - 1; i++) {
     lines.push(post.slides[i]);
     lines.push("");
@@ -147,18 +323,9 @@ function formatPostText(post) {
 }
 
 // ═══════════════════════════════════════════════════
-// SCHEDULING LOGIC
+// SCHEDULING
 // ═══════════════════════════════════════════════════
 
-/**
- * Publishing schedule (LinkedIn algo 2026):
- *   Mardi 9h    → Contenu éducatif
- *   Mercredi 11h → Cas d'usage
- *   Jeudi 14h   → Storytelling
- *   Dimanche 18h → Inspiration
- *
- * = 4 posts/semaine, ~30 posts over ~8 weeks
- */
 const SCHEDULE = [
   { day: 2, hour: 9, minute: 0 },   // Mardi 9h
   { day: 3, hour: 11, minute: 0 },  // Mercredi 11h
@@ -168,10 +335,9 @@ const SCHEDULE = [
 
 function getNextScheduledSlot() {
   const now = new Date();
-  const currentDay = now.getDay(); // 0=Sun, 1=Mon, ...
+  const currentDay = now.getDay();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-  // Find next slot
   for (const slot of SCHEDULE) {
     if (
       slot.day > currentDay ||
@@ -180,7 +346,6 @@ function getNextScheduledSlot() {
       return slot;
     }
   }
-  // Wrap to next week
   return SCHEDULE[0];
 }
 
@@ -205,7 +370,8 @@ function msUntilNextSlot(slot) {
 const args = process.argv.slice(2);
 const isDryRun = args.includes("--dry-run");
 const isCron = args.includes("--cron");
-const dayIdx = args.indexOf("--day");
+const noImages = args.includes("--no-images");
+const dayIdx = args.indexOf("--day") >= 0 ? args.indexOf("--day") : args.indexOf("--post");
 const specificDay = dayIdx >= 0 ? parseInt(args[dayIdx + 1], 10) : null;
 
 const posts = JSON.parse(readFileSync(POSTS_FILE, "utf-8"));
@@ -226,32 +392,58 @@ async function postNext(dayOverride) {
   }
 
   const text = formatPostText(post);
+  const authorUrn = LINKEDIN_ORG_URN || LINKEDIN_PERSON_URN;
 
   console.log(`\n📅 JOUR ${post.day} — ${post.title}`);
   console.log(`🕒 ${post.hour} | 🔥 Viralité: ${post.virality}`);
   console.log(`📝 Type: ${post.type}`);
+  console.log(`👤 Poster en tant que: ${authorUrn || "(non défini)"}`);
   console.log("─".repeat(50));
   console.log(text.slice(0, 500) + (text.length > 500 ? "\n..." : ""));
   console.log("─".repeat(50));
 
+  // Find images
+  const imageFiles = noImages ? [] : findImagesForPost(post);
+  if (imageFiles.length > 0) {
+    console.log(`📸 Images: ${imageFiles.map((f) => f.split(/[/\\]/).pop()).join(", ")}`);
+  } else {
+    console.log("📸 Aucune image (post texte uniquement)");
+  }
+
   if (isDryRun) {
-    console.log("🔍 DRY RUN — pas de publication");
+    console.log("\n🔍 DRY RUN — pas de publication");
     return;
   }
 
   if (!LINKEDIN_ACCESS_TOKEN) {
-    console.error("❌ LINKEDIN_ACCESS_TOKEN manquant. Créez scripts/linkedin/.env.linkedin");
-    console.log("\nContenu du fichier .env.linkedin :");
-    console.log("LINKEDIN_ACCESS_TOKEN=votre_token");
-    console.log("LINKEDIN_PERSON_URN=urn:li:person:XXXXX");
-    console.log("# Optionnel pour page entreprise :");
-    console.log("# LINKEDIN_ORG_URN=urn:li:organization:XXXXX");
+    console.error("❌ LINKEDIN_ACCESS_TOKEN manquant.");
+    console.error("   Lancez: node scripts/linkedin/linkedin-oauth-setup.mjs");
     return;
   }
 
+  // Auto-detect person URN if needed (only when not using org)
+  if (!LINKEDIN_ORG_URN) {
+    await resolvePersonUrn();
+  }
+
   try {
-    const result = await postToLinkedIn(text);
-    console.log(`✅ Publié ! ID: ${result.id || "OK"}`);
+    // Upload images
+    const imageAssets = [];
+    const postAuthor = LINKEDIN_ORG_URN || LINKEDIN_PERSON_URN;
+
+    for (const imgPath of imageFiles) {
+      try {
+        const asset = await uploadImage(postAuthor, imgPath);
+        imageAssets.push(asset);
+        // Rate limit between uploads
+        await new Promise((r) => setTimeout(r, 1000));
+      } catch (imgErr) {
+        console.warn(`   ⚠️  Image skip: ${imgErr.message}`);
+      }
+    }
+
+    const result = await postToLinkedIn(text, imageAssets);
+    console.log(`\n✅ Publié ! ID: ${result.id}`);
 
     state.lastPostedDay = nextDay;
     state.history.push({
@@ -261,14 +453,14 @@ async function postNext(dayOverride) {
     });
     saveState(state);
   } catch (err) {
-    console.error(`❌ Erreur publication: ${err.message}`);
+    console.error(`\n❌ Erreur publication: ${err.message}`);
   }
 }
 
 if (isCron) {
-  console.log("🤖 Devizly LinkedIn Auto-Poster — Mode CRON activé");
+  console.log("🤖 Devizly LinkedIn Auto-Poster — Mode CRON");
   console.log(`📊 Posts restants: ${posts.length - state.lastPostedDay}/${posts.length}`);
-  console.log("");
+  console.log(`👤 Poster en tant que: ${LINKEDIN_ORG_URN || LINKEDIN_PERSON_URN || "(non défini)"}\n`);
 
   async function scheduleNext() {
     const slot = getNextScheduledSlot();

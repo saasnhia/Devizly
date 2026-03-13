@@ -33,6 +33,7 @@ export default function ParametresPage() {
     auto_invoice_on_payment: true,
     auto_send_invoice: true,
     relance_enabled: true,
+    sms_reminders_enabled: false,
   });
   const [leadForm, setLeadForm] = useState({
     lead_form_enabled: true,
@@ -243,7 +244,7 @@ export default function ParametresPage() {
   }
 
   async function handleAutomationToggle(
-    field: "auto_invoice_on_sign" | "auto_invoice_on_payment" | "auto_send_invoice" | "relance_enabled"
+    field: "auto_invoice_on_sign" | "auto_invoice_on_payment" | "auto_send_invoice" | "relance_enabled" | "sms_reminders_enabled"
   ) {
     const newValue = !automations[field];
     setAutomations((prev) => ({ ...prev, [field]: newValue }));
@@ -922,6 +923,32 @@ export default function ParametresPage() {
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
                   automations.relance_enabled ? "translate-x-6" : "translate-x-1"
+                }`}
+              />
+            </button>
+          </div>
+
+          {/* SMS Reminders */}
+          <div className="flex items-center justify-between py-4">
+            <div>
+              <p className="text-sm font-medium">
+                Relances SMS (Twilio)
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Envoie un SMS de rappel en plus de l&apos;email. Pro: 10/mois, Business: illimite.
+              </p>
+            </div>
+            <button
+              role="switch"
+              aria-checked={automations.sms_reminders_enabled}
+              onClick={() => handleAutomationToggle("sms_reminders_enabled")}
+              className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
+                automations.sms_reminders_enabled ? "bg-primary" : "bg-slate-200"
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  automations.sms_reminders_enabled ? "translate-x-6" : "translate-x-1"
                 }`}
               />
             </button>

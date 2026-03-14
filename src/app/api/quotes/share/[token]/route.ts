@@ -134,26 +134,6 @@ export async function POST(
     );
   }
 
-  // Gate signature to Pro/Business — check quote owner's plan
-  if (action === "signé") {
-    const { data: ownerProfile } = await supabase
-      .from("profiles")
-      .select("subscription_status")
-      .eq("id", quote.user_id)
-      .single();
-
-    if (!ownerProfile || ownerProfile.subscription_status === "free") {
-      return NextResponse.json(
-        {
-          error: "PLAN_REQUIRED",
-          message: "Signature électronique — Pro requis",
-          upgradeUrl: "/pricing",
-        },
-        { status: 403 }
-      );
-    }
-  }
-
   const now = new Date().toISOString();
 
   const updateData: Record<string, unknown> = {

@@ -528,26 +528,15 @@ export default function PublicQuotePage({
                   {/* Sign/Refuse — only for envoyé */}
                   {quote.status === "envoyé" && (
                     <div className="flex flex-col gap-3 sm:flex-row">
-                      {ownerPlan !== "free" ? (
-                        <Button
-                          variant="outline"
-                          className="flex-1"
-                          onClick={() => setShowSignature(true)}
-                          disabled={responding}
-                        >
-                          <PenLine className="mr-2 h-4 w-4" />
-                          Accepter et signer
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="outline"
-                          className="flex-1 opacity-60 cursor-not-allowed"
-                          disabled
-                        >
-                          <PenLine className="mr-2 h-4 w-4" />
-                          Signature indisponible
-                        </Button>
-                      )}
+                      <Button
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => setShowSignature(true)}
+                        disabled={responding}
+                      >
+                        <PenLine className="mr-2 h-4 w-4" />
+                        Accepter et signer
+                      </Button>
                       <Button
                         variant="outline"
                         className="flex-1 border-red-200 text-red-600 hover:bg-red-50"

@@ -71,6 +71,18 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
 };
 
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Devizly",
+  url: "https://devizly.fr",
+  potentialAction: {
+    "@type": "SearchAction",
+    target: "https://devizly.fr/?q={search_term_string}",
+    "query-input": "required name=search_term_string",
+  },
+};
+
 const softwareSchema = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
@@ -111,6 +123,7 @@ export default function RootLayout({
           <link rel="preconnect" href={SUPABASE_URL} />
         )}
         <JsonLd data={softwareSchema} />
+        <JsonLd data={websiteSchema} />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

@@ -54,6 +54,7 @@ export async function GET(
     discount: Number(quote.discount),
     total_ttc: Number(quote.total_ttc),
     notes: quote.notes,
+    payment_terms: quote.payment_terms,
     status: quote.status,
     signature_data: quote.signature_data,
     signer_name: quote.signer_name,

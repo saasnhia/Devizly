@@ -425,7 +425,7 @@ export default function ParametresPage() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>SIRET</Label>
+                <Label>SIRET <span className="text-xs font-normal text-muted-foreground">(optionnel)</span></Label>
                 <Input
                   value={profile.company_siret}
                   onChange={(e) =>
@@ -433,6 +433,9 @@ export default function ParametresPage() {
                   }
                   placeholder="123 456 789 00012"
                 />
+                <p className="text-xs text-muted-foreground">
+                  Si vide, la mention &quot;SIRET en cours d&apos;immatriculation&quot; apparaîtra sur vos PDF.
+                </p>
               </div>
               <div className="space-y-2">
                 <Label>Téléphone</Label>
@@ -803,6 +806,10 @@ export default function ParametresPage() {
               <p className="text-center text-xs text-muted-foreground">
                 Gratuit. Configuration en 2 minutes.
               </p>
+
+              <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-center text-sm text-blue-700">
+                Configurez Stripe pour activer le paiement en ligne sur vos devis.
+              </div>
 
               {stripeConnectStatus === "pending" && (
                 <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-center text-sm text-amber-700">

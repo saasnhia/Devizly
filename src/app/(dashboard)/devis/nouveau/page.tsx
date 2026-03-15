@@ -58,6 +58,9 @@ export default function NouveauDevisPage() {
   const [discount, setDiscount] = useState("0");
   const [currency, setCurrency] = useState("EUR");
   const [notes, setNotes] = useState("");
+  const [paymentTerms, setPaymentTerms] = useState(
+    "Acompte de 50% à la signature, solde à la livraison"
+  );
   const [validUntil, setValidUntil] = useState(() => {
     const d = new Date();
     d.setDate(d.getDate() + 30);
@@ -95,6 +98,7 @@ export default function NouveauDevisPage() {
       setDiscount(String(data.discount));
       setCurrency(data.currency || "EUR");
       setNotes(data.notes || "");
+      setPaymentTerms(data.payment_terms || "Acompte de 50% à la signature, solde à la livraison");
       setValidUntil(data.valid_until || "");
       if (data.quote_items && data.quote_items.length > 0) {
         setItems(
@@ -227,6 +231,7 @@ export default function NouveauDevisPage() {
       tva_rate: Number(tvaRate),
       discount: Number(discount),
       notes,
+      payment_terms: paymentTerms || null,
       valid_until: validUntil || null,
       ai_prompt: aiPrompt || null,
       total_ht: totals.totalHT,
@@ -339,6 +344,17 @@ export default function NouveauDevisPage() {
                   type="date"
                   value={validUntil}
                   onChange={(e) => setValidUntil(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="paymentTerms">Conditions de paiement</Label>
+                <Textarea
+                  id="paymentTerms"
+                  placeholder="Acompte de 50% à la signature, solde à la livraison"
+                  value={paymentTerms}
+                  onChange={(e) => setPaymentTerms(e.target.value)}
+                  rows={2}
                 />
               </div>
 

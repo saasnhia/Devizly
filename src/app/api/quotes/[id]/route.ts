@@ -41,7 +41,7 @@ export async function PUT(
   }
 
   const body = await request.json();
-  const { title, client_id, currency, tva_rate, discount, notes, valid_until, status, items, total_ht, total_ttc } = body;
+  const { title, client_id, currency, tva_rate, discount, notes, payment_terms, valid_until, status, items, total_ht, total_ttc } = body;
 
   const { error: updateError } = await supabase
     .from("quotes")
@@ -52,6 +52,7 @@ export async function PUT(
       tva_rate,
       discount,
       notes,
+      payment_terms,
       valid_until,
       status,
       total_ht,

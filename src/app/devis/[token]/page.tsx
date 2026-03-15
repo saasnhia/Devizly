@@ -59,6 +59,7 @@ export default function PublicQuotePage({
   const [payLoading, setPayLoading] = useState(false);
   const [calendlyUrl, setCalendlyUrl] = useState<string | null>(null);
   const [ownerPlan, setOwnerPlan] = useState<string>("free");
+  const [stripeEnabled, setStripeEnabled] = useState(false);
 
   const fetchQuote = useCallback(async () => {
     const response = await fetch(`/api/quotes/share/${token}`);
@@ -74,6 +75,9 @@ export default function PublicQuotePage({
     }
     if (result.owner_plan) {
       setOwnerPlan(result.owner_plan);
+    }
+    if (result.stripe_enabled) {
+      setStripeEnabled(true);
     }
     setLoading(false);
   }, [token]);
@@ -489,41 +493,45 @@ export default function PublicQuotePage({
               ) : (
                 /* Main actions: Pay + Sign + Refuse */
                 <div className="flex flex-col gap-3">
-                  {/* Full payment */}
-                  <Button
-                    className="w-full bg-green-600 hover:bg-green-700 text-lg py-6"
-                    onClick={() => handlePayment()}
-                    disabled={payLoading}
-                  >
-                    {payLoading ? (
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    ) : (
-                      <CreditCard className="mr-2 h-5 w-5" />
-                    )}
-                    Payer {formatCurrency(Number(quote.total_ttc), quote.currency || "EUR")} maintenant
-                  </Button>
+                  {/* Full payment — only if Stripe is configured */}
+                  {stripeEnabled && (
+                    <>
+                      <Button
+                        className="w-full bg-green-600 hover:bg-green-700 text-lg py-6"
+                        onClick={() => handlePayment()}
+                        disabled={payLoading}
+                      >
+                        {payLoading ? (
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        ) : (
+                          <CreditCard className="mr-2 h-5 w-5" />
+                        )}
+                        Payer {formatCurrency(Number(quote.total_ttc), quote.currency || "EUR")} maintenant
+                      </Button>
 
-                  {/* Deposit options — Pro/Business only */}
-                  {ownerPlan !== "free" ? (
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        className="flex-1"
-                        onClick={() => handlePayment(30)}
-                        disabled={payLoading}
-                      >
-                        Acompte 30% — {formatCurrency(Number(quote.total_ttc) * 0.3, quote.currency || "EUR")}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        className="flex-1"
-                        onClick={() => handlePayment(50)}
-                        disabled={payLoading}
-                      >
-                        Acompte 50% — {formatCurrency(Number(quote.total_ttc) * 0.5, quote.currency || "EUR")}
-                      </Button>
-                    </div>
-                  ) : null}
+                      {/* Deposit options — Pro/Business only */}
+                      {ownerPlan !== "free" && (
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            className="flex-1"
+                            onClick={() => handlePayment(30)}
+                            disabled={payLoading}
+                          >
+                            Acompte 30% — {formatCurrency(Number(quote.total_ttc) * 0.3, quote.currency || "EUR")}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            className="flex-1"
+                            onClick={() => handlePayment(50)}
+                            disabled={payLoading}
+                          >
+                            Acompte 50% — {formatCurrency(Number(quote.total_ttc) * 0.5, quote.currency || "EUR")}
+                          </Button>
+                        </div>
+                      )}
+                    </>
+                  )}
 
                   {/* Sign/Refuse — only for envoyé */}
                   {quote.status === "envoyé" && (

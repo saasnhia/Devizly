@@ -51,6 +51,7 @@ export interface DevisPdfProps {
   discount: number;
   total_ttc: number;
   notes?: string | null;
+  payment_terms?: string | null;
   status: string;
   signature_data?: string | null;
   signer_name?: string | null;
@@ -348,6 +349,7 @@ export function DevisPdf(props: DevisPdfProps) {
     discount,
     total_ttc,
     notes,
+    payment_terms,
     status,
     signature_data,
     signer_name,
@@ -384,9 +386,9 @@ export function DevisPdf(props: DevisPdfProps) {
             {company.phone && (
               <Text style={s.companyInfo}>Tél : {company.phone}</Text>
             )}
-            {company.siret && (
-              <Text style={s.companyInfo}>SIRET : {company.siret}</Text>
-            )}
+            <Text style={s.companyInfo}>
+              {company.siret ? `SIRET : ${company.siret}` : "SIRET en cours d'immatriculation"}
+            </Text>
             {company.legal_form && (
               <Text style={s.companyInfo}>{company.legal_form}</Text>
             )}
@@ -514,6 +516,14 @@ export function DevisPdf(props: DevisPdfProps) {
           </View>
         )}
 
+        {/* ── Payment Terms ── */}
+        {payment_terms && (
+          <View style={s.notesBox}>
+            <Text style={s.notesLabel}>Conditions de paiement</Text>
+            <Text style={s.notesText}>{payment_terms}</Text>
+          </View>
+        )}
+
         {/* ── Signature ── */}
         {status === "signé" && signature_data && (
           <View style={s.signatureBox}>
@@ -539,12 +549,14 @@ export function DevisPdf(props: DevisPdfProps) {
           <Text style={s.footerText}>
             {company.name || "Devizly"}
             {company.legal_form ? ` — ${company.legal_form}` : ""}
-            {company.siret ? ` — SIRET ${company.siret}` : ""}
+            {company.siret ? ` — SIRET ${company.siret}` : " — SIRET en cours d'immatriculation"}
             {company.rcs_number ? ` — RCS ${company.rcs_number}` : ""}
             {company.address ? ` — ${company.address}` : ""}
           </Text>
           <Text style={s.footerText}>
-            Conditions : Devis valide 30 jours sauf mention contraire.
+            {valid_until
+              ? `Devis valable jusqu'au ${fmtDate(valid_until)}.`
+              : "Devis valide 30 jours sauf mention contraire."}{" "}
             Paiement à réception de facture. Pas d&apos;escompte pour règlement anticipé.
           </Text>
           <Text style={s.footerText}>

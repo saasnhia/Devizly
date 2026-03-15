@@ -60,20 +60,24 @@ export async function GET(
     .insert({ quote_id: quote.id, ip_address: ip, user_agent: ua })
     .then(() => {});
 
-  // Fetch owner profile for calendly link + subscription status
+  // Fetch owner profile for calendly link + subscription status + Stripe Connect
   const { data: ownerProfile } = await supabase
     .from("profiles")
-    .select("calendly_url, subscription_status")
+    .select("calendly_url, subscription_status, stripe_connect_status")
     .eq("id", quote.user_id)
     .single();
 
   const ownerPlan = ownerProfile?.subscription_status || "free";
+
+  // Stripe is enabled if the platform key is configured
+  const stripeEnabled = !!process.env.STRIPE_SECRET_KEY;
 
   return NextResponse.json({
     success: true,
     data: quote,
     calendly_url: ownerPlan !== "free" ? (ownerProfile?.calendly_url || null) : null,
     owner_plan: ownerPlan,
+    stripe_enabled: stripeEnabled,
   });
 }
 

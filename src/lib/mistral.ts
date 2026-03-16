@@ -14,12 +14,23 @@ export function getMistral(): Mistral {
 }
 
 /**
- * Strip markdown code fences that LLMs sometimes wrap around JSON responses.
+ * Clean malformed JSON returned by LLMs:
+ * - Strip markdown code fences
+ * - Replace single quotes with double quotes
+ * - Remove trailing commas before } or ]
  */
 export function cleanJSON(str: string): string {
-  return str
+  let cleaned = str
     .replace(/^```json\s*/i, "")
     .replace(/^```\s*/i, "")
     .replace(/```\s*$/i, "")
     .trim();
+
+  // Replace single quotes with double quotes
+  cleaned = cleaned.replace(/'/g, '"');
+
+  // Remove trailing commas before } or ]
+  cleaned = cleaned.replace(/,\s*([}\]])/g, "$1");
+
+  return cleaned;
 }

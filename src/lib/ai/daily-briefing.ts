@@ -175,7 +175,13 @@ Reponds UNIQUEMENT en JSON valide, sans markdown ni backticks.`;
       return fallbackBriefing(stats);
     }
 
-    const parsed = JSON.parse(cleanJSON(content)) as { summary: string; actions: string[] };
+    let parsed: { summary: string; actions: string[] };
+    try {
+      parsed = JSON.parse(cleanJSON(content)) as { summary: string; actions: string[] };
+    } catch (parseError) {
+      console.error("[daily-briefing] JSON parse failed:", parseError, "Raw:", content.slice(0, 500));
+      return fallbackBriefing(stats);
+    }
     return { ...parsed, stats };
   } catch {
     return fallbackBriefing(stats);

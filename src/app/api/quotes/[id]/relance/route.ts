@@ -91,7 +91,13 @@ L'email doit rappeler le devis, etre bienveillant, et proposer de repondre aux q
       return NextResponse.json({ error: "Reponse vide de l'IA" }, { status: 500 });
     }
 
-    const parsed = JSON.parse(cleanJSON(content)) as { subject: string; body: string };
+    let parsed: { subject: string; body: string };
+    try {
+      parsed = JSON.parse(cleanJSON(content)) as { subject: string; body: string };
+    } catch (parseError) {
+      console.error("[relance] JSON parse failed:", parseError, "Raw:", content.slice(0, 500));
+      return NextResponse.json({ error: "Réponse IA invalide — veuillez réessayer" }, { status: 500 });
+    }
 
     return NextResponse.json({
       success: true,

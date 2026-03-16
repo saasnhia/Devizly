@@ -68,7 +68,13 @@ Les prix doivent être en euros HT, réalistes pour le marché français.`,
       return NextResponse.json({ error: "Réponse vide de l'IA" }, { status: 500 });
     }
 
-    const parsed = JSON.parse(cleanJSON(content));
+    let parsed;
+    try {
+      parsed = JSON.parse(cleanJSON(content));
+    } catch (parseError) {
+      console.error("[generate-quote] JSON parse failed:", parseError, "Raw:", content.slice(0, 500));
+      return NextResponse.json({ error: "Réponse IA invalide — veuillez réessayer" }, { status: 500 });
+    }
     return NextResponse.json({ success: true, data: parsed });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Erreur IA";

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getMistral, cleanJSON } from "@/lib/mistral";
+import { getMistral, parseAIResponse } from "@/lib/mistral";
 import { checkRateLimit } from "@/lib/ratelimit";
 import { canCreateDevis, type PlanId } from "@/lib/stripe";
 
@@ -46,12 +46,14 @@ export async function POST(request: Request) {
     const mistral = getMistral();
     const completion = await mistral.chat.complete({
       model: "mistral-medium-latest",
+      responseFormat: { type: "json_object" },
       messages: [
         {
           role: "system",
-          content: `Tu es un assistant qui génère des devis professionnels français.
-Retourne un JSON avec: title (string), items (array of {description: string, quantity: number, unit_price: number}), notes (string).
-Réponds uniquement en JSON valide, sans markdown ni backticks.
+          content: `[STRICT MODE] Tu es un assistant qui génère des devis professionnels français.
+Tu dois répondre UNIQUEMENT avec du JSON brut valide.
+Pas de markdown, pas de backticks, pas de \`\`\`json, pas de texte avant ou après. Pas de commentaires. JSON pur uniquement.
+Structure attendue : { "title": string, "items": [{ "description": string, "quantity": number, "unit_price": number }], "notes": string }.
 Les prix doivent être en euros HT, réalistes pour le marché français.`,
         },
         {
@@ -70,7 +72,7 @@ Les prix doivent être en euros HT, réalistes pour le marché français.`,
 
     let parsed;
     try {
-      parsed = JSON.parse(cleanJSON(content));
+      parsed = parseAIResponse(content);
     } catch (parseError) {
       console.error("[generate-quote] JSON parse failed:", parseError, "Raw:", content.slice(0, 500));
       return NextResponse.json({ error: "Réponse IA invalide — veuillez réessayer" }, { status: 500 });

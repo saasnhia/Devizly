@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getMistral, cleanJSON } from "@/lib/mistral";
+import { getMistral, parseAIResponse } from "@/lib/mistral";
 import { formatCurrency } from "@/lib/utils/quote";
 
 export async function POST(
@@ -93,7 +93,7 @@ L'email doit rappeler le devis, etre bienveillant, et proposer de repondre aux q
 
     let parsed: { subject: string; body: string };
     try {
-      parsed = JSON.parse(cleanJSON(content)) as { subject: string; body: string };
+      parsed = parseAIResponse<{ subject: string; body: string }>(content);
     } catch (parseError) {
       console.error("[relance] JSON parse failed:", parseError, "Raw:", content.slice(0, 500));
       return NextResponse.json({ error: "Réponse IA invalide — veuillez réessayer" }, { status: 500 });

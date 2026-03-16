@@ -34,3 +34,22 @@ export function cleanJSON(str: string): string {
 
   return cleaned;
 }
+
+/**
+ * Tolerant JSON parser for LLM responses.
+ * Cleans the string, extracts the first JSON object/array found, and parses it.
+ */
+export function parseAIResponse<T = unknown>(raw: string): T {
+  const cleaned = cleanJSON(raw);
+
+  // Extract the first JSON object or array found in the string
+  const jsonMatch = cleaned.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
+  if (!jsonMatch) {
+    throw new Error("No JSON found in response");
+  }
+
+  const parsed = JSON.parse(jsonMatch[1]);
+
+  // If Mistral returns an array, take the first element
+  return Array.isArray(parsed) ? parsed[0] : parsed;
+}

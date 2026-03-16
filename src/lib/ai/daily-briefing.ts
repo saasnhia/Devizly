@@ -1,5 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
-import { getMistral, cleanJSON } from "@/lib/mistral";
+import { getMistral, parseAIResponse } from "@/lib/mistral";
 import { formatCurrency } from "@/lib/utils/quote";
 
 function createServiceClient() {
@@ -177,7 +177,7 @@ Reponds UNIQUEMENT en JSON valide, sans markdown ni backticks.`;
 
     let parsed: { summary: string; actions: string[] };
     try {
-      parsed = JSON.parse(cleanJSON(content)) as { summary: string; actions: string[] };
+      parsed = parseAIResponse<{ summary: string; actions: string[] }>(content);
     } catch (parseError) {
       console.error("[daily-briefing] JSON parse failed:", parseError, "Raw:", content.slice(0, 500));
       return fallbackBriefing(stats);

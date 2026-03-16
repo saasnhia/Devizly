@@ -12,3 +12,14 @@ export function getMistral(): Mistral {
   }
   return _client;
 }
+
+/**
+ * Strip markdown code fences that LLMs sometimes wrap around JSON responses.
+ */
+export function cleanJSON(str: string): string {
+  return str
+    .replace(/^```json\s*/i, "")
+    .replace(/^```\s*/i, "")
+    .replace(/```\s*$/i, "")
+    .trim();
+}

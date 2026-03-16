@@ -1,5 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
-import { getMistral } from "@/lib/mistral";
+import { getMistral, cleanJSON } from "@/lib/mistral";
 import { formatCurrency } from "@/lib/utils/quote";
 
 function createServiceClient() {
@@ -175,7 +175,7 @@ Reponds UNIQUEMENT en JSON valide, sans markdown ni backticks.`;
       return fallbackBriefing(stats);
     }
 
-    const parsed = JSON.parse(content) as { summary: string; actions: string[] };
+    const parsed = JSON.parse(cleanJSON(content)) as { summary: string; actions: string[] };
     return { ...parsed, stats };
   } catch {
     return fallbackBriefing(stats);

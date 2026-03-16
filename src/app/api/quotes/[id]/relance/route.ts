@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getMistral } from "@/lib/mistral";
+import { getMistral, cleanJSON } from "@/lib/mistral";
 import { formatCurrency } from "@/lib/utils/quote";
 
 export async function POST(
@@ -91,7 +91,7 @@ L'email doit rappeler le devis, etre bienveillant, et proposer de repondre aux q
       return NextResponse.json({ error: "Reponse vide de l'IA" }, { status: 500 });
     }
 
-    const parsed = JSON.parse(content) as { subject: string; body: string };
+    const parsed = JSON.parse(cleanJSON(content)) as { subject: string; body: string };
 
     return NextResponse.json({
       success: true,

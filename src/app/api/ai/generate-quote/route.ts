@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getMistral } from "@/lib/mistral";
+import { getMistral, cleanJSON } from "@/lib/mistral";
 import { checkRateLimit } from "@/lib/ratelimit";
 import { canCreateDevis, type PlanId } from "@/lib/stripe";
 
@@ -68,7 +68,7 @@ Les prix doivent être en euros HT, réalistes pour le marché français.`,
       return NextResponse.json({ error: "Réponse vide de l'IA" }, { status: 500 });
     }
 
-    const parsed = JSON.parse(content);
+    const parsed = JSON.parse(cleanJSON(content));
     return NextResponse.json({ success: true, data: parsed });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Erreur IA";

@@ -54,6 +54,7 @@ export async function POST(request: Request) {
 Tu dois répondre UNIQUEMENT avec du JSON brut valide.
 Pas de markdown, pas de backticks, pas de \`\`\`json, pas de texte avant ou après. Pas de commentaires. JSON pur uniquement.
 Structure attendue : { "title": string, "items": [{ "description": string, "quantity": number, "unit_price": number }], "notes": string }.
+Les descriptions doivent être courtes (10 mots max par ligne).
 Les prix doivent être en euros HT, réalistes pour le marché français.`,
         },
         {
@@ -62,7 +63,7 @@ Les prix doivent être en euros HT, réalistes pour le marché français.`,
         },
       ],
       temperature: 0.7,
-      maxTokens: 1000,
+      maxTokens: 2000,
     });
 
     const content = completion.choices?.[0]?.message?.content;

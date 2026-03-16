@@ -72,6 +72,7 @@ export interface Quote {
   deposit_paid_at: string | null;
   version: number;
   parent_quote_id: string | null;
+  archived_at: string | null;
   created_at: string;
   updated_at: string;
 }

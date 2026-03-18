@@ -29,6 +29,13 @@ export async function POST(request: Request) {
     );
   }
 
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return NextResponse.json(
+      { error: "Adresse email invalide" },
+      { status: 400 }
+    );
+  }
+
   // Get client IP
   const headersList = await headers();
   const ip =

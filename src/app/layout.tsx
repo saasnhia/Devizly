@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import { CookieBanner } from "@/components/cookie-banner";
+import { ServiceWorkerRegister } from "@/components/sw-register";
 import { JsonLd } from "@/components/seo/json-ld";
 import "./globals.css";
 
@@ -65,10 +66,20 @@ export const metadata: Metadata = {
     images: ["/og-image.png"],
   },
   icons: {
-    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
-    apple: "/favicon.svg",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
   },
   manifest: "/manifest.json",
+  other: {
+    "mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "black-translucent",
+    "apple-mobile-web-app-title": "Devizly",
+  },
 };
 
 const websiteSchema = {
@@ -113,6 +124,7 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <head>
+        <meta name="theme-color" content="#6366F1" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
@@ -131,6 +143,7 @@ export default function RootLayout({
         {children}
         <Toaster richColors position="top-right" />
         <CookieBanner />
+        <ServiceWorkerRegister />
       </body>
     </html>
   );

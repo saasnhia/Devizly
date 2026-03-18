@@ -43,10 +43,15 @@ export default function ClientsPage() {
   });
 
   const fetchClients = useCallback(async () => {
-    const supabase = createClient();
-    const { data } = await supabase.from("clients").select("*").order("name");
-    setClients((data || []) as Client[]);
-    setLoading(false);
+    try {
+      const supabase = createClient();
+      const { data } = await supabase.from("clients").select("*").order("name");
+      setClients((data || []) as Client[]);
+    } catch {
+      toast.error("Erreur de chargement des clients");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {

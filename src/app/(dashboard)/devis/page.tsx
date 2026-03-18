@@ -263,12 +263,14 @@ export default function DevisPage() {
         user_id: user.id,
         client_id: quote.client_id,
         title: `${quote.title} (copie)`,
+        status: "brouillon",
         total_ht: quote.total_ht,
         tva_rate: quote.tva_rate,
         discount: quote.discount,
         total_ttc: quote.total_ttc,
         currency: quote.currency || "EUR",
         notes: quote.notes,
+        payment_terms: quote.payment_terms,
         valid_until: quote.valid_until,
       })
       .select()

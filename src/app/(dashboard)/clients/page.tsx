@@ -155,7 +155,13 @@ export default function ClientsPage() {
         return;
       }
 
-      const rows = lines.slice(1);
+      const MAX_ROWS = 500;
+      const allRows = lines.slice(1);
+      if (allRows.length > MAX_ROWS) {
+        toast.error(`Le fichier contient ${allRows.length} lignes. Maximum autoris\u00e9 : ${MAX_ROWS}`);
+        return;
+      }
+      const rows = allRows;
       let imported = 0;
       let errors = 0;
 

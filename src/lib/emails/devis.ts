@@ -15,6 +15,10 @@ interface DevisEmailParams {
   customMessage?: string;
 }
 
+function escapeHtml(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
 export function devisEmail(p: DevisEmailParams): { subject: string; html: string } {
   const paymentBlock = p.stripeUrl
     ? `<table width="100%" cellpadding="0" cellspacing="0" style="margin:16px 0 0;">
@@ -44,7 +48,7 @@ export function devisEmail(p: DevisEmailParams): { subject: string; html: string
         <p style="margin:0 0 16px;font-size:16px;color:#0F172A;">Bonjour ${p.clientName},</p>
         <p style="margin:0 0 16px;font-size:15px;color:#334155;line-height:1.6;">
           ${p.customMessage
-            ? p.customMessage.replace(/\n/g, "<br>")
+            ? escapeHtml(p.customMessage).replace(/\n/g, "<br>")
             : `${p.companyName} vous a transmis un devis pour votre projet.`}
         </p>
 

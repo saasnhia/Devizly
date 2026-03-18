@@ -67,6 +67,13 @@ import { RelanceModal } from "@/components/quotes/relance-modal";
 import { SaveTemplateModal } from "@/components/templates/save-template-modal";
 import { QuotePreviewDrawer } from "@/components/quotes/quote-preview-drawer";
 import { toast } from "sonner";
+import { calculateQuoteScore, type QuoteScore } from "@/lib/quote-scoring";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -199,6 +206,40 @@ export default function DevisPage() {
   }, [viewTab, statusFilter, search, clientFilter, dateFrom, dateTo]);
 
   const archivedCount = quotes.filter((q) => !!q.archived_at).length;
+
+  // Quote scoring — computed from loaded data
+  const quoteScores = useMemo(() => {
+    const scores: Record<string, QuoteScore> = {};
+    // Build client history from all quotes
+    const clientStats: Record<string, { signed: number; total: number; amounts: number[] }> = {};
+    for (const q of quotes) {
+      if (!q.client_id) continue;
+      if (!clientStats[q.client_id]) clientStats[q.client_id] = { signed: 0, total: 0, amounts: [] };
+      clientStats[q.client_id].total++;
+      if (["signé", "accepté", "payé"].includes(q.status)) clientStats[q.client_id].signed++;
+      clientStats[q.client_id].amounts.push(Number(q.total_ttc));
+    }
+
+    for (const q of quotes) {
+      if (!["envoyé", "signé"].includes(q.status) || q.archived_at) continue;
+      const cs = q.client_id ? clientStats[q.client_id] : null;
+      const avgAmount = cs && cs.amounts.length > 0 ? cs.amounts.reduce((a, b) => a + b, 0) / cs.amounts.length : null;
+
+      scores[q.id] = calculateQuoteScore({
+        status: q.status,
+        viewCount: q.view_count || 0,
+        viewedAt: q.viewed_at,
+        createdAt: q.created_at,
+        validUntil: q.valid_until,
+        depositPercent: q.deposit_percent,
+        totalTtc: Number(q.total_ttc),
+        clientSignedCount: cs?.signed || 0,
+        clientTotalCount: cs?.total || 0,
+        clientAvgAmount: avgAmount,
+      });
+    }
+    return scores;
+  }, [quotes]);
 
   async function handleArchive(id: string) {
     // Optimistic UI
@@ -695,6 +736,7 @@ export default function DevisPage() {
                     <TableHead>Client</TableHead>
                     <TableHead>Montant TTC</TableHead>
                     <TableHead>Statut</TableHead>
+                    {viewTab === "actifs" && <TableHead>Score</TableHead>}
                     {viewTab === "actifs" && <TableHead>Relances</TableHead>}
                     <TableHead>Créé le</TableHead>
                     <TableHead>Expiration</TableHead>
@@ -770,6 +812,47 @@ export default function DevisPage() {
                           )}
                         </div>
                       </TableCell>
+                      {viewTab === "actifs" && (
+                        <TableCell>
+                          {quoteScores[quote.id] ? (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Badge
+                                    variant="secondary"
+                                    className={
+                                      quoteScores[quote.id].level === "hot"
+                                        ? "bg-green-100 text-green-700 cursor-help"
+                                        : quoteScores[quote.id].level === "warm"
+                                          ? "bg-orange-100 text-orange-700 cursor-help"
+                                          : "bg-red-100 text-red-700 cursor-help"
+                                    }
+                                  >
+                                    {quoteScores[quote.id].level === "hot" ? "\uD83D\uDFE2" : quoteScores[quote.id].level === "warm" ? "\uD83D\uDFE1" : "\uD83D\uDD34"}{" "}
+                                    {quoteScores[quote.id].score}%
+                                  </Badge>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom" className="max-w-xs">
+                                  <div className="space-y-1">
+                                    {quoteScores[quote.id].signals.map((s, i) => (
+                                      <p key={i} className="text-xs">
+                                        {s.positive ? "+" : ""}{s.points} {s.label}
+                                      </p>
+                                    ))}
+                                    {quoteScores[quote.id].advice && (
+                                      <p className="text-xs font-medium text-primary mt-1 pt-1 border-t">
+                                        {quoteScores[quote.id].advice}
+                                      </p>
+                                    )}
+                                  </div>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          ) : (
+                            <span className="text-xs text-slate-300">&mdash;</span>
+                          )}
+                        </TableCell>
+                      )}
                       {viewTab === "actifs" && (
                         <TableCell>
                           {quote.status === "envoyé" ||

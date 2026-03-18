@@ -323,3 +323,31 @@ export interface Notification {
   read: boolean;
   created_at: string;
 }
+
+// ── URSSAF Declarations ──────────────────────────────────────
+
+export type UrssafPeriodeType = 'mensuelle' | 'trimestrielle';
+export type UrssafStatut = 'a_declarer' | 'declare';
+
+export type UrssafActiviteType =
+  | 'vente_marchandises'
+  | 'prestations_bic'
+  | 'prestations_bnc'
+  | 'liberale_cipav';
+
+export interface UrssafDeclaration {
+  id: string;
+  user_id: string;
+  periode_type: UrssafPeriodeType;
+  periode_label: string;
+  periode_start: string;
+  periode_end: string;
+  ca_ht: number;
+  taux_activite: string;
+  cotisations: number;
+  cfp: number;
+  statut: UrssafStatut;
+  declared_at: string | null;
+  created_at: string;
+  updated_at: string;
+}

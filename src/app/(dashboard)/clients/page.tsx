@@ -131,7 +131,6 @@ export default function ClientsPage() {
         return;
       }
 
-      // Parse header to find column indexes
       const sep = lines[0].includes(";") ? ";" : ",";
       const headers = lines[0].split(sep).map((h) => h.trim().toLowerCase().replace(/^"|"$/g, ""));
       const colMap: Record<string, number> = {};
@@ -161,8 +160,17 @@ export default function ClientsPage() {
         toast.error(`Le fichier contient ${allRows.length} lignes. Maximum autoris\u00e9 : ${MAX_ROWS}`);
         return;
       }
+
+      // Build set of existing emails for dedup
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const existingEmails = new Set(
+        clients.filter((c) => c.email).map((c) => c.email!.toLowerCase())
+      );
+
       const rows = allRows;
       let imported = 0;
+      let skippedDuplicates = 0;
+      let invalidEmails = 0;
       let errors = 0;
 
       for (const row of rows) {
@@ -177,6 +185,20 @@ export default function ClientsPage() {
           }
         }
 
+        // Validate email if present
+        if (payload.email) {
+          if (!emailRegex.test(payload.email)) {
+            invalidEmails++;
+            continue;
+          }
+          // Dedup: skip if email already exists
+          const emailLower = payload.email.toLowerCase();
+          if (existingEmails.has(emailLower)) {
+            skippedDuplicates++;
+            continue;
+          }
+        }
+
         const res = await fetch("/api/clients", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -184,20 +206,26 @@ export default function ClientsPage() {
         });
         if (res.ok) {
           imported++;
+          if (payload.email) existingEmails.add(payload.email.toLowerCase());
         } else {
           errors++;
         }
       }
 
-      if (imported > 0) {
-        toast.success(`${imported} client${imported > 1 ? "s" : ""} import\u00e9${imported > 1 ? "s" : ""}`);
-        fetchClients();
-      }
-      if (errors > 0) {
-        toast.error(`${errors} ligne${errors > 1 ? "s" : ""} en erreur`);
-      }
-      if (imported === 0 && errors === 0) {
+      // Summary toast
+      const parts: string[] = [];
+      if (imported > 0) parts.push(`${imported} import\u00e9${imported > 1 ? "s" : ""}`);
+      if (skippedDuplicates > 0) parts.push(`${skippedDuplicates} ignor\u00e9${skippedDuplicates > 1 ? "s" : ""} (doublons)`);
+      if (invalidEmails > 0) parts.push(`${invalidEmails} invalide${invalidEmails > 1 ? "s" : ""} (email)`);
+      if (errors > 0) parts.push(`${errors} en erreur`);
+
+      if (parts.length === 0) {
         toast.info("Aucun client trouv\u00e9 dans le fichier");
+      } else if (imported > 0) {
+        toast.success(parts.join(", "));
+        fetchClients();
+      } else {
+        toast.warning(parts.join(", "));
       }
     } catch {
       toast.error("Erreur lors de la lecture du fichier CSV");

@@ -25,6 +25,7 @@ import {
   FileSignature,
   UsersRound,
   Timer,
+  Calculator,
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import { NotificationBell } from "@/components/layout/notification-bell";
@@ -35,6 +36,7 @@ const navItems = [
   { href: "/dashboard/briefing", label: "Briefing IA", icon: Brain },
   { href: "/dashboard/pipeline", label: "Pipeline", icon: Kanban },
   { href: "/dashboard/factures", label: "Factures", icon: Receipt },
+  { href: "/dashboard/urssaf", label: "URSSAF", icon: Calculator },
   { href: "/contrats", label: "Contrats", icon: FileSignature },
   { href: "/devis", label: "Devis", icon: FileText },
   { href: "/templates", label: "Templates", icon: LayoutTemplate },

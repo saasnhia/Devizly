@@ -26,6 +26,8 @@ import {
   Send,
   GripVertical,
   FileText,
+  Check,
+  Pencil,
 } from "lucide-react";
 import { calculateItemTotal, calculateTotals, formatCurrency } from "@/lib/utils/quote";
 import { CURRENCIES } from "@/lib/currencies";
@@ -198,6 +200,9 @@ export default function NouveauDevisPage() {
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
   const [pdfLoading, setPdfLoading] = useState(false);
   const defaultsLoaded = useRef(false);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<"idle" | "dirty" | "saving" | "saved">("idle");
+  const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pdfPreviewVersion = useRef(0);
 
   // Q3: Drag & drop sensors
   const sensors = useSensors(
@@ -227,6 +232,91 @@ export default function NouveauDevisPage() {
     }
     loadDefaults();
   }, [editId]);
+
+  // Auto-save silently as draft (edit mode only)
+  const autoSave = useCallback(async () => {
+    if (!editId || !title.trim()) return;
+    const validItems = stripIds(items.filter((i) => i.description.trim()));
+    if (validItems.length === 0) return;
+    setAutoSaveStatus("saving");
+    try {
+      const currentTotals = calculateTotals(validItems, Number(tvaRate), Number(discount));
+      const res = await fetch(`/api/quotes/${editId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title, client_id: clientId || null, currency,
+          tva_rate: Number(tvaRate), discount: Number(discount),
+          notes, payment_terms: paymentTerms || null,
+          valid_until: validUntil || null, ai_prompt: aiPrompt || null,
+          total_ht: currentTotals.totalHT, total_ttc: currentTotals.totalTTC,
+          status: "brouillon", items: validItems,
+        }),
+      });
+      if (res.ok) {
+        setAutoSaveStatus("saved");
+        pdfPreviewVersion.current++;
+      } else {
+        setAutoSaveStatus("dirty");
+      }
+    } catch {
+      setAutoSaveStatus("dirty");
+    }
+  }, [editId, title, clientId, currency, tvaRate, discount, notes, paymentTerms, validUntil, aiPrompt, items]);
+
+  // Debounce: mark dirty on any change, auto-save after 2s idle (edit mode only)
+  useEffect(() => {
+    if (!editId || autoSaveStatus === "idle") return;
+    if (autoSaveStatus !== "dirty") return;
+    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+    autoSaveTimer.current = setTimeout(() => { autoSave(); }, 2000);
+    return () => { if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current); };
+  }, [autoSaveStatus, editId, autoSave]);
+
+  // Mark dirty when form changes (only in edit mode, after initial load)
+  const initialLoadDone = useRef(false);
+  useEffect(() => {
+    if (!editId) return;
+    if (!initialLoadDone.current) { initialLoadDone.current = true; return; }
+    setAutoSaveStatus("dirty");
+  }, [editId, title, clientId, currency, tvaRate, discount, notes, paymentTerms, validUntil, items]);
+
+  // Save & Preview button
+  async function handleSaveAndPreview() {
+    if (!editId) {
+      // For new quotes: save first, get the ID, then redirect to edit mode with preview
+      if (!title.trim()) { toast.error("Le titre est requis"); return; }
+      if (!items.some((i) => i.description.trim())) { toast.error("Ajoutez au moins une ligne"); return; }
+      setSaving(true);
+      const validItems = stripIds(items.filter((i) => i.description.trim()));
+      try {
+        const res = await fetch("/api/quotes", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title, client_id: clientId || null, currency,
+            tva_rate: Number(tvaRate), discount: Number(discount), notes,
+            payment_terms: paymentTerms || null, valid_until: validUntil || null,
+            ai_prompt: aiPrompt || null, total_ht: totals.totalHT,
+            total_ttc: totals.totalTTC, status: "brouillon", items: validItems,
+          }),
+        });
+        const result = await res.json();
+        if (res.ok && result.data?.id) {
+          router.replace(`/devis/nouveau?edit=${result.data.id}`);
+          // PDF preview will be available on next render when editId is set
+          toast.success("Brouillon sauvegard\u00e9");
+        } else {
+          toast.error(result.error || "Erreur de sauvegarde");
+        }
+      } catch { toast.error("Erreur de connexion"); }
+      finally { setSaving(false); }
+      return;
+    }
+    // Edit mode: auto-save then preview
+    await autoSave();
+    handlePdfPreview();
+  }
 
   const fetchClients = useCallback(async () => {
     const supabase = createClient();
@@ -453,9 +543,18 @@ export default function NouveauDevisPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">
-        {editId ? "Modifier le devis" : "Nouveau devis"}
-      </h1>
+      <div className="flex items-center gap-3">
+        <h1 className="text-2xl font-bold">
+          {editId ? "Modifier le devis" : "Nouveau devis"}
+        </h1>
+        {editId && autoSaveStatus !== "idle" && (
+          <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            {autoSaveStatus === "saving" && <><Loader2 className="h-3 w-3 animate-spin" /> Sauvegarde...</>}
+            {autoSaveStatus === "saved" && <><Check className="h-3 w-3 text-green-500" /> Sauvegard&eacute;</>}
+            {autoSaveStatus === "dirty" && <><Pencil className="h-3 w-3" /> Modification en cours...</>}
+          </span>
+        )}
+      </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* LEFT COLUMN */}
@@ -684,22 +783,20 @@ export default function NouveauDevisPage() {
                 </div>
               </div>
 
-              {/* Q2: PDF Preview button */}
-              {editId && (
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={handlePdfPreview}
-                  disabled={pdfLoading}
-                >
-                  {pdfLoading ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <FileText className="mr-2 h-4 w-4" />
-                  )}
-                  Aperçu PDF
-                </Button>
-              )}
+              {/* PDF Preview button */}
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={handleSaveAndPreview}
+                disabled={pdfLoading || saving}
+              >
+                {pdfLoading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <FileText className="mr-2 h-4 w-4" />
+                )}
+                {editId ? "Aperçu PDF" : "Sauvegarder & Aperçu"}
+              </Button>
 
               <div className="flex gap-3 pt-4">
                 <Button

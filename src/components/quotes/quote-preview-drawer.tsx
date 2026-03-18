@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
+import { calculateQuoteScore, type QuoteScore } from "@/lib/quote-scoring";
 import {
   Sheet,
   SheetContent,
@@ -61,6 +62,7 @@ export function QuotePreviewDrawer({
   const [emailTo, setEmailTo] = useState("");
   const [emailMessage, setEmailMessage] = useState("");
   const [emailSending, setEmailSending] = useState(false);
+  const [clientQuotes, setClientQuotes] = useState<{ status: string; total_ttc: number }[]>([]);
 
   const fetchQuote = useCallback(async () => {
     if (!quoteId) return;
@@ -72,6 +74,15 @@ export function QuotePreviewDrawer({
         setQuote(json.data);
         if (json.data?.clients?.email) {
           setEmailTo(json.data.clients.email);
+        }
+        // Fetch client quote history for scoring
+        if (json.data?.client_id) {
+          const supabase = createClient();
+          const { data: cq } = await supabase
+            .from("quotes")
+            .select("status, total_ttc")
+            .eq("client_id", json.data.client_id);
+          setClientQuotes((cq || []) as { status: string; total_ttc: number }[]);
         }
       } else {
         setQuote(null);
@@ -168,6 +179,26 @@ export function QuotePreviewDrawer({
     navigator.clipboard.writeText(url);
     toast.success("Lien copié dans le presse-papiers");
   }
+
+  // Score computation
+  const scoreData: QuoteScore | null = useMemo(() => {
+    if (!quote || !["envoyé", "signé"].includes(quote.status)) return null;
+    const signed = clientQuotes.filter((q) => ["signé", "accepté", "payé"].includes(q.status)).length;
+    const amounts = clientQuotes.map((q) => Number(q.total_ttc));
+    const avg = amounts.length > 0 ? amounts.reduce((a, b) => a + b, 0) / amounts.length : null;
+    return calculateQuoteScore({
+      status: quote.status,
+      viewCount: quote.view_count || 0,
+      viewedAt: quote.viewed_at,
+      createdAt: quote.created_at,
+      validUntil: quote.valid_until,
+      depositPercent: quote.deposit_percent,
+      totalTtc: Number(quote.total_ttc),
+      clientSignedCount: signed,
+      clientTotalCount: clientQuotes.length,
+      clientAvgAmount: avg,
+    });
+  }, [quote, clientQuotes]);
 
   if (!quoteId) return null;
 
@@ -305,6 +336,58 @@ export function QuotePreviewDrawer({
                 {getStatusLabel(quote.status)}
               </Badge>
             </div>
+
+            {/* Score */}
+            {scoreData && (
+              <div className="rounded-lg border p-4 space-y-3">
+                <div className="flex items-center gap-4">
+                  {/* Circular gauge */}
+                  <div className="relative h-16 w-16 shrink-0">
+                    <svg className="h-16 w-16 -rotate-90" viewBox="0 0 36 36">
+                      <path
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                        fill="none"
+                        stroke="#e2e8f0"
+                        strokeWidth="3"
+                      />
+                      <path
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                        fill="none"
+                        stroke={scoreData.level === "hot" ? "#22c55e" : scoreData.level === "warm" ? "#f97316" : "#ef4444"}
+                        strokeWidth="3"
+                        strokeDasharray={`${scoreData.score}, 100`}
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    <span className="absolute inset-0 flex items-center justify-center text-sm font-bold">
+                      {scoreData.score}%
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">
+                      Score de signature{" "}
+                      <Badge variant="secondary" className={
+                        scoreData.level === "hot" ? "bg-green-100 text-green-700"
+                          : scoreData.level === "warm" ? "bg-orange-100 text-orange-700"
+                          : "bg-red-100 text-red-700"
+                      }>
+                        {scoreData.level === "hot" ? "Chaud" : scoreData.level === "warm" ? "Ti\u00e8de" : "Froid"}
+                      </Badge>
+                    </p>
+                    {scoreData.advice && (
+                      <p className="text-xs text-primary mt-1">{scoreData.advice}</p>
+                    )}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-1">
+                  {scoreData.signals.map((s, i) => (
+                    <p key={i} className={`text-xs ${s.positive ? "text-green-600" : "text-red-500"}`}>
+                      {s.positive ? "+" : ""}{s.points} {s.label}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Client */}
             {quote.clients && (

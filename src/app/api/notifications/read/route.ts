@@ -22,7 +22,7 @@ export async function POST(request: Request) {
       .eq("read", false);
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 });
     }
   } else if (Array.isArray(body.ids) && body.ids.length > 0) {
     const { error } = await supabase
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
       .in("id", body.ids);
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 });
     }
   } else {
     return NextResponse.json(

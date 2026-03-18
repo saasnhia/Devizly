@@ -46,9 +46,9 @@ export async function GET(request: Request) {
 
   // Filter by date range
   if (year) {
-    const y = parseInt(year);
+    const y = parseInt(year, 10);
     if (month) {
-      const m = parseInt(month) - 1; // 0-indexed
+      const m = parseInt(month, 10) - 1; // 0-indexed
       const startDate = new Date(y, m, 1).toISOString();
       const endDate = new Date(y, m + 1, 0, 23, 59, 59).toISOString();
       query = query.gte("created_at", startDate).lte("created_at", endDate);
@@ -66,7 +66,7 @@ export async function GET(request: Request) {
   const { data: quotes, error } = await query;
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 });
   }
 
   if (!quotes || quotes.length === 0) {

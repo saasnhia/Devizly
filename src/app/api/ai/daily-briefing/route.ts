@@ -29,7 +29,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, briefing });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Erreur IA";
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error("[daily-briefing] Error:", error);
+    return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 });
   }
 }

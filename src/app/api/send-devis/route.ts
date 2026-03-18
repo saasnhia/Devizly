@@ -23,8 +23,9 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { to, devis } = body as {
+  const { to, devis, customMessage } = body as {
     to: string;
+    customMessage?: string;
     devis: {
       id: string | number;
       uuid?: string;
@@ -87,6 +88,7 @@ export async function POST(request: Request) {
     stripeUrl: devis.stripe_url,
     companyName,
     trackingPixelUrl,
+    customMessage: customMessage || undefined,
   });
 
   const { data, error } = await resend.emails.send({
@@ -99,7 +101,7 @@ export async function POST(request: Request) {
   if (error) {
     console.error("[send-devis] Resend error:", error);
     return NextResponse.json(
-      { error: error.message, details: error },
+      { error: "Une erreur est survenue" },
       { status: 500 }
     );
   }

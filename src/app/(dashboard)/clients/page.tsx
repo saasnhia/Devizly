@@ -21,7 +21,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, Search, Pencil, Trash2, Users, ExternalLink, Copy } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Users, ExternalLink, Copy, Upload, Loader2 } from "lucide-react";
 import type { Client } from "@/types";
 import { toast } from "sonner";
 
@@ -31,6 +31,8 @@ export default function ClientsPage() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
+
+  const [csvImporting, setCsvImporting] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -115,6 +117,89 @@ export default function ClientsPage() {
     fetchClients();
   }
 
+  async function handleCsvImport(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = "";
+
+    setCsvImporting(true);
+    try {
+      const text = await file.text();
+      const lines = text.split(/\r?\n/).filter((l) => l.trim());
+      if (lines.length < 2) {
+        toast.error("Le fichier CSV est vide ou ne contient qu\u2019une ligne d\u2019en-t\u00eate");
+        return;
+      }
+
+      // Parse header to find column indexes
+      const sep = lines[0].includes(";") ? ";" : ",";
+      const headers = lines[0].split(sep).map((h) => h.trim().toLowerCase().replace(/^"|"$/g, ""));
+      const colMap: Record<string, number> = {};
+      const aliases: Record<string, string[]> = {
+        name: ["nom", "name", "raison sociale", "raison_sociale", "societe", "société", "client"],
+        email: ["email", "e-mail", "mail", "courriel"],
+        phone: ["phone", "telephone", "téléphone", "tel", "tél", "portable"],
+        address: ["address", "adresse", "rue"],
+        city: ["city", "ville"],
+        postal_code: ["postal_code", "code_postal", "code postal", "cp", "zip"],
+        siret: ["siret", "siren"],
+      };
+
+      for (const [field, names] of Object.entries(aliases)) {
+        const idx = headers.findIndex((h) => names.includes(h));
+        if (idx !== -1) colMap[field] = idx;
+      }
+
+      if (!("name" in colMap)) {
+        toast.error("Colonne \u00ab nom \u00bb introuvable dans le CSV. Colonnes attendues : nom, email, phone, adresse, ville, code_postal, siret");
+        return;
+      }
+
+      const rows = lines.slice(1);
+      let imported = 0;
+      let errors = 0;
+
+      for (const row of rows) {
+        const cols = row.split(sep).map((c) => c.trim().replace(/^"|"$/g, ""));
+        const name = cols[colMap.name] || "";
+        if (!name) continue;
+
+        const payload: Record<string, string> = { name };
+        for (const field of ["email", "phone", "address", "city", "postal_code", "siret"] as const) {
+          if (field in colMap && cols[colMap[field]]) {
+            payload[field] = cols[colMap[field]];
+          }
+        }
+
+        const res = await fetch("/api/clients", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (res.ok) {
+          imported++;
+        } else {
+          errors++;
+        }
+      }
+
+      if (imported > 0) {
+        toast.success(`${imported} client${imported > 1 ? "s" : ""} import\u00e9${imported > 1 ? "s" : ""}`);
+        fetchClients();
+      }
+      if (errors > 0) {
+        toast.error(`${errors} ligne${errors > 1 ? "s" : ""} en erreur`);
+      }
+      if (imported === 0 && errors === 0) {
+        toast.info("Aucun client trouv\u00e9 dans le fichier");
+      }
+    } catch {
+      toast.error("Erreur lors de la lecture du fichier CSV");
+    } finally {
+      setCsvImporting(false);
+    }
+  }
+
   const filtered = clients.filter(
     (c) =>
       !search ||
@@ -126,6 +211,26 @@ export default function ClientsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Clients</h1>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => document.getElementById("csv-import")?.click()}
+            disabled={csvImporting}
+          >
+            {csvImporting ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Upload className="mr-2 h-4 w-4" />
+            )}
+            Importer CSV
+          </Button>
+          <input
+            id="csv-import"
+            type="file"
+            accept=".csv,text/csv"
+            className="hidden"
+            onChange={handleCsvImport}
+          />
         <Dialog
           open={dialogOpen}
           onOpenChange={(open) => {
@@ -215,6 +320,7 @@ export default function ClientsPage() {
             </div>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       <Card>

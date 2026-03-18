@@ -21,7 +21,7 @@ export async function GET() {
     .limit(50);
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 });
   }
 
   return NextResponse.json({ notifications: data ?? [] });
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
   });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 });
   }
 
   return NextResponse.json({ success: true });

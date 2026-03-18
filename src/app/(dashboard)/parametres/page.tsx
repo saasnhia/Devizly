@@ -54,6 +54,7 @@ export default function ParametresPage() {
     company_siret: "",
     company_phone: "",
     default_tva_rate: "20",
+    default_payment_terms: "",
     tva_number: "",
     is_micro_entrepreneur: false,
     legal_form: "",
@@ -75,6 +76,7 @@ export default function ParametresPage() {
           company_siret: user.user_metadata.company_siret || "",
           company_phone: user.user_metadata.company_phone || "",
           default_tva_rate: user.user_metadata.default_tva_rate || "20",
+          default_payment_terms: user.user_metadata.default_payment_terms || "",
           tva_number: user.user_metadata.tva_number || "",
           is_micro_entrepreneur: user.user_metadata.is_micro_entrepreneur || false,
           legal_form: user.user_metadata.legal_form || "",
@@ -503,6 +505,21 @@ export default function ParametresPage() {
                   <SelectItem value="0">0%</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Conditions de paiement par défaut</Label>
+              <Textarea
+                value={profile.default_payment_terms}
+                onChange={(e) =>
+                  setProfile({ ...profile, default_payment_terms: e.target.value })
+                }
+                placeholder="Acompte de 50% à la signature, solde à la livraison"
+                rows={2}
+              />
+              <p className="text-xs text-muted-foreground">
+                Pré-rempli automatiquement à chaque nouveau devis.
+              </p>
             </div>
 
             {/* Micro-entrepreneur toggle */}

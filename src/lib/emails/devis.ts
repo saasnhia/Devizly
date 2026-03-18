@@ -12,6 +12,7 @@ interface DevisEmailParams {
   stripeUrl?: string;
   companyName: string;
   trackingPixelUrl?: string;
+  customMessage?: string;
 }
 
 export function devisEmail(p: DevisEmailParams): { subject: string; html: string } {
@@ -42,7 +43,9 @@ export function devisEmail(p: DevisEmailParams): { subject: string; html: string
       <td style="padding:32px;">
         <p style="margin:0 0 16px;font-size:16px;color:#0F172A;">Bonjour ${p.clientName},</p>
         <p style="margin:0 0 16px;font-size:15px;color:#334155;line-height:1.6;">
-          ${p.companyName} vous a transmis un devis pour votre projet.
+          ${p.customMessage
+            ? p.customMessage.replace(/\n/g, "<br>")
+            : `${p.companyName} vous a transmis un devis pour votre projet.`}
         </p>
 
         <!-- Devis summary card -->

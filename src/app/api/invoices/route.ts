@@ -18,8 +18,8 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const status = searchParams.get("status");
-  const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
-  const limit = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") || "20")));
+  const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+  const limit = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") || "20", 10)));
   const offset = (page - 1) * limit;
 
   let query = supabase
@@ -36,7 +36,7 @@ export async function GET(request: Request) {
   const { data: invoices, count, error } = await query;
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 });
   }
 
   return NextResponse.json({
@@ -71,7 +71,7 @@ export async function POST(request: Request) {
     const result = await generateInvoice(quoteId, user.id);
     return NextResponse.json({ success: true, invoice: result.invoice });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Erreur création facture";
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error("[invoices] POST error:", err);
+    return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 });
   }
 }

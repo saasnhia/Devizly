@@ -66,7 +66,7 @@ export async function PATCH(
       .eq("id", id);
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 });
     }
   } else {
     // Disable recurring
@@ -80,7 +80,7 @@ export async function PATCH(
       .eq("id", id);
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 });
     }
   }
 

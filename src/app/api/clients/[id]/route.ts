@@ -49,7 +49,7 @@ export async function PUT(
     .eq("user_id", user.id);
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 });
   }
 
   return NextResponse.json({ success: true });
@@ -74,7 +74,7 @@ export async function DELETE(
     .eq("user_id", user.id);
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 });
   }
 
   return NextResponse.json({ success: true });

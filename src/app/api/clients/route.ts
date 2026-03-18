@@ -16,7 +16,7 @@ export async function GET() {
     .order("name");
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 });
   }
 
   return NextResponse.json({ success: true, data });
@@ -53,7 +53,7 @@ export async function POST(request: Request) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 });
   }
 
   return NextResponse.json({ success: true, data }, { status: 201 });

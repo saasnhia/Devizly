@@ -80,7 +80,7 @@ Les prix doivent être en euros HT, réalistes pour le marché français.`,
     }
     return NextResponse.json({ success: true, data: parsed });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Erreur IA";
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error("[generate-quote] Error:", error);
+    return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 });
   }
 }

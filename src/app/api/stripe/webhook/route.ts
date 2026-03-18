@@ -76,7 +76,7 @@ export async function POST(request: Request) {
             .single();
 
           const depositPercent = session.metadata?.deposit_percent
-            ? parseInt(session.metadata.deposit_percent)
+            ? parseInt(session.metadata.deposit_percent, 10)
             : null;
 
           await supabase

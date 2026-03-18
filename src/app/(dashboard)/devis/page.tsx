@@ -820,6 +820,17 @@ export default function DevisPage() {
                           className="flex items-center gap-1"
                           onClick={(e) => e.stopPropagation()}
                         >
+                          {/* Inline Duplicate */}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => handleDuplicate(quote)}
+                            title="Dupliquer"
+                          >
+                            <Copy className="h-4 w-4" />
+                          </Button>
+
                           {/* Inline PDF download */}
                           <Button
                             variant="ghost"

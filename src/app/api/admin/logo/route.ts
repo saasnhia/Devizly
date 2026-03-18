@@ -56,7 +56,7 @@ export async function POST(request: Request) {
     .eq("id", user.id);
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 });
   }
 
   return NextResponse.json({ success: true });

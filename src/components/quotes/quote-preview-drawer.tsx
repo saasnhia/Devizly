@@ -21,6 +21,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Download,
   Copy,
@@ -28,6 +30,7 @@ import {
   CheckCircle,
   Loader2,
   FileText,
+  Send,
 } from "lucide-react";
 import {
   formatCurrency,
@@ -54,6 +57,10 @@ export function QuotePreviewDrawer({
   const [quote, setQuote] = useState<QuoteWithItems | null>(null);
   const [loading, setLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [showEmailForm, setShowEmailForm] = useState(false);
+  const [emailTo, setEmailTo] = useState("");
+  const [emailMessage, setEmailMessage] = useState("");
+  const [emailSending, setEmailSending] = useState(false);
 
   const fetchQuote = useCallback(async () => {
     if (!quoteId) return;
@@ -63,6 +70,9 @@ export function QuotePreviewDrawer({
       if (res.ok) {
         const json = await res.json();
         setQuote(json.data);
+        if (json.data?.clients?.email) {
+          setEmailTo(json.data.clients.email);
+        }
       } else {
         setQuote(null);
       }
@@ -79,6 +89,8 @@ export function QuotePreviewDrawer({
     }
     if (!open) {
       setQuote(null);
+      setShowEmailForm(false);
+      setEmailMessage("");
     }
   }, [open, quoteId, fetchQuote]);
 
@@ -105,6 +117,45 @@ export function QuotePreviewDrawer({
       toast.error("Erreur de connexion");
     } finally {
       setPdfLoading(false);
+    }
+  }
+
+  async function handleSendEmail() {
+    if (!quote || !emailTo.trim()) {
+      toast.error("Adresse email requise");
+      return;
+    }
+    setEmailSending(true);
+    try {
+      const res = await fetch("/api/send-devis", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: emailTo,
+          customMessage: emailMessage || undefined,
+          devis: {
+            id: quote.number,
+            uuid: quote.id,
+            client: quote.clients?.name || "Client",
+            montant: Number(quote.total_ttc),
+            titre: quote.title,
+            share_token: quote.share_token,
+            currency: quote.currency || "EUR",
+          },
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || "Erreur lors de l\u2019envoi");
+        return;
+      }
+      toast.success("Email envoy\u00e9 avec succ\u00e8s");
+      setShowEmailForm(false);
+      setEmailMessage("");
+    } catch {
+      toast.error("Erreur de connexion");
+    } finally {
+      setEmailSending(false);
     }
   }
 
@@ -184,7 +235,54 @@ export function QuotePreviewDrawer({
                   Dupliquer
                 </Button>
               )}
+              <Button
+                variant={showEmailForm ? "default" : "outline"}
+                size="sm"
+                onClick={() => setShowEmailForm((v) => !v)}
+              >
+                <Send className="mr-2 h-4 w-4" />
+                Envoyer par email
+              </Button>
             </div>
+
+            {/* Q6: Email send form */}
+            {showEmailForm && (
+              <div className="space-y-3 rounded-lg border border-primary/20 bg-primary/5 p-4">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium">Destinataire</label>
+                  <Input
+                    type="email"
+                    value={emailTo}
+                    onChange={(e) => setEmailTo(e.target.value)}
+                    placeholder="client@exemple.fr"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium">
+                    Message personnalis&eacute; <span className="text-xs font-normal text-muted-foreground">(optionnel)</span>
+                  </label>
+                  <Textarea
+                    value={emailMessage}
+                    onChange={(e) => setEmailMessage(e.target.value)}
+                    placeholder="Bonjour, veuillez trouver ci-joint notre devis..."
+                    rows={3}
+                  />
+                </div>
+                <Button
+                  size="sm"
+                  onClick={handleSendEmail}
+                  disabled={emailSending || !emailTo.trim()}
+                  className="w-full"
+                >
+                  {emailSending ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="mr-2 h-4 w-4" />
+                  )}
+                  Envoyer
+                </Button>
+              </div>
+            )}
 
             {/* Header */}
             <div className="flex items-start justify-between">

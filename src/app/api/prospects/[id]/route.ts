@@ -55,7 +55,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 });
   }
 
   return NextResponse.json({ success: true, prospect: data });
@@ -92,7 +92,7 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
   const { error } = await supabase.from("prospects").delete().eq("id", id);
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 });
   }
 
   return NextResponse.json({ success: true });

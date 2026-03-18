@@ -18,7 +18,7 @@ export async function GET() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 });
   }
 
   return NextResponse.json({ success: true, data });
@@ -79,7 +79,7 @@ export async function POST(request: Request) {
     .single();
 
   if (quoteError || !quote) {
-    return NextResponse.json({ error: quoteError?.message || "Erreur création devis" }, { status: 500 });
+    return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 });
   }
 
   // Increment devis_used
@@ -103,7 +103,7 @@ export async function POST(request: Request) {
       .insert(itemsToInsert);
 
     if (itemsError) {
-      return NextResponse.json({ error: itemsError.message }, { status: 500 });
+      return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 });
     }
   }
 

@@ -62,13 +62,13 @@ export async function GET(request: Request) {
     );
   }
 
-  const y = parseInt(year);
+  const y = parseInt(year, 10);
   const month = searchParams.get("month");
 
   let startDate: string;
   let endDate: string;
   if (month) {
-    const m = parseInt(month) - 1;
+    const m = parseInt(month, 10) - 1;
     startDate = new Date(y, m, 1).toISOString();
     endDate = new Date(y, m + 1, 0, 23, 59, 59).toISOString();
   } else {

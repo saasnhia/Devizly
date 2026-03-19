@@ -1346,7 +1346,7 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
               </Link>
             </div>
             <p className="text-xs text-slate-600">
-              &copy; {new Date().getFullYear()} Devizly. Tous droits réservés.
+              &copy; {new Date().getFullYear()} NBHC SAS — SIREN 102 637 899 — 55 Rue Henri Clément, 71100 Saint-Rémy
             </p>
           </div>
         </div>

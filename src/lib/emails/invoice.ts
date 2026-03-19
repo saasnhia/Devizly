@@ -80,8 +80,11 @@ export function invoiceEmail(p: InvoiceEmailParams): { subject: string; html: st
         <p style="margin:0 0 4px;font-size:12px;color:#94A3B8;text-align:center;">
           Cet email a été envoyé par ${p.companyName} via Devizly.
         </p>
-        <p style="margin:0;font-size:11px;color:#CBD5E1;text-align:center;">
+        <p style="margin:0 0 4px;font-size:11px;color:#CBD5E1;text-align:center;">
           Conformément au RGPD, vos données sont traitées uniquement pour la gestion de cette facture.
+        </p>
+        <p style="margin:0;font-size:10px;color:#CBD5E1;text-align:center;">
+          NBHC SAS — 55 Rue Henri Clément, 71100 Saint-Rémy — SIREN 102 637 899
         </p>
       </td>
     </tr>

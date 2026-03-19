@@ -19,34 +19,34 @@ export default function MentionsLegalesPage() {
       <h2>1. Éditeur du site</h2>
       <ul>
         <li>
-          <strong>Raison sociale :</strong> [RAISON SOCIALE À COMPLÉTER]
+          <strong>Raison sociale :</strong> NBHC
         </li>
         <li>
-          <strong>Forme juridique :</strong> SAS en cours d&apos;immatriculation
+          <strong>Forme juridique :</strong> Société par actions simplifiée (SAS)
         </li>
         <li>
-          <strong>Capital social :</strong> [À REMPLIR]
+          <strong>Capital social :</strong> 500,00 €
         </li>
         <li>
-          <strong>Siège social :</strong> 55 rue Henri Clément, 71100 Saint-Rémy
+          <strong>Siège social :</strong> 55 Rue Henri Clément, 71100 Saint-Rémy
         </li>
         <li>
-          <strong>SIRET :</strong> [SIRET À COMPLÉTER APRÈS IMMATRICULATION]
+          <strong>SIREN :</strong> 102 637 899
         </li>
         <li>
-          <strong>RCS :</strong> [À COMPLÉTER APRÈS IMMATRICULATION]
+          <strong>RCS :</strong> 102 637 899 R.C.S. Chalon-sur-Saône
         </li>
         <li>
-          <strong>Numéro de TVA intracommunautaire :</strong> [À COMPLÉTER APRÈS IMMATRICULATION]
+          <strong>Président :</strong> Haroun CHIKH
         </li>
         <li>
-          <strong>Directeur de la publication :</strong> [À REMPLIR]
+          <strong>Directeur général :</strong> Noam BAHRI
         </li>
         <li>
-          <strong>Email :</strong> privacy@devizly.fr
+          <strong>Directeur de la publication :</strong> Haroun CHIKH
         </li>
         <li>
-          <strong>Téléphone :</strong> [À REMPLIR]
+          <strong>Email :</strong> contact@devizly.fr
         </li>
       </ul>
 
@@ -56,8 +56,7 @@ export default function MentionsLegalesPage() {
           <strong>Hébergeur :</strong> Vercel Inc.
         </li>
         <li>
-          <strong>Adresse :</strong> 440 N Barranca Ave #4133, Covina, CA 91723,
-          États-Unis
+          <strong>Adresse :</strong> 340 Pine Street Suite 701, San Francisco, CA 94104, États-Unis
         </li>
         <li>
           <strong>Site web :</strong> vercel.com
@@ -83,8 +82,10 @@ export default function MentionsLegalesPage() {
 
       <h2>4. Données personnelles</h2>
       <p>
-        Le traitement des données personnelles est décrit dans notre{" "}
-        <a href="/confidentialite">Politique de confidentialité</a>.
+        Le responsable de traitement au sens du RGPD est NBHC, SAS au capital
+        de 500 €, dont le siège social est situé 55 Rue Henri Clément, 71100
+        Saint-Rémy. Le détail du traitement des données personnelles est décrit
+        dans notre <a href="/confidentialite">Politique de confidentialité</a>.
       </p>
 
       <h2>5. Cookies</h2>

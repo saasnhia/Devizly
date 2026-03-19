@@ -568,6 +568,9 @@ export function DevisPdf(props: DevisPdfProps) {
             Prestations soumises à nos conditions générales de vente disponibles sur demande.
           </Text>
           <Text style={s.footerText}>
+            Édité par NBHC SAS — SIREN 102 637 899 — RCS Chalon-sur-Saône
+          </Text>
+          <Text style={s.footerText}>
             Document généré par Devizly — devizly.fr
           </Text>
         </View>

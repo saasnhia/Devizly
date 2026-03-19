@@ -11,8 +11,11 @@ export default function CGVPage() {
     <article className="prose prose-slate max-w-none">
       <h1>Conditions Générales de Vente (CGV)</h1>
       <p className="lead">
-        Les présentes CGV régissent les relations commerciales entre
-        l&apos;éditeur de Devizly et ses clients professionnels.
+        Les présentes CGV sont conclues entre NBHC, SAS au capital de 500 €,
+        immatriculée au RCS de Chalon-sur-Saône sous le numéro 102 637 899,
+        dont le siège social est situé 55 Rue Henri Clément, 71100 Saint-Rémy
+        (ci-après « l&apos;Éditeur »), et tout client professionnel souscrivant
+        aux services Devizly (ci-après « le Client »).
       </p>
 
       <h2>1. Objet</h2>
@@ -26,16 +29,28 @@ export default function CGVPage() {
       <h2>2. Identification du prestataire</h2>
       <ul>
         <li>
-          <strong>Raison sociale :</strong> [RAISON SOCIALE À COMPLÉTER]
+          <strong>Raison sociale :</strong> NBHC
         </li>
         <li>
-          <strong>Siège social :</strong> 55 rue Henri Clément, 71100 Saint-Rémy
+          <strong>Forme juridique :</strong> Société par actions simplifiée (SAS)
         </li>
         <li>
-          <strong>SIRET :</strong> [SIRET À COMPLÉTER APRÈS IMMATRICULATION]
+          <strong>Capital social :</strong> 500,00 €
         </li>
         <li>
-          <strong>Email :</strong> privacy@devizly.fr
+          <strong>Siège social :</strong> 55 Rue Henri Clément, 71100 Saint-Rémy
+        </li>
+        <li>
+          <strong>SIREN :</strong> 102 637 899
+        </li>
+        <li>
+          <strong>RCS :</strong> 102 637 899 R.C.S. Chalon-sur-Saône
+        </li>
+        <li>
+          <strong>Président :</strong> Haroun CHIKH
+        </li>
+        <li>
+          <strong>Email :</strong> contact@devizly.fr
         </li>
       </ul>
 

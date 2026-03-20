@@ -1,0 +1,135 @@
+{
+  "words": [
+    {
+      "word": "Avant",
+      "start": 0,
+      "end": 0.418
+    },
+    {
+      "word": ":",
+      "start": 0.453,
+      "end": 0.499
+    },
+    {
+      "word": "Word,",
+      "start": 0.708,
+      "end": 1.207
+    },
+    {
+      "word": "Excel,",
+      "start": 1.382,
+      "end": 1.974
+    },
+    {
+      "word": "copier-coller,",
+      "start": 2.148,
+      "end": 2.937
+    },
+    {
+      "word": "reformater...",
+      "start": 3.146,
+      "end": 4.075
+    },
+    {
+      "word": "Après",
+      "start": 4.516,
+      "end": 4.888
+    },
+    {
+      "word": "Devizly",
+      "start": 4.923,
+      "end": 5.433
+    },
+    {
+      "word": ":",
+      "start": 5.515,
+      "end": 5.573
+    },
+    {
+      "word": "un",
+      "start": 5.782,
+      "end": 5.898
+    },
+    {
+      "word": "devis",
+      "start": 5.956,
+      "end": 6.188
+    },
+    {
+      "word": "professionnel",
+      "start": 6.211,
+      "end": 6.815
+    },
+    {
+      "word": "en",
+      "start": 6.885,
+      "end": 7.012
+    },
+    {
+      "word": "deux",
+      "start": 7.082,
+      "end": 7.198
+    },
+    {
+      "word": "clics.",
+      "start": 7.221,
+      "end": 7.663
+    },
+    {
+      "word": "Signature",
+      "start": 7.941,
+      "end": 8.452
+    },
+    {
+      "word": "électronique",
+      "start": 8.487,
+      "end": 9.056
+    },
+    {
+      "word": "intégrée.",
+      "start": 9.079,
+      "end": 9.729
+    },
+    {
+      "word": "Paiement",
+      "start": 9.938,
+      "end": 10.298
+    },
+    {
+      "word": "Stripe",
+      "start": 10.333,
+      "end": 10.751
+    },
+    {
+      "word": "direct.",
+      "start": 10.786,
+      "end": 11.366
+    },
+    {
+      "word": "Tes",
+      "start": 11.749,
+      "end": 11.923
+    },
+    {
+      "word": "clients",
+      "start": 11.947,
+      "end": 12.283
+    },
+    {
+      "word": "adorent,",
+      "start": 12.33,
+      "end": 12.852
+    },
+    {
+      "word": "toi",
+      "start": 12.934,
+      "end": 13.154
+    },
+    {
+      "word": "aussi.",
+      "start": 13.212,
+      "end": 13.886
+    }
+  ],
+  "totalDuration": 13.886
+}

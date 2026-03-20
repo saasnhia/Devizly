@@ -1,0 +1,150 @@
+{
+  "words": [
+    {
+      "word": "Ton",
+      "start": 0,
+      "end": 0.186
+    },
+    {
+      "word": "client",
+      "start": 0.232,
+      "end": 0.488
+    },
+    {
+      "word": "reçoit",
+      "start": 0.511,
+      "end": 0.871
+    },
+    {
+      "word": "un",
+      "start": 0.94,
+      "end": 1.057
+    },
+    {
+      "word": "lien.",
+      "start": 1.103,
+      "end": 1.463
+    },
+    {
+      "word": "Il",
+      "start": 1.904,
+      "end": 2.055
+    },
+    {
+      "word": "ouvre",
+      "start": 2.113,
+      "end": 2.299
+    },
+    {
+      "word": "son",
+      "start": 2.334,
+      "end": 2.45
+    },
+    {
+      "word": "téléphone.",
+      "start": 2.496,
+      "end": 3.123
+    },
+    {
+      "word": "Il",
+      "start": 3.448,
+      "end": 3.622
+    },
+    {
+      "word": "lit",
+      "start": 3.692,
+      "end": 3.866
+    },
+    {
+      "word": "ton",
+      "start": 3.889,
+      "end": 4.017
+    },
+    {
+      "word": "devis.",
+      "start": 4.063,
+      "end": 4.493
+    },
+    {
+      "word": "Il",
+      "start": 5.004,
+      "end": 5.166
+    },
+    {
+      "word": "signe",
+      "start": 5.259,
+      "end": 5.515
+    },
+    {
+      "word": "en",
+      "start": 5.561,
+      "end": 5.642
+    },
+    {
+      "word": "dix",
+      "start": 5.712,
+      "end": 5.863
+    },
+    {
+      "word": "secondes.",
+      "start": 5.886,
+      "end": 6.409
+    },
+    {
+      "word": "C'est",
+      "start": 7.105,
+      "end": 7.303
+    },
+    {
+      "word": "ça,",
+      "start": 7.349,
+      "end": 7.523
+    },
+    {
+      "word": "Devizly.",
+      "start": 7.558,
+      "end": 8.115
+    },
+    {
+      "word": "La",
+      "start": 8.719,
+      "end": 8.847
+    },
+    {
+      "word": "signature",
+      "start": 8.893,
+      "end": 9.346
+    },
+    {
+      "word": "électronique",
+      "start": 9.381,
+      "end": 9.915
+    },
+    {
+      "word": "la",
+      "start": 9.938,
+      "end": 9.996
+    },
+    {
+      "word": "plus",
+      "start": 10.054,
+      "end": 10.217
+    },
+    {
+      "word": "simple",
+      "start": 10.252,
+      "end": 10.507
+    },
+    {
+      "word": "du",
+      "start": 10.542,
+      "end": 10.612
+    },
+    {
+      "word": "marché.",
+      "start": 10.646,
+      "end": 11.331
+    }
+  ],
+  "totalDuration": 11.331
+}

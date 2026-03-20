@@ -808,13 +808,28 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
       </section>
 
       {/* ══════════════════════════════════════════════
-          DEMO 3 STEPS — Alternating rows
+          DEMO 3 STEPS — 3D Glassmorphism Cards
           ══════════════════════════════════════════════ */}
-      <section className="relative overflow-hidden border-y border-white/5 bg-white/[0.02] py-20 sm:py-28">
-        {/* Background glow */}
-        <div className="pointer-events-none absolute left-1/2 top-1/2 h-[500px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-600/5 blur-[128px]" />
+      <section
+        className="relative overflow-hidden border-y border-white/5 py-20 sm:py-28"
+        style={{
+          background: "linear-gradient(135deg, #070b18 0%, #0d1428 50%, #0a1020 100%)",
+        }}
+      >
+        {/* Dot grid */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-60"
+          style={{
+            backgroundImage: "radial-gradient(circle, #1e2545 1px, transparent 1px)",
+            backgroundSize: "36px 36px",
+          }}
+        />
+        {/* Glow orbs */}
+        <div className="pointer-events-none absolute -top-32 left-[25%] h-[500px] w-[500px] rounded-full opacity-30 blur-[80px]" style={{ background: "radial-gradient(circle, rgba(124,58,237,0.5) 0%, transparent 70%)" }} />
+        <div className="pointer-events-none absolute -top-20 right-[20%] h-[450px] w-[450px] rounded-full opacity-25 blur-[80px]" style={{ background: "radial-gradient(circle, rgba(34,211,165,0.4) 0%, transparent 70%)" }} />
 
         <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+          {/* Title */}
           <motion.div
             variants={stagger}
             initial="hidden"
@@ -830,82 +845,209 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
             </motion.span>
             <motion.h2
               variants={fadeUp}
-              className="mt-6 text-3xl font-bold sm:text-4xl"
+              className="mt-6 text-3xl font-bold sm:text-4xl md:text-5xl"
             >
               3 étapes. Zéro prise de tête.
             </motion.h2>
+            <motion.p
+              variants={fadeUp}
+              className="mx-auto mt-4 max-w-md text-base text-slate-500"
+            >
+              De la description à l&apos;encaissement, tout est automatisé.
+            </motion.p>
+            <motion.div variants={fadeUp} className="mx-auto mt-4 h-0.5 w-16 rounded-full bg-violet-500" />
           </motion.div>
 
-          <div className="mt-20 space-y-24 sm:space-y-32">
-            {demoSteps.map((step, i) => (
-              <motion.div
-                key={step.step}
-                variants={stagger}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.2 }}
-                className={`grid items-center gap-10 md:grid-cols-2 md:gap-16 ${
-                  i % 2 === 1 ? "md:[direction:rtl]" : ""
-                }`}
-              >
-                {/* Text side */}
-                <motion.div
-                  variants={fadeUp}
-                  className={i % 2 === 1 ? "md:[direction:ltr]" : ""}
-                >
-                  <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-white/20 bg-violet-500/15 text-xl font-black text-white shadow-xl shadow-violet-500/20 backdrop-blur-xl">
-                    {step.step}
-                  </div>
-                  <h3 className="text-2xl font-bold text-white sm:text-3xl">
-                    {step.title}
-                  </h3>
-                  <p className="mt-4 max-w-md text-base leading-relaxed text-slate-400">
-                    {step.description}
-                  </p>
-                </motion.div>
+          {/* 3 Cards */}
+          <div className="relative mx-auto mt-16 flex max-w-[1100px] flex-col items-center gap-8 md:flex-row md:items-stretch md:justify-center md:gap-8" style={{ perspective: "1200px" }}>
 
-                {/* Screenshot side */}
-                <motion.div
-                  variants={scaleIn}
-                  className={`${i % 2 === 1 ? "md:[direction:ltr]" : ""} ${
-                    step.imageWidth < step.imageHeight
-                      ? "flex justify-center"
-                      : ""
-                  }`}
-                >
-                  <div
-                    className={`group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] shadow-2xl shadow-violet-500/5 transition-all duration-500 hover:border-violet-400/30 hover:shadow-violet-500/15 ${
-                      step.imageWidth < step.imageHeight
-                        ? "max-w-[320px]"
-                        : ""
-                    }`}
-                  >
-                    <Image
-                      src={step.image}
-                      alt={step.imageAlt}
-                      width={step.imageWidth}
-                      height={step.imageHeight}
-                      className="w-full transition-transform duration-500 group-hover:scale-[1.02]"
-                    />
-                    {/* Subtle glow on hover */}
-                    <div className="pointer-events-none absolute -inset-4 -z-10 rounded-3xl bg-gradient-to-b from-violet-500/10 to-transparent opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100" />
+            {/* ── Card 1: Devizly IA ── */}
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+              className="group w-full max-w-[340px] rounded-3xl p-7 transition-all duration-500 md:hover:!transform-none md:hover:scale-105"
+              style={{
+                background: "linear-gradient(145deg, rgba(91,91,214,0.18) 0%, rgba(12,15,35,0.9) 100%)",
+                border: "1.5px solid rgba(124,58,237,0.5)",
+                boxShadow: "0 0 50px rgba(124,58,237,0.25), 0 0 100px rgba(124,58,237,0.08), 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)",
+                transform: "perspective(1200px) rotateY(-8deg) rotateX(4deg)",
+              }}
+            >
+              <span className="text-xs font-bold tracking-[3px] text-violet-400">01</span>
+
+              {/* Mockup: AI devis creation */}
+              <div className="mt-4 overflow-hidden rounded-xl border border-white/10 bg-[#0f1428] p-4">
+                <div className="flex items-center gap-1.5 pb-3">
+                  <div className="h-2 w-2 rounded-full bg-red-400/60" />
+                  <div className="h-2 w-2 rounded-full bg-yellow-400/60" />
+                  <div className="h-2 w-2 rounded-full bg-green-400/60" />
+                </div>
+                <div className="mb-3 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-slate-500">
+                  Site vitrine 5 pages pour un restaurant...
+                </div>
+                <div className="space-y-1.5">
+                  {[
+                    { d: "Design UX/UI (maquettes)", p: "1 200 €" },
+                    { d: "Développement Next.js", p: "2 800 €" },
+                    { d: "Hébergement + déploiement", p: "350 €" },
+                  ].map((line) => (
+                    <div key={line.d} className="flex items-center justify-between rounded-md bg-white/[0.04] px-2.5 py-1.5 text-[11px]">
+                      <span className="text-slate-400">{line.d}</span>
+                      <span className="font-semibold text-white">{line.p}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/10">
+                  <div className="h-full w-3/4 animate-pulse rounded-full bg-gradient-to-r from-violet-500 to-indigo-500" />
+                </div>
+              </div>
+
+              <h3 className="mt-5 text-xl font-bold text-white">
+                Décrivez votre prestation
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-slate-400">
+                L&apos;IA comprend votre métier, structure le devis et propose
+                des prix marché.
+              </p>
+              <p className="mt-2 text-xs font-medium text-violet-400">
+                Vous ajustez chaque ligne à vos tarifs.
+              </p>
+            </motion.div>
+
+            {/* ── Card 2: Pipeline ── */}
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ delay: 0.15 }}
+              className="group w-full max-w-[340px] rounded-3xl p-7 transition-all duration-500 md:hover:!transform-none md:hover:scale-105"
+              style={{
+                background: "linear-gradient(145deg, rgba(59,130,246,0.16) 0%, rgba(12,15,35,0.92) 100%)",
+                border: "1.5px solid rgba(59,130,246,0.45)",
+                boxShadow: "0 0 50px rgba(59,130,246,0.2), 0 0 100px rgba(59,130,246,0.06), 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)",
+                transform: "perspective(1200px) rotateY(0deg) rotateX(-2deg) scale(1.05)",
+              }}
+            >
+              <span className="text-xs font-bold tracking-[3px] text-blue-400">02</span>
+
+              {/* Mockup: Pipeline kanban */}
+              <div className="mt-4 overflow-hidden rounded-xl border border-white/10 bg-[#0f1428] p-3">
+                <div className="grid grid-cols-4 gap-1.5">
+                  {[
+                    { label: "Prospect", color: "bg-slate-500/30", items: ["Boulangerie Dupont"] },
+                    { label: "Envoyé", color: "bg-blue-500/30", items: ["Marie Petit", "Studio XYZ"] },
+                    { label: "Signé", color: "bg-violet-500/30", items: ["Atelier Bois"] },
+                    { label: "Payé", color: "bg-emerald-500/30", items: ["Cabinet Leroy"] },
+                  ].map((col) => (
+                    <div key={col.label}>
+                      <div className={`mb-1.5 rounded px-1.5 py-0.5 text-center text-[9px] font-semibold text-white ${col.color}`}>
+                        {col.label}
+                      </div>
+                      {col.items.map((item) => (
+                        <div
+                          key={item}
+                          className="mb-1 rounded-md border border-white/5 bg-white/[0.04] px-1.5 py-1 text-[9px] text-slate-400"
+                        >
+                          {item}
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+                {/* Animated card moving */}
+                <div className="mt-2 flex items-center gap-1 text-[9px] text-blue-400">
+                  <div className="h-px flex-1 bg-gradient-to-r from-blue-500/50 to-violet-500/50" />
+                  <span className="animate-pulse">Envoyé → Signé</span>
+                  <div className="h-px flex-1 bg-gradient-to-r from-violet-500/50 to-emerald-500/50" />
+                </div>
+              </div>
+
+              <h3 className="mt-5 text-xl font-bold text-white">
+                Envoyez en un clic
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-slate-400">
+                Partagez par email, lien direct ou QR code. Suivez chaque devis
+                dans votre pipeline.
+              </p>
+              <p className="mt-2 text-xs font-medium text-blue-400">
+                prospect → envoyé → signé → payé
+              </p>
+            </motion.div>
+
+            {/* ── Card 3: Payment ── */}
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ delay: 0.3 }}
+              className="group w-full max-w-[340px] rounded-3xl p-7 transition-all duration-500 md:hover:!transform-none md:hover:scale-105"
+              style={{
+                background: "linear-gradient(145deg, rgba(34,211,165,0.15) 0%, rgba(12,15,35,0.9) 100%)",
+                border: "1.5px solid rgba(34,211,165,0.45)",
+                boxShadow: "0 0 50px rgba(34,211,165,0.2), 0 0 100px rgba(34,211,165,0.06), 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)",
+                transform: "perspective(1200px) rotateY(8deg) rotateX(4deg)",
+              }}
+            >
+              <span className="text-xs font-bold tracking-[3px] text-emerald-400">03</span>
+
+              {/* Mockup: Payment */}
+              <div className="mt-4 overflow-hidden rounded-xl border border-white/10 bg-[#0f1428] p-4">
+                <div className="text-center">
+                  <p className="text-[10px] font-medium uppercase tracking-wider text-slate-500">
+                    Montant TTC
+                  </p>
+                  <p className="mt-1 text-2xl font-bold text-white">
+                    2 850,00 €
+                  </p>
+                  <div className="mx-auto mt-3 w-full rounded-lg bg-emerald-500 px-4 py-2 text-center text-xs font-semibold text-white">
+                    Payer maintenant
                   </div>
-                </motion.div>
-              </motion.div>
-            ))}
+                  <div className="mt-2 flex items-center justify-center gap-1 text-[10px] text-emerald-400">
+                    <Check className="h-3 w-3" />
+                    <span>Facture auto-générée</span>
+                  </div>
+                </div>
+                <div className="mt-2 flex justify-center gap-2">
+                  {["J+2", "J+5", "J+7"].map((d) => (
+                    <span
+                      key={d}
+                      className="rounded bg-white/5 px-2 py-0.5 text-[9px] font-medium text-slate-500"
+                    >
+                      Relance {d}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <h3 className="mt-5 text-xl font-bold text-white">
+                Encaissez automatiquement
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-slate-400">
+                Votre client signe et paie depuis son navigateur — sans créer de
+                compte.
+              </p>
+              <p className="mt-2 text-xs font-medium text-emerald-400">
+                Facture générée, relances auto J+2, J+5, J+7.
+              </p>
+            </motion.div>
           </div>
 
+          {/* CTA */}
           <motion.div
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="mt-20 text-center"
+            className="mt-16 text-center"
           >
             <Link
               href="/signup"
               onClick={fireConfetti}
-              className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-500 px-8 py-3.5 text-base font-semibold text-white shadow-xl shadow-violet-500/25 transition-all hover:shadow-violet-500/40 hover:brightness-110"
+              className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-500 px-8 py-3.5 text-base font-semibold text-white shadow-xl shadow-violet-500/25 transition-all hover:scale-[1.03] hover:shadow-violet-500/40 hover:brightness-110"
             >
               Essayer maintenant — c&apos;est gratuit
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

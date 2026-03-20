@@ -300,7 +300,7 @@ function fmt(n: number, currency: string = "EUR"): string {
   return new Intl.NumberFormat("fr-FR", {
     style: "currency",
     currency,
-  }).format(n);
+  }).format(n).replace(/\u202f/g, " ").replace(/\u00a0/g, " ");
 }
 
 function fmtDate(d: string): string {

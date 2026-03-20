@@ -244,7 +244,7 @@ function fmt(n: number, currency: string = "EUR"): string {
   return new Intl.NumberFormat("fr-FR", {
     style: "currency",
     currency,
-  }).format(n);
+  }).format(n).replace(/\u202f/g, " ").replace(/\u00a0/g, " ");
 }
 
 function fmtDate(d: string): string {
@@ -316,9 +316,9 @@ export function InvoicePdf(props: InvoicePdfProps) {
             {company.phone && (
               <Text style={s.companyInfo}>Tel : {company.phone}</Text>
             )}
-            {company.siret && (
-              <Text style={s.companyInfo}>SIRET : {company.siret}</Text>
-            )}
+            <Text style={s.companyInfo}>
+              {company.siret ? `SIRET : ${company.siret}` : "SIRET en cours d'immatriculation"}
+            </Text>
             {company.legal_form && (
               <Text style={s.companyInfo}>{company.legal_form}</Text>
             )}
@@ -462,7 +462,7 @@ export function InvoicePdf(props: InvoicePdfProps) {
           <Text style={s.footerText}>
             {company.name || "Devizly"}
             {company.legal_form ? ` — ${company.legal_form}` : ""}
-            {company.siret ? ` — SIRET ${company.siret}` : ""}
+            {company.siret ? ` — SIRET ${company.siret}` : " — SIRET en cours d'immatriculation"}
             {company.rcs_number ? ` — RCS ${company.rcs_number}` : ""}
             {company.address ? ` — ${company.address}` : ""}
           </Text>
@@ -476,6 +476,9 @@ export function InvoicePdf(props: InvoicePdfProps) {
           </Text>
           <Text style={s.footerText}>
             Prestations soumises à nos conditions générales de vente disponibles sur demande.
+          </Text>
+          <Text style={s.footerText}>
+            Édité par NBHC SAS — SIREN 102 637 899 — RCS Chalon-sur-Saône
           </Text>
           <Text style={s.footerText}>
             Document généré par Devizly — devizly.fr

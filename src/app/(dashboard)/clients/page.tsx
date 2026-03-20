@@ -22,6 +22,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Plus, Search, Pencil, Trash2, Users, ExternalLink, Copy, Upload, Loader2 } from "lucide-react";
+import { CompanyAutocomplete } from "@/components/company-autocomplete";
+import type { CompanyData } from "@/components/company-autocomplete";
 import type { Client } from "@/types";
 import { toast } from "sonner";
 
@@ -287,10 +289,19 @@ export default function ClientsPage() {
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>Nom *</Label>
-                <Input
+                <CompanyAutocomplete
                   value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="Nom ou raison sociale"
+                  onChange={(val) => setForm({ ...form, name: val })}
+                  onSelect={(c: CompanyData) =>
+                    setForm({
+                      ...form,
+                      name: c.name,
+                      siret: c.siret,
+                      address: c.address,
+                      city: c.city,
+                      postal_code: c.postal_code,
+                    })
+                  }
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">

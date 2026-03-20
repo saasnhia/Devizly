@@ -189,6 +189,7 @@ const plans = [
     ],
     cta: "Commencer gratuitement",
     popular: false,
+    href: "/signup",
   },
   {
     name: "Pro",
@@ -206,6 +207,7 @@ const plans = [
     ],
     cta: "Choisir Pro",
     popular: true,
+    href: "/signup?plan=pro",
   },
   {
     name: "Business",
@@ -223,6 +225,7 @@ const plans = [
     ],
     cta: "Choisir Business",
     popular: false,
+    href: "/signup?plan=business",
   },
 ];
 
@@ -1067,7 +1070,7 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
                 </ul>
 
                 <Link
-                  href="/signup"
+                  href={plan.href}
                   onClick={plan.popular ? fireConfetti : undefined}
                   className={`mt-8 block rounded-xl py-3 text-center text-sm font-semibold transition-all ${
                     plan.popular

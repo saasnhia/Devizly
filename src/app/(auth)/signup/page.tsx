@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,8 +12,23 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
+const PLAN_PRICE_MAP: Record<string, string | undefined> = {
+  pro: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO,
+  business: process.env.NEXT_PUBLIC_STRIPE_PRICE_BUSINESS,
+};
+
 export default function SignupPage() {
+  return (
+    <Suspense fallback={<Card><CardContent className="pt-6"><Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" /></CardContent></Card>}>
+      <SignupForm />
+    </Suspense>
+  );
+}
+
+function SignupForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const planParam = searchParams.get("plan"); // "pro" | "business" | null
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -60,6 +75,26 @@ export default function SignupPage() {
       }
 
       toast.success("Compte créé avec succès !");
+
+      // If a paid plan was selected, redirect to Stripe Checkout
+      const priceId = planParam ? PLAN_PRICE_MAP[planParam] : undefined;
+      if (priceId) {
+        try {
+          const checkoutRes = await fetch("/api/stripe/checkout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ priceId }),
+          });
+          const checkoutData = await checkoutRes.json();
+          if (checkoutData.url) {
+            window.location.href = checkoutData.url;
+            return;
+          }
+        } catch {
+          // Fallback to dashboard if checkout fails
+        }
+      }
+
       setLoading(false);
       router.push("/wizard");
       router.refresh();
@@ -71,18 +106,29 @@ export default function SignupPage() {
 
   async function handleGoogleSignup() {
     const supabase = createClient();
+    const priceId = planParam ? PLAN_PRICE_MAP[planParam] : undefined;
+    const redirectPath = priceId
+      ? `/auth/callback?next=${encodeURIComponent(`/api/stripe/checkout-redirect?priceId=${priceId}`)}`
+      : "/auth/callback";
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}${redirectPath}`,
       },
     });
     if (error) toast.error(error.message);
   }
 
+  const planLabel = planParam === "pro" ? "Pro — 19€/mois" : planParam === "business" ? "Business — 39€/mois" : null;
+
   return (
     <Card>
       <CardContent className="space-y-4 pt-6">
+        {planLabel && (
+          <div className="rounded-lg border border-violet-200 bg-violet-50 p-3 text-center text-sm text-violet-700">
+            Vous serez redirigé vers le paiement <strong>{planLabel}</strong> après inscription
+          </div>
+        )}
         <Button
           type="button"
           variant="outline"

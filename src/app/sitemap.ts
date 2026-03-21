@@ -38,5 +38,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/cgv`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
     { url: `${SITE_URL}/confidentialite`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
     { url: `${SITE_URL}/cookies`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${SITE_URL}/securite`, lastModified: now, changeFrequency: "yearly", priority: 0.4 },
   ];
 }

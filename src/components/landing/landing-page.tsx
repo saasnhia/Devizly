@@ -1489,6 +1489,12 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
               >
                 Cookies
               </Link>
+              <Link
+                href="/securite"
+                className="transition-colors hover:text-slate-400"
+              >
+                Sécurité
+              </Link>
             </div>
             <p className="text-xs text-slate-600">
               &copy; {new Date().getFullYear()} NBHC SAS — SIREN 102 637 899 — 55 Rue Henri Clément, 71100 Saint-Rémy

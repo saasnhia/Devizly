@@ -20,10 +20,19 @@ export default function ConfidentialitePage() {
       <h2>1. Responsable du traitement</h2>
       <ul>
         <li>
-          <strong>Raison sociale :</strong> [RAISON SOCIALE À COMPLÉTER]
+          <strong>Raison sociale :</strong> NBHC
         </li>
         <li>
-          <strong>Siège social :</strong> 55 rue Henri Clément, 71100 Saint-Rémy
+          <strong>Forme juridique :</strong> Société par actions simplifiée (SAS)
+        </li>
+        <li>
+          <strong>Capital social :</strong> 500,00 €
+        </li>
+        <li>
+          <strong>Siège social :</strong> 55 Rue Henri Clément, 71100 Saint-Rémy
+        </li>
+        <li>
+          <strong>SIREN :</strong> 102 637 899 — RCS Chalon-sur-Saône
         </li>
         <li>
           <strong>Email DPO :</strong> privacy@devizly.fr

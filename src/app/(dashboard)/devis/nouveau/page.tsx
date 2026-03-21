@@ -599,6 +599,10 @@ export default function NouveauDevisPage() {
                 )}
                 Générer avec l&apos;IA
               </Button>
+              <p className="text-xs text-slate-400">
+                Les textes et montants proposés par l&apos;IA sont fournis à titre indicatif.
+                Vérifiez et adaptez-les avant envoi à votre client.
+              </p>
             </CardContent>
           </Card>
 

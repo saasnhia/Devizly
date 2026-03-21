@@ -278,6 +278,9 @@ function OnboardingDashboard({
             Paiement sécurisé Stripe
           </span>
         </div>
+        <p className="mt-3 text-[11px] text-slate-400">
+          Devizly est un outil de productivité — pas un cabinet comptable ni un conseiller juridique.
+        </p>
       </div>
     </div>
   );

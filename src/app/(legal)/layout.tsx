@@ -49,9 +49,12 @@ export default function LegalLayout({
             <Link href="/cookies" className="hover:text-foreground">
               Cookies
             </Link>
+            <Link href="/securite" className="hover:text-foreground">
+              Sécurité
+            </Link>
           </div>
           <p className="mt-3 text-center text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} Devizly. Tous droits réservés.
+            &copy; {new Date().getFullYear()} NBHC SAS — SIREN 102 637 899
           </p>
         </div>
       </footer>

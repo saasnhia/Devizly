@@ -32,6 +32,7 @@ import {
 import { calculateItemTotal, calculateTotals, formatCurrency } from "@/lib/utils/quote";
 import { CURRENCIES } from "@/lib/currencies";
 import type { Client, QuoteItemDraft } from "@/types";
+import { ClientPicker } from "@/components/client-picker";
 import { TemplatePicker } from "@/components/templates/template-picker";
 import { useTemplate } from "@/app/(dashboard)/templates/actions";
 import { toast } from "sonner";
@@ -619,18 +620,14 @@ export default function NouveauDevisPage() {
 
               <div className="space-y-2">
                 <Label>Client</Label>
-                <Select value={clientId} onValueChange={setClientId}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner un client" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {clients.map((client) => (
-                      <SelectItem key={client.id} value={client.id}>
-                        {client.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <ClientPicker
+                  clients={clients}
+                  selectedId={clientId}
+                  onSelect={setClientId}
+                  onClientCreated={(newClient) => {
+                    setClients((prev) => [...prev, newClient].sort((a, b) => a.name.localeCompare(b.name)));
+                  }}
+                />
               </div>
 
               <div className="space-y-2">

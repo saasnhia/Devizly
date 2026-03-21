@@ -12,10 +12,10 @@ const slides = [
     url: "devizly.fr/devis/nouveau",
   },
   {
-    src: "/landing-screens/hero-share.webp",
-    alt: "Partage du devis — envoyez par lien, WhatsApp, Email ou SMS",
-    label: "Partagez par lien, WhatsApp, Email ou SMS en un clic",
-    url: "devizly.fr/devis",
+    src: "/landing-screens/hero-devis-client.webp",
+    alt: "Vue client du devis — signature électronique et paiement Stripe",
+    label: "Votre client signe et paie en 1 clic depuis son navigateur",
+    url: "devizly.fr/devis/a3f8c2e1",
   },
   {
     src: "/landing-screens/hero-pipeline.webp",

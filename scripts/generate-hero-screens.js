@@ -346,9 +346,97 @@ const slide3 = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${BASE}
 </div>
 </body></html>`;
 
+/* ═══════════════════════════════════════════════════
+   SLIDE 4 — Page publique devis (client view)
+   Reproduces: the real /devis/[token] share page
+   ═══════════════════════════════════════════════════ */
+const slide4 = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${BASE}
+body { background:#f8fafc; display:flex; justify-content:center; align-items:flex-start; padding:8px 0; }
+.page { width:680px; background:#fff; border-radius:12px; border:1px solid #e2e8f0; box-shadow:0 4px 24px rgba(0,0,0,0.06); overflow:hidden; transform:scale(0.76); transform-origin:top center; }
+.page-header { padding:20px 28px; display:flex; align-items:center; justify-content:space-between; }
+.logo { display:flex; align-items:center; gap:6px; }
+.logo .icon { width:24px; height:24px; background:#6366F1; border-radius:6px; }
+.logo span { font-size:16px; font-weight:800; }
+.status { padding:4px 12px; border-radius:6px; font-size:11px; font-weight:600; background:#dbeafe; color:#2563eb; }
+.page-body { padding:0 28px 24px; }
+.quote-title { font-size:18px; font-weight:700; }
+.quote-ref { font-size:12px; color:#64748b; margin-top:2px; }
+.valid { font-size:12px; color:#64748b; text-align:right; }
+.client-box { background:#f8fafc; border-radius:10px; padding:14px 18px; margin:16px 0; }
+.client-label { font-size:11px; color:#94a3b8; font-weight:500; }
+.client-name { font-size:14px; font-weight:600; margin-top:2px; }
+.client-detail { font-size:12px; color:#64748b; margin-top:1px; }
+table { width:100%; border-collapse:collapse; margin:16px 0; }
+th { text-align:left; font-size:11px; font-weight:600; color:#64748b; padding:8px 0; border-bottom:1px solid #e2e8f0; }
+th:nth-child(2),th:nth-child(3),th:nth-child(4) { text-align:right; }
+td { padding:10px 0; font-size:13px; border-bottom:1px solid #f1f5f9; }
+td:nth-child(2),td:nth-child(3),td:nth-child(4) { text-align:right; }
+td:nth-child(4) { font-weight:600; }
+.totals-area { display:flex; justify-content:flex-end; margin:8px 0 16px; }
+.totals-box { width:220px; }
+.t-row { display:flex; justify-content:space-between; padding:4px 0; font-size:13px; }
+.t-row span:first-child { color:#64748b; }
+.t-row.big { border-top:2px solid #0F172A; padding-top:8px; margin-top:4px; font-size:17px; font-weight:800; }
+.notes-box { background:#f8fafc; border-radius:10px; padding:14px 18px; margin-bottom:16px; }
+.notes-label { font-size:11px; color:#94a3b8; font-weight:500; }
+.notes-text { font-size:12px; color:#374151; margin-top:4px; }
+.actions { display:flex; flex-direction:column; gap:8px; }
+.btn-pay { width:100%; padding:14px; background:#16a34a; color:#fff; border:none; border-radius:10px; font-size:15px; font-weight:700; text-align:center; display:flex; align-items:center; justify-content:center; gap:8px; }
+.btn-action { flex:1; padding:10px; border:1px solid #e2e8f0; border-radius:10px; font-size:13px; font-weight:600; text-align:center; background:#fff; display:flex; align-items:center; justify-content:center; gap:6px; }
+.btn-action.refuse { border-color:#fecaca; color:#dc2626; }
+.btn-row { display:flex; gap:8px; }
+.page-footer { text-align:center; padding:12px; font-size:11px; color:#94a3b8; }
+</style></head><body>
+<div class="page">
+  <div class="page-header">
+    <div class="logo"><div class="icon"></div><span>Devizly</span></div>
+    <div class="status">Envoyé</div>
+  </div>
+  <div class="page-body">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div><div class="quote-title">Renovation cuisine professionnelle</div><div class="quote-ref">Devis n° DEV-0009 — 07/03/2026</div></div>
+      <div class="valid">Valide jusqu'au 01/05/2026</div>
+    </div>
+    <div class="client-box">
+      <div class="client-label">Client</div>
+      <div class="client-name">Restaurant Le Gourmet</div>
+      <div class="client-detail">contact@legourmet-paris.fr</div>
+      <div class="client-detail">8 Rue du Commerce, 33000 Bordeaux</div>
+    </div>
+    <table>
+      <thead><tr><th style="width:50%;">Description</th><th>Qté</th><th>Prix unit.</th><th>Total</th></tr></thead>
+      <tbody>
+        <tr><td>Plan de travail inox professionnel (6m)</td><td>1</td><td>4 800,00 €</td><td>4 800,00 €</td></tr>
+        <tr><td>Hotte extraction industrielle</td><td>1</td><td>5 200,00 €</td><td>5 200,00 €</td></tr>
+        <tr><td>Installation gaz + raccordements</td><td>1</td><td>3 600,00 €</td><td>3 600,00 €</td></tr>
+        <tr><td>Revêtement sol antidérapant</td><td>35</td><td>120,00 €</td><td>4 200,00 €</td></tr>
+        <tr><td>Plonge double bac + lave-vaisselle pro</td><td>1</td><td>4 800,00 €</td><td>4 800,00 €</td></tr>
+        <tr><td>Mise aux normes électrique</td><td>1</td><td>3 000,00 €</td><td>3 000,00 €</td></tr>
+      </tbody>
+    </table>
+    <div class="totals-area"><div class="totals-box">
+      <div class="t-row"><span>Total HT</span><span>25 600,00 €</span></div>
+      <div class="t-row"><span>TVA (20%)</span><span>5 120,00 €</span></div>
+      <div class="t-row big"><span>Total TTC</span><span>30 720,00 €</span></div>
+    </div></div>
+    <div class="notes-box"><div class="notes-label">Notes</div><div class="notes-text">En attente validation chef cuisinier pour plan définitif.</div></div>
+    <div class="actions">
+      <div class="btn-action" style="width:100%;border-color:#e2e8f0;padding:12px;">⬇️ Télécharger PDF</div>
+      <div class="btn-pay">💳 Payer 30 720,00 € maintenant</div>
+      <div class="btn-row">
+        <div class="btn-action" style="flex:1;">✍️ Accepter et signer</div>
+        <div class="btn-action refuse" style="flex:1;">✕ Refuser</div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">Propulsé par Devizly</div>
+</div>
+</body></html>`;
+
 const slides = [
   { name: "hero-ai-builder", html: slide1 },
   { name: "hero-signature", html: slide2 },
+  { name: "hero-devis-client", html: slide4 },
   { name: "hero-pipeline", html: slide3 },
 ];
 

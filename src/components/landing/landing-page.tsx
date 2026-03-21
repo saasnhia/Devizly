@@ -909,15 +909,32 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
             >
               <span className="text-xs font-bold tracking-[3px] text-blue-400">02</span>
 
-              {/* Mockup: Share modal screenshot */}
-              <div className="mt-4 overflow-hidden rounded-xl border border-white/10">
-                <Image
-                  src="/landing-screens/hero-share.webp"
-                  alt="Modale de partage de devis — lien, WhatsApp, Email, SMS"
-                  width={700}
-                  height={390}
-                  className="w-full"
-                />
+              {/* Mockup: Share link modal (dark, same DA as other cards) */}
+              <div className="mt-4 overflow-hidden rounded-xl border border-white/10 bg-[#0f1428] p-4">
+                <p className="mb-2 text-center text-[10px] font-semibold text-white">
+                  Partager le devis
+                </p>
+                <div className="mb-3 flex items-center gap-1.5 rounded-lg border border-blue-500/30 bg-blue-500/10 px-2.5 py-2">
+                  <span className="flex-1 truncate text-[10px] text-blue-300/80" style={{ fontFamily: "monospace" }}>
+                    devizly.fr/devis/a3f8c2e1...
+                  </span>
+                  <div className="flex h-5 w-5 items-center justify-center rounded bg-white/10 text-[8px] text-slate-300">📋</div>
+                </div>
+                <div className="flex gap-2">
+                  {[
+                    { icon: "💬", label: "WhatsApp", bg: "bg-emerald-500/15" },
+                    { icon: "✉️", label: "Email", bg: "bg-blue-500/20 ring-1 ring-blue-500/40" },
+                    { icon: "📱", label: "SMS", bg: "bg-amber-500/15" },
+                  ].map((btn) => (
+                    <div key={btn.label} className={`flex flex-1 flex-col items-center gap-1 rounded-lg ${btn.bg} py-2`}>
+                      <span className="text-sm">{btn.icon}</span>
+                      <span className="text-[8px] font-semibold text-slate-300">{btn.label}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-2 text-center text-[8px] text-slate-500">
+                  Le client consulte, signe ou refuse en ligne
+                </p>
               </div>
 
               <h3 className="mt-5 text-xl font-bold text-white">

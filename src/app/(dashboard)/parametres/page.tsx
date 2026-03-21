@@ -19,6 +19,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Save, Loader2, CreditCard, Building, ExternalLink, Upload, Trash2, ImageIcon, Wallet, CheckCircle2, Zap, Globe, Copy, Check, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
+import { CompanyAutocomplete } from "@/components/company-autocomplete";
+import type { CompanyData } from "@/components/company-autocomplete";
 
 export default function ParametresPage() {
   const [loading, setLoading] = useState(false);
@@ -407,13 +409,30 @@ export default function ParametresPage() {
             </div>
             <div className="space-y-2">
               <Label>Nom de l&apos;entreprise</Label>
-              <Input
+              <CompanyAutocomplete
                 value={profile.company_name}
-                onChange={(e) =>
-                  setProfile({ ...profile, company_name: e.target.value })
-                }
+                onChange={(val) => setProfile({ ...profile, company_name: val })}
+                onSelect={(c: CompanyData) => {
+                  const legalMap: Record<string, string> = {
+                    EI: "EI", EIRL: "EIRL", EURL: "EURL", SARL: "SARL",
+                    SAS: "SAS", SASU: "SASU", SA: "SA", SCI: "SCI",
+                    SNC: "SNC",
+                  };
+                  const lf = legalMap[c.legal_form] || "";
+                  setProfile({
+                    ...profile,
+                    company_name: c.name,
+                    company_siret: c.siret,
+                    company_address: [c.address, c.postal_code, c.city].filter(Boolean).join(", "),
+                    tva_number: c.vat_number,
+                    legal_form: lf || profile.legal_form,
+                  });
+                }}
                 placeholder="Ma Société SAS"
               />
+              <p className="text-xs text-slate-400">
+                Tapez votre raison sociale pour remplir automatiquement vos informations
+              </p>
             </div>
             <div className="space-y-2">
               <Label>Adresse</Label>

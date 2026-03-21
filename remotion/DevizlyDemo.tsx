@@ -653,10 +653,10 @@ function SceneDashboard() {
 function SceneDevisList() {
   return (
     <ScreenshotScene
-      title="Tous vos devis, organises"
-      subtitle="Statuts, relances, tracking de lecture — rien ne vous echappe"
-      windowTitle="Devizly — Devis"
-      imagePath="marketing/relance.png"
+      title="Partagez en un clic"
+      subtitle="Lien, Email, WhatsApp ou SMS — le client consulte et signe en ligne"
+      windowTitle="Devizly — Partager le devis"
+      imagePath="landing-screens/hero-share.webp"
       rotateDir="left"
     />
   );
@@ -671,7 +671,7 @@ function ScenePipeline() {
       title="Pipeline visuel Kanban"
       subtitle="Prospect → Envoye → Signe → Paye"
       windowTitle="Devizly — Pipeline"
-      imagePath="marketing/pipeline.png"
+      imagePath="landing-screens/hero-pipeline.webp"
       rotateDir="right"
     />
   );
@@ -686,7 +686,7 @@ function SceneAIForm() {
       title="Creation intelligente"
       subtitle="L'IA comprend votre metier et structure le devis"
       windowTitle="Devizly — Nouveau devis"
-      imagePath="marketing/création IA devis .png"
+      imagePath="landing-screens/hero-ai-builder.webp"
       rotateDir="left"
     />
   );
@@ -765,110 +765,14 @@ function SceneClientView() {
    SCENE 7: SHARE DIALOG (52-58s)
    ═══════════════════════════════════════════════════ */
 function SceneShare() {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-
-  const enterProgress = spring({
-    frame,
-    fps,
-    config: { damping: 20, mass: 0.8 },
-  });
-  const scale = interpolate(enterProgress, [0, 1], [0.8, 1]);
-
-  // Features appear one by one
-  const features = [
-    { icon: "🔗", text: "Lien direct" },
-    { icon: "📱", text: "WhatsApp" },
-    { icon: "📧", text: "Email" },
-    { icon: "💬", text: "SMS" },
-    { icon: "📄", text: "QR Code" },
-  ];
-
   return (
-    <AbsoluteFill
-      style={{
-        background: C.bg,
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "flex-start",
-      }}
-    >
-      <SceneTitle
-        text="Partagez en un clic"
-        sub="Email, WhatsApp, SMS, lien direct ou QR code"
-      />
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 40,
-          marginTop: 10,
-        }}
-      >
-        {/* Share dialog screenshot */}
-        <div
-          style={{
-            transform: `scale(${scale})`,
-            opacity: enterProgress,
-            width: 420,
-          }}
-        >
-          <MacWindow title="Partager le devis">
-            <Img
-              src={staticFile("marketing/lien.png")}
-              style={{ width: "100%", display: "block" }}
-            />
-          </MacWindow>
-        </div>
-
-        {/* Feature pills */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {features.map((f, i) => {
-            const delay = 20 + i * 10;
-            const pillOpacity = interpolate(
-              frame,
-              [delay, delay + 10],
-              [0, 1],
-              { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
-            );
-            const pillX = interpolate(
-              frame,
-              [delay, delay + 10],
-              [30, 0],
-              { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
-            );
-            return (
-              <div
-                key={f.text}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 12,
-                  background: C.white,
-                  borderRadius: 12,
-                  padding: "12px 24px",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-                  opacity: pillOpacity,
-                  transform: `translateX(${pillX}px)`,
-                }}
-              >
-                <span style={{ fontSize: 22 }}>{f.icon}</span>
-                <span
-                  style={{
-                    fontSize: 18,
-                    fontWeight: 600,
-                    color: C.dark,
-                    fontFamily: font,
-                  }}
-                >
-                  {f.text}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </AbsoluteFill>
+    <ScreenshotScene
+      title="Partagez en un clic"
+      subtitle="Email, WhatsApp, SMS, lien direct ou QR code"
+      windowTitle="Devizly — Partager"
+      imagePath="landing-screens/hero-share.webp"
+      rotateDir="right"
+    />
   );
 }
 
@@ -878,10 +782,10 @@ function SceneShare() {
 function SceneClients() {
   return (
     <ScreenshotScene
-      title="Gestion clients centralisee"
-      subtitle="Portail client, SIRET, coordonnees — tout au meme endroit"
-      windowTitle="Devizly — Clients"
-      imagePath="marketing/portail client .png"
+      title="Vue client du devis"
+      subtitle="Votre client consulte, signe et paie depuis son navigateur"
+      windowTitle="Devizly — Devis client"
+      imagePath="landing-screens/hero-devis-client.webp"
       rotateDir="left"
     />
   );

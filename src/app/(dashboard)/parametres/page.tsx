@@ -411,7 +411,7 @@ export default function ParametresPage() {
               <Label>Nom de l&apos;entreprise</Label>
               <CompanyAutocomplete
                 value={profile.company_name}
-                onChange={(val) => setProfile({ ...profile, company_name: val })}
+                onChange={(val) => setProfile((prev) => ({ ...prev, company_name: val }))}
                 onSelect={(c: CompanyData) => {
                   const legalMap: Record<string, string> = {
                     EI: "EI", EIRL: "EIRL", EURL: "EURL", SARL: "SARL",
@@ -419,14 +419,14 @@ export default function ParametresPage() {
                     SNC: "SNC",
                   };
                   const lf = legalMap[c.legal_form] || "";
-                  setProfile({
-                    ...profile,
+                  setProfile((prev) => ({
+                    ...prev,
                     company_name: c.name,
                     company_siret: c.siret,
                     company_address: [c.address, c.postal_code, c.city].filter(Boolean).join(", "),
                     tva_number: c.vat_number,
-                    legal_form: lf || profile.legal_form,
-                  });
+                    legal_form: lf || prev.legal_form,
+                  }));
                 }}
                 placeholder="Ma Société SAS"
               />

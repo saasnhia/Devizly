@@ -1,4 +1,6 @@
 const { chromium } = require("playwright");
+const sharp = require("sharp");
+const fs = require("fs");
 const path = require("path");
 
 const FONT = `@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');`;
@@ -7,217 +9,324 @@ const W = 1400, H = 780;
 const BASE = `
 ${FONT}
 * { margin:0; padding:0; box-sizing:border-box; }
-body { width:${W}px; height:${H}px; overflow:hidden; font-family:'Inter',sans-serif;
-  background:#0c1022; color:#fff; position:relative; }
-body::before { content:''; position:absolute; inset:0;
-  background-image:radial-gradient(circle,#1a2040 1px,transparent 1px);
-  background-size:28px 28px; opacity:0.35; }
-.wrap { position:relative; z-index:1; width:100%; height:100%; padding:40px; display:flex; flex-direction:column; }
-.orb { position:absolute; border-radius:50%; filter:blur(80px); z-index:0; }
-.card { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);
-  border-radius:16px; backdrop-filter:blur(12px); }
-.card-glow-v { box-shadow:0 0 40px rgba(124,58,237,0.15); border-color:rgba(124,58,237,0.3); }
-.card-glow-g { box-shadow:0 0 40px rgba(34,197,94,0.15); border-color:rgba(34,197,94,0.3); }
-.card-glow-b { box-shadow:0 0 40px rgba(59,130,246,0.15); border-color:rgba(59,130,246,0.3); }
-.btn { display:inline-flex; align-items:center; gap:8px; padding:10px 20px; border-radius:10px;
-  font-size:13px; font-weight:600; border:none; cursor:pointer; }
-.btn-v { background:#5B5BD6; color:#fff; }
-.btn-g { background:#16a34a; color:#fff; }
-.lbl { font-size:10px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#64748b; }
+body { width:${W}px; height:${H}px; overflow:hidden; font-family:'Inter',-apple-system,sans-serif; background:#F8F9FC; color:#0F172A; }
 `;
 
-/* ═══ SLIDE 1 — AI Builder ═══ */
+/* ═══════════════════════════════════════════════════
+   SLIDE 1 — Nouveau devis (AI generation form)
+   Reproduces: the real /devis/nouveau page
+   ═══════════════════════════════════════════════════ */
 const slide1 = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${BASE}
-.input-box { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12);
-  border-radius:12px; padding:16px 20px; font-size:15px; color:#94a3b8; width:100%;
-  display:flex; align-items:center; gap:12px; }
-.input-box .cursor { display:inline-block; width:2px; height:18px; background:#5B5BD6;
-  animation:blink 1s infinite; }
-@keyframes blink { 0%,50%{opacity:1} 51%,100%{opacity:0} }
-.items-table { margin-top:24px; }
-.row { display:flex; align-items:center; padding:14px 20px; border-radius:10px; }
-.row:nth-child(odd) { background:rgba(255,255,255,0.03); }
-.row .desc { flex:1; font-size:14px; color:#cbd5e1; }
-.row .qty { width:50px; text-align:center; font-size:13px; color:#64748b; }
-.row .price { width:100px; text-align:right; font-size:14px; font-weight:700; color:#fff; }
-.total-bar { display:flex; justify-content:flex-end; align-items:center; gap:16px;
-  margin-top:16px; padding:16px 20px; border-top:1px solid rgba(255,255,255,0.08); }
-.total-label { font-size:14px; color:#64748b; }
-.total-value { font-size:24px; font-weight:800; color:#fff; }
-.check { display:inline-flex; align-items:center; justify-content:center;
-  width:24px; height:24px; border-radius:50%; background:#16a34a; font-size:13px; }
+.layout { display:flex; height:100%; }
+.sidebar { width:220px; border-right:1px solid #e2e8f0; background:#fff; display:flex; flex-direction:column; padding:0; }
+.sidebar-logo { display:flex; align-items:center; gap:8px; padding:16px 20px; border-bottom:1px solid #e2e8f0; }
+.sidebar-logo .icon { width:28px; height:28px; background:#6366F1; border-radius:8px; display:flex; align-items:center; justify-content:center; }
+.sidebar-logo .icon svg { width:16px; height:16px; fill:#fff; }
+.sidebar-logo span { font-size:18px; font-weight:800; color:#0F172A; }
+.nav { padding:12px 12px; flex:1; }
+.nav-section { font-size:10px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#94A3B8; padding:16px 12px 4px; }
+.nav-item { display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:0 8px 8px 0; font-size:13px; font-weight:500; color:#64748b; margin:1px 0; border-left:3px solid transparent; }
+.nav-item.active { background:#F3F0FF; color:#5B5BD6; border-left-color:#5B5BD6; font-weight:600; }
+.nav-item .dot { width:15px; height:15px; display:flex; align-items:center; justify-content:center; font-size:13px; }
+.main { flex:1; padding:28px 32px; overflow:hidden; }
+.main h1 { font-size:22px; font-weight:700; margin-bottom:20px; }
+.grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; overflow:hidden; }
+.card-header { padding:16px 20px; border-bottom:1px solid #f1f5f9; display:flex; align-items:center; gap:8px; }
+.card-header .title { font-size:14px; font-weight:700; }
+.card-body { padding:16px 20px; }
+.input { width:100%; padding:10px 14px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px; color:#0F172A; background:#fff; }
+.textarea { width:100%; padding:10px 14px; border:1px solid #e2e8f0; border-radius:8px; font-size:12px; color:#64748b; background:#fff; min-height:60px; resize:none; line-height:1.5; }
+.label { font-size:12px; font-weight:500; color:#374151; margin-bottom:6px; display:block; }
+.btn { display:inline-flex; align-items:center; gap:6px; padding:9px 16px; border-radius:8px; font-size:13px; font-weight:600; border:1px solid #e2e8f0; background:#fff; color:#374151; cursor:pointer; }
+.btn-primary { background:#6366F1; color:#fff; border-color:#6366F1; }
+.btn-outline { background:#fff; }
+.spark { color:#F59E0B; }
+.badge { display:inline-flex; align-items:center; padding:2px 8px; border-radius:6px; font-size:11px; font-weight:600; }
+.badge-line { background:#f1f5f9; color:#64748b; }
+.line-item { border:1px solid #e2e8f0; border-radius:10px; padding:12px 16px; margin-bottom:10px; }
+.line-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.line-input { width:100%; padding:8px 12px; border:1px solid #e2e8f0; border-radius:6px; font-size:12px; margin-bottom:6px; }
+.line-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+.line-grid .sm-label { font-size:10px; color:#94a3b8; margin-bottom:2px; }
+.line-grid input { width:100%; padding:6px 10px; border:1px solid #e2e8f0; border-radius:6px; font-size:12px; }
+.totals { margin-top:12px; font-size:13px; }
+.totals .row { display:flex; justify-content:space-between; padding:4px 0; }
+.totals .row.bold { font-weight:800; font-size:16px; border-top:1px solid #e2e8f0; padding-top:8px; margin-top:4px; }
+.ai-glow { border:1.5px solid #6366F1; box-shadow:0 0 0 3px rgba(99,102,241,0.1); }
+.green-check { color:#16a34a; font-weight:600; font-size:12px; display:flex; align-items:center; gap:4px; }
+.user-bottom { padding:12px 16px; border-top:1px solid #e2e8f0; display:flex; align-items:center; gap:10px; }
+.avatar { width:32px; height:32px; border-radius:50%; background:#EDE9FE; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#6366F1; }
+.user-name { font-size:12px; font-weight:600; } .user-email { font-size:10px; color:#94a3b8; }
 </style></head><body>
-<div class="orb" style="width:500px;height:500px;background:radial-gradient(circle,rgba(91,91,214,0.25),transparent 70%);top:-100px;left:200px;"></div>
-<div class="wrap">
-  <div class="lbl" style="margin-bottom:16px;">Génération IA</div>
-  <div class="card card-glow-v" style="padding:32px;flex:1;display:flex;flex-direction:column;">
-    <div class="input-box">
-      <span style="font-size:18px;">⚡</span>
-      <span>Site vitrine 5 pages pour un restaurant à Lyon</span>
-      <span class="cursor"></span>
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/><path d="M14 2v6h6M12 11l-2 4h4l-2 4" fill="none" stroke="#fff" stroke-width="1.5"/></svg></div>
+      <span>Devizly</span>
     </div>
-    <div class="items-table" style="flex:1;">
-      <div style="display:flex;padding:8px 20px;margin-bottom:4px;">
-        <span class="lbl" style="flex:1;letter-spacing:1px;">Description</span>
-        <span class="lbl" style="width:50px;text-align:center;">Qté</span>
-        <span class="lbl" style="width:100px;text-align:right;">Montant</span>
-      </div>
-      <div class="row"><span class="desc">Design UX/UI (maquettes + charte graphique)</span><span class="qty">1</span><span class="price">1 200 €</span></div>
-      <div class="row"><span class="desc">Développement Next.js + CMS</span><span class="qty">1</span><span class="price">2 800 €</span></div>
-      <div class="row"><span class="desc">Rédaction contenu + SEO (5 pages)</span><span class="qty">5</span><span class="price">600 €</span></div>
-      <div class="row"><span class="desc">Hébergement Vercel + nom de domaine (1 an)</span><span class="qty">1</span><span class="price">350 €</span></div>
-      <div class="row"><span class="desc">Formation + support post-livraison</span><span class="qty">1</span><span class="price">250 €</span></div>
+    <div class="nav">
+      <div class="nav-item"><span class="dot">📊</span> Dashboard</div>
+      <div class="nav-item"><span class="dot">⚡</span> Briefing IA</div>
+      <div class="nav-section">COMMERCIAL</div>
+      <div class="nav-item active"><span class="dot">📄</span> Devis</div>
+      <div class="nav-item"><span class="dot">📋</span> Templates</div>
+      <div class="nav-item"><span class="dot">🔄</span> Pipeline</div>
+      <div class="nav-section">FINANCES</div>
+      <div class="nav-item"><span class="dot">🧾</span> Factures</div>
+      <div class="nav-section">CLIENTS</div>
+      <div class="nav-item"><span class="dot">👥</span> Clients</div>
     </div>
-    <div class="total-bar">
-      <div style="display:flex;align-items:center;gap:8px;margin-right:auto;">
-        <span class="check">✓</span>
-        <span style="font-size:13px;color:#16a34a;font-weight:600;">Devis généré en 8 secondes</span>
-      </div>
-      <span class="total-label">Total HT</span>
-      <span class="total-value">5 200 €</span>
+    <div class="user-bottom">
+      <div class="avatar">HC</div>
+      <div><div class="user-name">Haroun Chikh</div><div class="user-email">harounchikh71@gmail.com</div></div>
     </div>
   </div>
-</div>
-</body></html>`;
-
-/* ═══ SLIDE 2 — Signature mobile ═══ */
-const slide2 = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${BASE}
-.phone { width:340px; height:620px; border-radius:40px; border:3px solid rgba(255,255,255,0.15);
-  background:#0f1428; overflow:hidden; position:relative; margin:0 auto; }
-.phone-notch { width:120px; height:28px; background:#000; border-radius:0 0 16px 16px;
-  position:absolute; top:0; left:50%; transform:translateX(-50%); z-index:5; }
-.phone-screen { padding:44px 20px 20px; height:100%; display:flex; flex-direction:column; }
-.pdf-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
-.pdf-title { font-size:16px; font-weight:700; }
-.pdf-ref { font-size:11px; color:#64748b; }
-.pdf-line { display:flex; justify-content:space-between; padding:8px 0;
-  border-bottom:1px solid rgba(255,255,255,0.06); font-size:12px; }
-.pdf-line .n { color:#94a3b8; } .pdf-line .v { font-weight:600; }
-.sig-box { margin-top:auto; }
-.sig-done { display:flex; align-items:center; gap:8px; padding:12px 16px;
-  background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.3);
-  border-radius:12px; margin-bottom:12px; }
-.sig-img { font-style:italic; color:#22c55e; font-size:18px; font-weight:700; }
-.info-panel { position:absolute; right:40px; top:50%; transform:translateY(-50%);
-  width:380px; display:flex; flex-direction:column; gap:16px; }
-.info-card { padding:20px 24px; }
-.info-title { font-size:15px; font-weight:700; margin-bottom:4px; }
-.info-desc { font-size:12px; color:#94a3b8; line-height:1.5; }
-</style></head><body>
-<div class="orb" style="width:400px;height:400px;background:radial-gradient(circle,rgba(34,197,94,0.2),transparent 70%);top:100px;left:100px;"></div>
-<div class="orb" style="width:300px;height:300px;background:radial-gradient(circle,rgba(91,91,214,0.15),transparent 70%);bottom:50px;right:200px;"></div>
-<div class="wrap" style="flex-direction:row;align-items:center;gap:48px;">
-  <div style="flex:0 0 auto;">
-    <div class="phone">
-      <div class="phone-notch"></div>
-      <div class="phone-screen">
-        <div class="pdf-header">
-          <div><div class="pdf-title">DEV-0024</div><div class="pdf-ref">Salon de coiffure — Marie Petit</div></div>
-          <div style="font-size:10px;padding:4px 10px;background:rgba(59,130,246,0.2);color:#60a5fa;border-radius:6px;font-weight:600;">ENVOYÉ</div>
-        </div>
-        <div class="pdf-line"><span class="n">Postes de coiffage (×3)</span><span class="v">2 850 €</span></div>
-        <div class="pdf-line"><span class="n">Bac à shampoing (×2)</span><span class="v">1 560 €</span></div>
-        <div class="pdf-line"><span class="n">Comptoir accueil</span><span class="v">1 200 €</span></div>
-        <div class="pdf-line"><span class="n">Éclairage LED</span><span class="v">890 €</span></div>
-        <div style="display:flex;justify-content:space-between;padding:12px 0;border-top:2px solid rgba(255,255,255,0.1);margin-top:8px;">
-          <span style="font-weight:800;font-size:14px;">Total TTC</span>
-          <span style="font-weight:800;font-size:16px;">8 160 €</span>
-        </div>
-        <div class="sig-box">
-          <div class="sig-done">
-            <span style="font-size:16px;">✓</span>
-            <div><div style="font-size:12px;font-weight:600;color:#22c55e;">Signé électroniquement</div>
-            <div style="font-size:10px;color:#4ade80;">Marie Petit · 07/03/2026</div></div>
+  <div class="main">
+    <h1>Nouveau devis</h1>
+    <div class="grid">
+      <div>
+        <!-- AI Card -->
+        <div class="card ai-glow" style="margin-bottom:16px;">
+          <div class="card-header"><span class="spark">⚡</span><span class="title">Générer avec l'IA</span></div>
+          <div class="card-body">
+            <div class="textarea" style="color:#0F172A;">Rénovation complète d'une cuisine professionnelle pour un restaurant gastronomique à Bordeaux. Plan de travail inox 6m, hotte extraction, installation gaz, sol antidérapant, éclairage LED.</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
+              <span class="green-check">✓ Devis généré en 8 secondes</span>
+              <button class="btn btn-outline"><span class="spark">⚡</span> Générer avec l'IA</button>
+            </div>
           </div>
-          <button class="btn btn-g" style="width:100%;justify-content:center;padding:12px;font-size:14px;border-radius:12px;">
-            💳 Payer acompte 30% — 2 448 €
-          </button>
+        </div>
+        <!-- Details -->
+        <div class="card">
+          <div class="card-header"><span class="title">Détails du devis</span></div>
+          <div class="card-body">
+            <label class="label">Titre du devis</label>
+            <input class="input" value="Renovation cuisine professionnelle" style="margin-bottom:12px;" />
+            <label class="label">Client</label>
+            <div class="input" style="display:flex;align-items:center;gap:8px;margin-bottom:12px;color:#6366F1;">
+              <span>👥</span> <span style="font-weight:600;color:#0F172A;">Restaurant Le Gourmet</span> <span style="color:#94a3b8;font-size:11px;">Bordeaux</span>
+            </div>
+            <label class="label">Valide jusqu'au</label>
+            <input class="input" value="2026-05-01" type="text" />
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-  <div class="info-panel" style="position:static;transform:none;">
-    <div class="card info-card card-glow-g">
-      <div class="info-title">✓ Signature eIDAS</div>
-      <div class="info-desc">Certificat SHA-256, horodatage, IP enregistrée. Valeur juridique en France et en Europe.</div>
-    </div>
-    <div class="card info-card card-glow-b">
-      <div class="info-title">💳 Paiement Stripe intégré</div>
-      <div class="info-desc">Votre client paie l'acompte ou le total en un clic. Les fonds arrivent sur votre compte sous 48h.</div>
-    </div>
-    <div class="card info-card" style="border-color:rgba(245,158,11,0.3);box-shadow:0 0 30px rgba(245,158,11,0.1);">
-      <div class="info-title">🔔 Relances automatiques</div>
-      <div class="info-desc">J+2, J+5, J+7 — vos clients reçoivent un rappel sans action de votre part.</div>
+      <div>
+        <!-- Lines -->
+        <div class="card">
+          <div class="card-header" style="justify-content:space-between;">
+            <span class="title">Lignes du devis</span>
+            <span style="font-size:11px;color:#6366F1;font-weight:600;">Depuis un template</span>
+          </div>
+          <div class="card-body">
+            <div class="line-item">
+              <div class="line-header"><span class="badge badge-line">Ligne 1</span></div>
+              <input class="line-input" value="Plan de travail inox professionnel (6m linéaire)" />
+              <div class="line-grid"><div><div class="sm-label">Quantité</div><input value="1" /></div><div><div class="sm-label">Prix unitaire</div><input value="4800" /></div><div><div class="sm-label">Total</div><input value="4 800,00 €" style="background:#f8fafc;" disabled /></div></div>
+            </div>
+            <div class="line-item">
+              <div class="line-header"><span class="badge badge-line">Ligne 2</span></div>
+              <input class="line-input" value="Hotte extraction industrielle" />
+              <div class="line-grid"><div><div class="sm-label">Quantité</div><input value="1" /></div><div><div class="sm-label">Prix unitaire</div><input value="5200" /></div><div><div class="sm-label">Total</div><input value="5 200,00 €" style="background:#f8fafc;" disabled /></div></div>
+            </div>
+            <div class="line-item">
+              <div class="line-header"><span class="badge badge-line">Ligne 3</span></div>
+              <input class="line-input" value="Installation gaz + raccordements" />
+              <div class="line-grid"><div><div class="sm-label">Quantité</div><input value="1" /></div><div><div class="sm-label">Prix unitaire</div><input value="3600" /></div><div><div class="sm-label">Total</div><input value="3 600,00 €" style="background:#f8fafc;" disabled /></div></div>
+            </div>
+            <div class="totals">
+              <div class="row"><span style="color:#64748b;">Total HT</span><span>25 600,00 €</span></div>
+              <div class="row"><span style="color:#64748b;">TVA (20%)</span><span>5 120,00 €</span></div>
+              <div class="row bold"><span>Total TTC</span><span>30 720,00 €</span></div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:16px;">
+              <button class="btn btn-outline" style="flex:1;">📝 Brouillon</button>
+              <button class="btn btn-primary" style="flex:1;">📤 Envoyer</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 </body></html>`;
 
-/* ═══ SLIDE 3 — Pipeline Kanban ═══ */
-const slide3 = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${BASE}
-.pipeline { display:flex; gap:16px; flex:1; }
-.col { flex:1; display:flex; flex-direction:column; gap:10px; }
-.col-header { display:flex; align-items:center; justify-content:space-between;
-  padding:10px 14px; border-radius:10px; background:rgba(255,255,255,0.04); margin-bottom:4px; }
-.col-title { font-size:13px; font-weight:700; }
-.col-count { font-size:11px; font-weight:600; padding:2px 8px; border-radius:6px;
-  background:rgba(255,255,255,0.08); color:#94a3b8; }
-.deal { padding:14px 16px; border-radius:12px; background:rgba(255,255,255,0.05);
-  border:1px solid rgba(255,255,255,0.08); }
-.deal-name { font-size:13px; font-weight:600; margin-bottom:2px; }
-.deal-info { font-size:11px; color:#64748b; }
-.deal-amount { font-size:14px; font-weight:800; margin-top:6px; }
-.deal-drag { border:2px dashed rgba(34,197,94,0.5); background:rgba(34,197,94,0.05); }
-.kpi-bar { display:flex; gap:20px; margin-bottom:24px; }
-.kpi { padding:16px 24px; border-radius:14px; flex:1; }
-.kpi-label { font-size:11px; color:#64748b; font-weight:500; }
-.kpi-value { font-size:28px; font-weight:800; margin-top:4px; }
-.kpi-sub { font-size:11px; margin-top:2px; }
+/* ═══════════════════════════════════════════════════
+   SLIDE 2 — Page publique devis (client view)
+   Reproduces: the real /devis/[token] share page
+   ═══════════════════════════════════════════════════ */
+const slide2 = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${BASE}
+body { background:#f8fafc; display:flex; justify-content:center; padding:24px 0; }
+.page { width:680px; background:#fff; border-radius:12px; border:1px solid #e2e8f0; box-shadow:0 4px 24px rgba(0,0,0,0.06); overflow:hidden; }
+.page-header { padding:20px 28px; display:flex; align-items:center; justify-content:space-between; }
+.logo { display:flex; align-items:center; gap:6px; }
+.logo .icon { width:24px; height:24px; background:#6366F1; border-radius:6px; }
+.logo span { font-size:16px; font-weight:800; }
+.status { padding:4px 12px; border-radius:6px; font-size:11px; font-weight:600; background:#dbeafe; color:#2563eb; }
+.page-body { padding:0 28px 24px; }
+.quote-title { font-size:18px; font-weight:700; }
+.quote-ref { font-size:12px; color:#64748b; margin-top:2px; }
+.valid { font-size:12px; color:#64748b; text-align:right; }
+.client-box { background:#f8fafc; border-radius:10px; padding:14px 18px; margin:16px 0; }
+.client-label { font-size:11px; color:#94a3b8; font-weight:500; }
+.client-name { font-size:14px; font-weight:600; margin-top:2px; }
+.client-detail { font-size:12px; color:#64748b; margin-top:1px; }
+table { width:100%; border-collapse:collapse; margin:16px 0; }
+th { text-align:left; font-size:11px; font-weight:600; color:#64748b; padding:8px 0; border-bottom:1px solid #e2e8f0; }
+th:nth-child(2),th:nth-child(3),th:nth-child(4) { text-align:right; }
+td { padding:10px 0; font-size:13px; border-bottom:1px solid #f1f5f9; }
+td:nth-child(2),td:nth-child(3),td:nth-child(4) { text-align:right; }
+td:nth-child(4) { font-weight:600; }
+.totals-area { display:flex; justify-content:flex-end; margin:8px 0 16px; }
+.totals-box { width:220px; }
+.t-row { display:flex; justify-content:space-between; padding:4px 0; font-size:13px; }
+.t-row span:first-child { color:#64748b; }
+.t-row.big { border-top:2px solid #0F172A; padding-top:8px; margin-top:4px; font-size:17px; font-weight:800; }
+.notes-box { background:#f8fafc; border-radius:10px; padding:14px 18px; margin-bottom:16px; }
+.notes-label { font-size:11px; color:#94a3b8; font-weight:500; }
+.notes-text { font-size:12px; color:#374151; margin-top:4px; }
+.sig-box { background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:14px 18px; margin-bottom:16px; display:flex; align-items:center; gap:10px; }
+.sig-icon { color:#16a34a; font-size:18px; }
+.sig-text { font-size:13px; font-weight:600; color:#166534; }
+.sig-detail { font-size:11px; color:#22c55e; }
+.actions { display:flex; flex-direction:column; gap:8px; }
+.btn-pay { width:100%; padding:14px; background:#16a34a; color:#fff; border:none; border-radius:10px; font-size:15px; font-weight:700; text-align:center; display:flex; align-items:center; justify-content:center; gap:8px; }
+.btn-action { flex:1; padding:10px; border:1px solid #e2e8f0; border-radius:10px; font-size:13px; font-weight:600; text-align:center; background:#fff; display:flex; align-items:center; justify-content:center; gap:6px; }
+.btn-action.refuse { border-color:#fecaca; color:#dc2626; }
+.btn-row { display:flex; gap:8px; }
+.footer { text-align:center; padding:12px; font-size:11px; color:#94a3b8; }
 </style></head><body>
-<div class="orb" style="width:500px;height:500px;background:radial-gradient(circle,rgba(59,130,246,0.2),transparent 70%);top:-100px;right:100px;"></div>
-<div class="wrap">
-  <div class="kpi-bar">
-    <div class="card kpi card-glow-v">
-      <div class="kpi-label">CA ce mois</div>
-      <div class="kpi-value" style="color:#22c55e;">12 480 €</div>
-      <div class="kpi-sub" style="color:#4ade80;">+23% vs mois dernier</div>
+<div class="page">
+  <div class="page-header">
+    <div class="logo"><div class="icon"></div><span>Devizly</span></div>
+    <div class="status">Envoyé</div>
+  </div>
+  <div class="page-body">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div><div class="quote-title">Renovation cuisine professionnelle</div><div class="quote-ref">Devis n° DEV-0009 — 07/03/2026</div></div>
+      <div class="valid">Valide jusqu'au 01/05/2026</div>
     </div>
-    <div class="card kpi card-glow-b">
-      <div class="kpi-label">Devis envoyés</div>
-      <div class="kpi-value">7</div>
-      <div class="kpi-sub" style="color:#64748b;">3 en attente de réponse</div>
+    <div class="client-box">
+      <div class="client-label">Client</div>
+      <div class="client-name">Restaurant Le Gourmet</div>
+      <div class="client-detail">contact@legourmet-paris.fr</div>
+      <div class="client-detail">8 Rue du Commerce, 33000 Bordeaux</div>
     </div>
-    <div class="card kpi card-glow-g">
-      <div class="kpi-label">Taux de conversion</div>
-      <div class="kpi-value" style="color:#22c55e;">72%</div>
-      <div class="kpi-sub" style="color:#64748b;">Moy. secteur : 65%</div>
-    </div>
-    <div class="card kpi" style="border-color:rgba(245,158,11,0.3);box-shadow:0 0 30px rgba(245,158,11,0.1);">
-      <div class="kpi-label">En attente</div>
-      <div class="kpi-value">3 850 €</div>
-      <div class="kpi-sub" style="color:#64748b;">2 devis</div>
+    <table>
+      <thead><tr><th style="width:50%;">Description</th><th>Qté</th><th>Prix unit.</th><th>Total</th></tr></thead>
+      <tbody>
+        <tr><td>Plan de travail inox professionnel (6m linéaire)</td><td>1</td><td>4 800,00 €</td><td>4 800,00 €</td></tr>
+        <tr><td>Hotte extraction industrielle</td><td>1</td><td>5 200,00 €</td><td>5 200,00 €</td></tr>
+        <tr><td>Installation gaz + raccordements</td><td>1</td><td>3 600,00 €</td><td>3 600,00 €</td></tr>
+        <tr><td>Revêtement sol antidérapant</td><td>35</td><td>120,00 €</td><td>4 200,00 €</td></tr>
+        <tr><td>Plonge double bac + lave-vaisselle pro</td><td>1</td><td>4 800,00 €</td><td>4 800,00 €</td></tr>
+        <tr><td>Mise aux normes électrique</td><td>1</td><td>3 000,00 €</td><td>3 000,00 €</td></tr>
+      </tbody>
+    </table>
+    <div class="totals-area"><div class="totals-box">
+      <div class="t-row"><span>Total HT</span><span>25 600,00 €</span></div>
+      <div class="t-row"><span>TVA (20%)</span><span>5 120,00 €</span></div>
+      <div class="t-row big"><span>Total TTC</span><span>30 720,00 €</span></div>
+    </div></div>
+    <div class="notes-box"><div class="notes-label">Notes</div><div class="notes-text">En attente validation chef cuisinier pour plan définitif.</div></div>
+    <div class="actions">
+      <div class="btn-action" style="width:100%;border-color:#e2e8f0;padding:12px;">⬇️ Télécharger PDF</div>
+      <div class="btn-pay">💳 Payer 30 720,00 € maintenant</div>
+      <div class="btn-row">
+        <div class="btn-action" style="flex:1;">✍️ Accepter et signer</div>
+        <div class="btn-action refuse" style="flex:1;">✕ Refuser</div>
+      </div>
     </div>
   </div>
-  <div class="pipeline">
-    <div class="col">
-      <div class="col-header"><span class="col-title" style="color:#f59e0b;">Prospect</span><span class="col-count">2</span></div>
-      <div class="deal"><div class="deal-name">Lucas Martin</div><div class="deal-info">E-commerce Shopify</div><div class="deal-amount" style="color:#f59e0b;">4 200 €</div></div>
-      <div class="deal"><div class="deal-name">Sophie Durand</div><div class="deal-info">App mobile React Native</div><div class="deal-amount" style="color:#f59e0b;">6 500 €</div></div>
+  <div class="footer">Propulsé par Devizly</div>
+</div>
+</body></html>`;
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 3 — Pipeline Kanban
+   Reproduces: the real /dashboard/pipeline page
+   ═══════════════════════════════════════════════════ */
+const slide3 = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${BASE}
+.layout { display:flex; height:100%; }
+.sidebar { width:220px; border-right:1px solid #e2e8f0; background:#fff; display:flex; flex-direction:column; }
+.sidebar-logo { display:flex; align-items:center; gap:8px; padding:16px 20px; border-bottom:1px solid #e2e8f0; }
+.sidebar-logo .icon { width:28px; height:28px; background:#6366F1; border-radius:8px; }
+.sidebar-logo span { font-size:18px; font-weight:800; }
+.nav { padding:12px 12px; flex:1; }
+.nav-section { font-size:10px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#94A3B8; padding:16px 12px 4px; }
+.nav-item { display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:0 8px 8px 0; font-size:13px; font-weight:500; color:#64748b; margin:1px 0; border-left:3px solid transparent; }
+.nav-item.active { background:#F3F0FF; color:#5B5BD6; border-left-color:#5B5BD6; font-weight:600; }
+.nav-item .dot { width:15px; }
+.user-bottom { padding:12px 16px; border-top:1px solid #e2e8f0; display:flex; align-items:center; gap:10px; }
+.avatar { width:32px; height:32px; border-radius:50%; background:#EDE9FE; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#6366F1; }
+.user-name { font-size:12px; font-weight:600; } .user-email { font-size:10px; color:#94a3b8; }
+.main { flex:1; padding:24px 28px; background:#f8f9fc; }
+.main h1 { font-size:22px; font-weight:700; margin-bottom:4px; }
+.main .sub { font-size:13px; color:#64748b; margin-bottom:20px; }
+.pipeline { display:flex; gap:16px; height:calc(100% - 70px); }
+.col { flex:1; display:flex; flex-direction:column; gap:10px; min-width:0; }
+.col-head { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+.col-dot { width:10px; height:10px; border-radius:50%; }
+.col-name { font-size:13px; font-weight:700; }
+.col-count { font-size:11px; color:#94a3b8; }
+.col-total { font-size:11px; color:#64748b; margin-left:auto; font-weight:600; }
+.deal { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:14px 16px; }
+.deal-name { font-size:13px; font-weight:600; margin-bottom:2px; }
+.deal-desc { font-size:11px; color:#94a3b8; margin-bottom:8px; }
+.deal-amount { font-size:15px; font-weight:800; }
+.deal-footer { display:flex; align-items:center; gap:8px; margin-top:8px; }
+.deal-date { font-size:10px; color:#94a3b8; }
+.deal-badge { font-size:10px; padding:2px 8px; border-radius:4px; font-weight:600; }
+.badge-new { background:#dbeafe; color:#2563eb; }
+.badge-hot { background:#fef3c7; color:#d97706; }
+.badge-signed { background:#dcfce7; color:#16a34a; }
+.btn-relance { font-size:10px; padding:3px 10px; border-radius:6px; background:#6366F1; color:#fff; font-weight:600; border:none; }
+.amt-prospect { color:#f59e0b; } .amt-sent { color:#3b82f6; } .amt-signed { color:#16a34a; } .amt-paid { color:#8b5cf6; }
+</style></head><body>
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-logo"><div class="icon"></div><span>Devizly</span></div>
+    <div class="nav">
+      <div class="nav-item"><span class="dot">📊</span> Dashboard</div>
+      <div class="nav-item"><span class="dot">⚡</span> Briefing IA</div>
+      <div class="nav-section">COMMERCIAL</div>
+      <div class="nav-item"><span class="dot">📄</span> Devis</div>
+      <div class="nav-item"><span class="dot">📋</span> Templates</div>
+      <div class="nav-item active"><span class="dot">🔄</span> Pipeline</div>
+      <div class="nav-section">FINANCES</div>
+      <div class="nav-item"><span class="dot">🧾</span> Factures</div>
+      <div class="nav-section">CLIENTS</div>
+      <div class="nav-item"><span class="dot">👥</span> Clients</div>
     </div>
-    <div class="col">
-      <div class="col-header"><span class="col-title" style="color:#3b82f6;">Envoyé</span><span class="col-count">1</span></div>
-      <div class="deal"><div class="deal-name">Thomas Bernard</div><div class="deal-info">Refonte identité visuelle</div><div class="deal-amount" style="color:#3b82f6;">1 850 €</div></div>
-    </div>
-    <div class="col">
-      <div class="col-header"><span class="col-title" style="color:#22c55e;">Signé</span><span class="col-count">3</span></div>
-      <div class="deal deal-drag"><div class="deal-name">Marie Petit</div><div class="deal-info">Aménagement salon coiffure</div><div class="deal-amount" style="color:#22c55e;">8 160 €</div></div>
-      <div class="deal"><div class="deal-name">Pierre Lefebvre</div><div class="deal-info">Site vitrine avocat</div><div class="deal-amount" style="color:#22c55e;">3 200 €</div></div>
-      <div class="deal"><div class="deal-name">Camille Roux</div><div class="deal-info">Audit SEO + contenu</div><div class="deal-amount" style="color:#22c55e;">1 120 €</div></div>
-    </div>
-    <div class="col">
-      <div class="col-header"><span class="col-title" style="color:#8b5cf6;">Payé</span><span class="col-count">€12.4k</span></div>
-      <div class="deal"><div class="deal-name">Emma Moreau</div><div class="deal-info">Landing page SaaS</div><div class="deal-amount" style="color:#8b5cf6;">2 400 €</div></div>
-      <div class="deal"><div class="deal-name">Jules Girard</div><div class="deal-info">Dashboard analytics</div><div class="deal-amount" style="color:#8b5cf6;">5 800 €</div></div>
+    <div class="user-bottom"><div class="avatar">HC</div><div><div class="user-name">Haroun Chikh</div><div class="user-email">harounchikh71@gmail.com</div></div></div>
+  </div>
+  <div class="main">
+    <h1>Pipeline</h1>
+    <div class="sub">Gérez vos prospects et devis par étape.</div>
+    <div class="pipeline">
+      <!-- Prospect -->
+      <div class="col">
+        <div class="col-head"><div class="col-dot" style="background:#f59e0b;"></div><span class="col-name">Prospect</span><span class="col-count">2</span><span class="col-total">5 400 €</span></div>
+        <div class="deal"><div class="deal-name">Marie Petit - Coiffeuse</div><div class="deal-desc">Aménagement salon de coiffure</div><div class="deal-amount amt-prospect">8 160,00 €</div><div class="deal-footer"><span class="deal-date">Mar. 07</span><span class="deal-badge badge-hot">🔥 Hot</span></div></div>
+        <div class="deal"><div class="deal-name">Restaurant Le Gourmet</div><div class="deal-desc">Rénovation cuisine professionnelle</div><div class="deal-amount amt-prospect">30 720,00 €</div><div class="deal-footer"><span class="deal-date">Mar. 07</span><button class="btn-relance">📧 Relancer</button></div></div>
+      </div>
+      <!-- Envoyé -->
+      <div class="col">
+        <div class="col-head"><div class="col-dot" style="background:#3b82f6;"></div><span class="col-name">Envoyé</span><span class="col-count">2</span><span class="col-total">3 950 €</span></div>
+        <div class="deal"><div class="deal-name">Martin Dupont</div><div class="deal-desc">Site e-commerce Shopify</div><div class="deal-amount amt-sent">9 350,00 €</div><div class="deal-footer"><span class="deal-date">Mar. 05</span><span class="deal-badge badge-new">Nouveau</span></div></div>
+        <div class="deal"><div class="deal-name">Sophie Laurent - Architecte</div><div class="deal-desc">Aménagement bureau cabinet</div><div class="deal-amount amt-sent">14 592,00 €</div><div class="deal-footer"><span class="deal-date">Mar. 03</span><button class="btn-relance">📧 Relancer</button></div></div>
+      </div>
+      <!-- Signé -->
+      <div class="col">
+        <div class="col-head"><div class="col-dot" style="background:#16a34a;"></div><span class="col-name">Signé</span><span class="col-count">1</span></div>
+        <div class="deal" style="border-color:#bbf7d0;"><div class="deal-name">Tech Solutions SAS</div><div class="deal-desc">Dashboard analytics complet</div><div class="deal-amount amt-signed">5 800,00 €</div><div class="deal-footer"><span class="deal-date">Mar. 02</span><span class="deal-badge badge-signed">✓ Signé</span></div></div>
+      </div>
+      <!-- Payé -->
+      <div class="col">
+        <div class="col-head"><div class="col-dot" style="background:#8b5cf6;"></div><span class="col-name">Payé</span><span class="col-count">1</span><span class="col-total" style="color:#8b5cf6;">Encaissé</span></div>
+        <div class="deal" style="border-color:#ddd6fe;"><div class="deal-name">Emma Moreau</div><div class="deal-desc">Landing page SaaS</div><div class="deal-amount amt-paid">2 400,00 €</div><div class="deal-footer"><span class="deal-date">Fév. 28</span><span class="deal-badge" style="background:#f3e8ff;color:#7c3aed;">💰 Payé</span></div></div>
+      </div>
     </div>
   </div>
 </div>
@@ -236,17 +345,12 @@ const slides = [
     await page.setViewportSize({ width: W, height: H });
     await page.setContent(s.html, { waitUntil: "networkidle" });
     await page.waitForTimeout(500);
-    const out = path.join("public", "landing-screens", `${s.name}.webp`);
-    await page.screenshot({ path: out, fullPage: false, type: "png" });
+    const pngBuf = await page.screenshot({ fullPage: false });
     await page.close();
-    // Convert to webp via sharp
-    const sharp = require("sharp");
-    const pngPath = out;
-    await sharp(pngPath).webp({ quality: 90 }).toFile(pngPath.replace(".webp", ".tmp.webp"));
-    const fs = require("fs");
-    fs.renameSync(pngPath.replace(".webp", ".tmp.webp"), pngPath);
-    console.log("✓", s.name + ".webp");
+    const outPath = path.join("public", "landing-screens", `${s.name}.webp`);
+    await sharp(pngBuf).webp({ quality: 92 }).toFile(outPath);
+    console.log("✓", s.name + ".webp", (fs.statSync(outPath).size / 1024).toFixed(0) + "KB");
   }
   await browser.close();
-  console.log("\nDone! 3 hero screens in public/landing-screens/");
+  console.log("\nDone! 3 screens in public/landing-screens/");
 })();

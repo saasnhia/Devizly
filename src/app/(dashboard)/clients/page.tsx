@@ -21,7 +21,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, Search, Pencil, Trash2, Users, ExternalLink, Copy, Upload, Loader2 } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Users, ExternalLink, Copy, Upload, Loader2, FileText } from "lucide-react";
 import { CompanyAutocomplete } from "@/components/company-autocomplete";
 import type { CompanyData } from "@/components/company-autocomplete";
 import type { Client } from "@/types";
@@ -451,6 +451,17 @@ export default function ClientsPage() {
                         <Button
                           variant="ghost"
                           size="icon"
+                          title="Nouveau devis"
+                          onClick={() =>
+                            window.location.href = `/devis/nouveau?client_id=${client.id}`
+                          }
+                        >
+                          <FileText className="h-4 w-4 text-violet-500" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="Modifier"
                           onClick={() => openEdit(client)}
                         >
                           <Pencil className="h-4 w-4" />
@@ -458,6 +469,7 @@ export default function ClientsPage() {
                         <Button
                           variant="ghost"
                           size="icon"
+                          title="Supprimer"
                           onClick={() => handleDelete(client.id)}
                         >
                           <Trash2 className="h-4 w-4 text-red-500" />

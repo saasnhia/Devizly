@@ -176,6 +176,7 @@ export default function NouveauDevisPage() {
   const searchParams = useSearchParams();
   const editId = searchParams.get("edit");
   const templateId = searchParams.get("template");
+  const prefilClientId = searchParams.get("client_id");
 
   const [title, setTitle] = useState("");
   const [clientId, setClientId] = useState<string>("");
@@ -327,6 +328,14 @@ export default function NouveauDevisPage() {
   useEffect(() => {
     fetchClients();
   }, [fetchClients]);
+
+  // Pre-select client from query param ?client_id=XXX
+  useEffect(() => {
+    if (!prefilClientId || editId || clients.length === 0) return;
+    if (clientId) return; // already set
+    const match = clients.find((c) => c.id === prefilClientId);
+    if (match) setClientId(match.id);
+  }, [prefilClientId, editId, clients, clientId]);
 
   useEffect(() => {
     if (!editId) return;

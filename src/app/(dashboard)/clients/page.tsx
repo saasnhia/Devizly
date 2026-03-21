@@ -49,7 +49,9 @@ export default function ClientsPage() {
   const fetchClients = useCallback(async () => {
     try {
       const supabase = createClient();
-      const { data } = await supabase.from("clients").select("*").order("name");
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (!currentUser) return;
+      const { data } = await supabase.from("clients").select("*").eq("user_id", currentUser.id).order("name");
       setClients((data || []) as Client[]);
     } catch {
       toast.error("Erreur de chargement des clients");

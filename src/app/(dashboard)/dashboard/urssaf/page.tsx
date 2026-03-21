@@ -116,12 +116,16 @@ export default function UrssafPage() {
   const fetchCA = useCallback(async () => {
     setLoading(true);
     const supabase = createClient();
+    const { data: { user: currentUser } } = await supabase.auth.getUser();
+    if (!currentUser) { setLoading(false); return; }
+    const uid = currentUser.id;
     const { start, end } = getPeriodBounds();
 
     // Paid invoices in period
     const { data: invoices } = await supabase
       .from("invoices")
       .select("amount")
+      .eq("user_id", uid)
       .eq("status", "paid")
       .gte("paid_at", start)
       .lte("paid_at", end + "T23:59:59");
@@ -130,6 +134,7 @@ export default function UrssafPage() {
     const { data: paidQuotes } = await supabase
       .from("quotes")
       .select("total_ht")
+      .eq("user_id", uid)
       .eq("status", "pay\u00e9")
       .gte("paid_at", start)
       .lte("paid_at", end + "T23:59:59");
@@ -144,6 +149,9 @@ export default function UrssafPage() {
   // ── Fetch annual summary ──
   const fetchAnnualSummary = useCallback(async () => {
     const supabase = createClient();
+    const { data: { user: currentUser } } = await supabase.auth.getUser();
+    if (!currentUser) return;
+    const uid = currentUser.id;
     const y = parseInt(year, 10);
     const periods = periodeType === "mensuelle"
       ? Array.from({ length: 12 }, (_, i) => ({
@@ -161,9 +169,9 @@ export default function UrssafPage() {
     const endYear = `${y}-12-31T23:59:59`;
 
     const [{ data: invoices }, { data: quotes }] = await Promise.all([
-      supabase.from("invoices").select("amount, paid_at").eq("status", "paid")
+      supabase.from("invoices").select("amount, paid_at").eq("user_id", uid).eq("status", "paid")
         .gte("paid_at", startYear).lte("paid_at", endYear),
-      supabase.from("quotes").select("total_ht, paid_at").eq("status", "pay\u00e9")
+      supabase.from("quotes").select("total_ht, paid_at").eq("user_id", uid).eq("status", "pay\u00e9")
         .gte("paid_at", startYear).lte("paid_at", endYear),
     ]);
 

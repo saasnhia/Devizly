@@ -321,7 +321,9 @@ export default function NouveauDevisPage() {
 
   const fetchClients = useCallback(async () => {
     const supabase = createClient();
-    const { data } = await supabase.from("clients").select("*").order("name");
+    const { data: { user: currentUser } } = await supabase.auth.getUser();
+    if (!currentUser) return;
+    const { data } = await supabase.from("clients").select("*").eq("user_id", currentUser.id).order("name");
     setClients((data || []) as Client[]);
   }, []);
 

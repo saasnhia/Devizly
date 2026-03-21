@@ -120,18 +120,23 @@ export default function DevisPage() {
 
   const fetchQuotes = useCallback(async () => {
     const supabase = createClient();
+    const { data: { user: currentUser } } = await supabase.auth.getUser();
+    if (!currentUser) return;
+    const uid = currentUser.id;
     const [quotesRes, profileRes, remindersRes, clientsRes] = await Promise.all(
       [
         supabase
           .from("quotes")
           .select("*, clients(*)")
+          .eq("user_id", uid)
           .order("created_at", { ascending: false }),
         supabase
           .from("profiles")
           .select("subscription_status, devis_used")
+          .eq("id", uid)
           .single(),
-        supabase.from("quote_reminders").select("quote_id"),
-        supabase.from("clients").select("id, name").order("name"),
+        supabase.from("quote_reminders").select("quote_id").eq("user_id", uid),
+        supabase.from("clients").select("id, name").eq("user_id", uid).order("name"),
       ]
     );
     setQuotes((quotesRes.data || []) as QuoteWithClient[]);

@@ -10,6 +10,7 @@ import { useInView } from "react-intersection-observer";
 import CountUp from "react-countup";
 import confetti from "canvas-confetti";
 import { DevizlyLogo } from "@/components/devizly-logo";
+import { HeroCarousel } from "@/components/landing/hero-carousel";
 import { BetaBanner } from "@/components/landing/beta-banner";
 import {
   Sparkles,
@@ -621,39 +622,14 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
             </motion.div>
           </motion.div>
 
-          {/* Hero screenshot — browser chrome frame */}
+          {/* Hero carousel — 3 premium screens */}
           <motion.div
             variants={scaleIn}
             initial="hidden"
             animate="visible"
             className="mt-16 sm:mt-20"
           >
-            <div className="relative mx-auto max-w-5xl">
-              {/* Browser chrome */}
-              <div className="flex items-center gap-2 rounded-t-xl border border-b-0 border-white/10 bg-white/[0.06] px-4 py-3 backdrop-blur-sm">
-                <div className="flex gap-1.5">
-                  <div className="h-2.5 w-2.5 rounded-full bg-red-400/60" />
-                  <div className="h-2.5 w-2.5 rounded-full bg-yellow-400/60" />
-                  <div className="h-2.5 w-2.5 rounded-full bg-green-400/60" />
-                </div>
-                <div className="ml-3 flex-1 rounded-md bg-white/5 px-3 py-1 text-xs text-slate-500">
-                  devizly.fr/dashboard
-                </div>
-              </div>
-              {/* Screenshot */}
-              <div className="overflow-hidden rounded-b-xl border border-t-0 border-white/10">
-                <Image
-                  src="/landing-screens/hero-dashboard.webp"
-                  alt="Tableau de bord Devizly — KPIs, graphiques CA et conversion, liste des devis"
-                  width={1400}
-                  height={671}
-                  className="w-full"
-                  priority
-                />
-              </div>
-              {/* Glow behind */}
-              <div className="pointer-events-none absolute -inset-6 -z-10 rounded-3xl bg-gradient-to-b from-violet-500/15 via-indigo-500/10 to-transparent blur-2xl" />
-            </div>
+            <HeroCarousel />
           </motion.div>
         </div>
       </section>

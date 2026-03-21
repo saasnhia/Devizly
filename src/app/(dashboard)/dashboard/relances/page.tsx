@@ -15,6 +15,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils/quote";
+import { RelanceCustomizeButton } from "@/components/relance-customize-button";
 import type { QuoteWithClient } from "@/types";
 
 const REMINDER_LABELS = [
@@ -143,6 +144,9 @@ export default async function RelancesPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Customize button */}
+      <RelanceCustomizeButton />
 
       {/* Status banner */}
       {plan === "free" ? (
@@ -349,6 +353,9 @@ export default async function RelancesPage() {
                   </div>
                   <p className="mt-2 text-[10px] text-muted-foreground">
                     Les emails incluent un lien de désinscription RGPD
+                  </p>
+                  <p className="mt-1 text-[10px] text-violet-500 font-medium">
+                    📧 Emails personnalisables (Pro) — Adaptez le ton, ajoutez votre signature
                   </p>
                 </div>
               </div>

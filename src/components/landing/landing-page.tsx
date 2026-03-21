@@ -1508,7 +1508,7 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
                 controls
                 className="w-full"
               >
-                <source src="/marketing/demo-devizly-90s.mp4" type="video/mp4" />
+                <source src="/marketing/demo-devizly-v2.mp4" type="video/mp4" />
               </video>
             </motion.div>
           </motion.div>

@@ -5,7 +5,7 @@ import { DevizlyLogo } from "@/components/devizly-logo";
 import { ArrowRight, Clock, Tag } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Blog Devizly — Conseils Devis et Facturation",
+  title: "Blog Devizly — Guides Freelances et Artisans",
   description:
     "Conseils pratiques pour freelances, artisans et auto-entrepreneurs : devis, facturation, TVA, mentions légales, relances clients.",
   alternates: { canonical: "https://devizly.fr/blog" },

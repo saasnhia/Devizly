@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     template: "%s | Devizly — Devis & Factures IA",
   },
   description:
-    "Créez vos devis professionnels en 2 minutes avec l'IA. Signature électronique, paiement Stripe, relances automatiques. Essai gratuit — sans CB.",
+    "Créez des devis professionnels en 30 secondes avec l'IA Mistral. Signature électronique, relances automatiques, encaissement Stripe. Essai gratuit sans CB.",
   keywords: [
     "logiciel devis gratuit",
     "créer devis en ligne",
@@ -55,14 +55,14 @@ export const metadata: Metadata = {
     siteName: "Devizly",
     title: "Devizly — Logiciel Devis et Facturation Gratuit pour Freelances",
     description:
-      "Créez vos devis professionnels en 2 minutes avec l'IA. Signature électronique, paiement Stripe, relances automatiques. Essai gratuit — sans CB.",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Devizly — Logiciel devis IA" }],
+      "Créez des devis professionnels en 30 secondes avec l'IA Mistral. Signature électronique, relances automatiques, encaissement Stripe. Essai gratuit sans CB.",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Devizly — Logiciel devis IA pour freelances" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Devizly — Logiciel Devis et Facturation Gratuit pour Freelances",
+    title: "Devizly — Devis IA pour freelances et artisans français",
     description:
-      "Créez vos devis professionnels en 2 minutes avec l'IA. Essai gratuit — sans CB.",
+      "Devis en 30s, signature électronique, relances auto, paiement Stripe. Essai gratuit.",
     images: ["/og-image.png"],
   },
   icons: {
@@ -109,11 +109,6 @@ const softwareSchema = {
   description:
     "Logiciel de devis et facturation en ligne pour freelances et artisans français.",
   url: "https://devizly.fr",
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "4.8",
-    reviewCount: "127",
-  },
 };
 
 export default function RootLayout({

@@ -78,10 +78,10 @@ const professions = [
 ];
 
 const stats = [
-  { value: 30, suffix: "s", label: "par devis" },
-  { value: 3, suffix: "x", label: "plus de signatures" },
-  { value: 48, suffix: "h", label: "paiement reçu" },
-  { value: 100, suffix: "%", label: "conforme RGPD" },
+  { value: 30, suffix: "s", label: "pour créer un devis" },
+  { value: 10, suffix: "s", label: "pour signer en ligne" },
+  { value: 48, suffix: "h", label: "pour recevoir le paiement" },
+  { value: 100, suffix: "%", label: "hébergé en France" },
 ];
 
 const bentoFeatures = [

@@ -785,7 +785,7 @@ function SceneClients() {
       title="Relances automatiques"
       subtitle="J+2, J+5, J+7 — vos clients sont relances sans effort"
       windowTitle="Devizly — Relances"
-      imagePath="landing-screens/bento-relance.webp"
+      imagePath="landing-screens/hero-relance.webp"
       rotateDir="left"
     />
   );

@@ -26,6 +26,7 @@ import {
   UsersRound,
   Timer,
   Calculator,
+  Bell,
   type LucideIcon,
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
@@ -60,6 +61,7 @@ const sections: NavSection[] = [
       { href: "/devis", label: "Devis", icon: FileText },
       { href: "/templates", label: "Templates", icon: LayoutTemplate },
       { href: "/dashboard/pipeline", label: "Pipeline", icon: Kanban },
+      { href: "/dashboard/relances", label: "Relances", icon: Bell },
     ],
   },
   {

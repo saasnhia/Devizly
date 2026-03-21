@@ -153,93 +153,107 @@ const slide1 = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${BASE}
 </body></html>`;
 
 /* ═══════════════════════════════════════════════════
-   SLIDE 2 — Page publique devis (client view)
-   Reproduces: the real /devis/[token] share page
+   SLIDE 2 — Devis list + "Partager le devis" modal
+   Reproduces: the real /devis page with share modal overlay
    ═══════════════════════════════════════════════════ */
 const slide2 = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${BASE}
-body { background:#f8fafc; display:flex; justify-content:center; align-items:flex-start; padding:8px 0; }
-.page { width:680px; background:#fff; border-radius:12px; border:1px solid #e2e8f0; box-shadow:0 4px 24px rgba(0,0,0,0.06); overflow:hidden; transform:scale(0.76); transform-origin:top center; }
-.page-header { padding:20px 28px; display:flex; align-items:center; justify-content:space-between; }
-.logo { display:flex; align-items:center; gap:6px; }
-.logo .icon { width:24px; height:24px; background:#6366F1; border-radius:6px; }
-.logo span { font-size:16px; font-weight:800; }
-.status { padding:4px 12px; border-radius:6px; font-size:11px; font-weight:600; background:#dbeafe; color:#2563eb; }
-.page-body { padding:0 28px 24px; }
-.quote-title { font-size:18px; font-weight:700; }
-.quote-ref { font-size:12px; color:#64748b; margin-top:2px; }
-.valid { font-size:12px; color:#64748b; text-align:right; }
-.client-box { background:#f8fafc; border-radius:10px; padding:14px 18px; margin:16px 0; }
-.client-label { font-size:11px; color:#94a3b8; font-weight:500; }
-.client-name { font-size:14px; font-weight:600; margin-top:2px; }
-.client-detail { font-size:12px; color:#64748b; margin-top:1px; }
-table { width:100%; border-collapse:collapse; margin:16px 0; }
-th { text-align:left; font-size:11px; font-weight:600; color:#64748b; padding:8px 0; border-bottom:1px solid #e2e8f0; }
-th:nth-child(2),th:nth-child(3),th:nth-child(4) { text-align:right; }
-td { padding:10px 0; font-size:13px; border-bottom:1px solid #f1f5f9; }
-td:nth-child(2),td:nth-child(3),td:nth-child(4) { text-align:right; }
-td:nth-child(4) { font-weight:600; }
-.totals-area { display:flex; justify-content:flex-end; margin:8px 0 16px; }
-.totals-box { width:220px; }
-.t-row { display:flex; justify-content:space-between; padding:4px 0; font-size:13px; }
-.t-row span:first-child { color:#64748b; }
-.t-row.big { border-top:2px solid #0F172A; padding-top:8px; margin-top:4px; font-size:17px; font-weight:800; }
-.notes-box { background:#f8fafc; border-radius:10px; padding:14px 18px; margin-bottom:16px; }
-.notes-label { font-size:11px; color:#94a3b8; font-weight:500; }
-.notes-text { font-size:12px; color:#374151; margin-top:4px; }
-.sig-box { background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:14px 18px; margin-bottom:16px; display:flex; align-items:center; gap:10px; }
-.sig-icon { color:#16a34a; font-size:18px; }
-.sig-text { font-size:13px; font-weight:600; color:#166534; }
-.sig-detail { font-size:11px; color:#22c55e; }
-.actions { display:flex; flex-direction:column; gap:8px; }
-.btn-pay { width:100%; padding:14px; background:#16a34a; color:#fff; border:none; border-radius:10px; font-size:15px; font-weight:700; text-align:center; display:flex; align-items:center; justify-content:center; gap:8px; }
-.btn-action { flex:1; padding:10px; border:1px solid #e2e8f0; border-radius:10px; font-size:13px; font-weight:600; text-align:center; background:#fff; display:flex; align-items:center; justify-content:center; gap:6px; }
-.btn-action.refuse { border-color:#fecaca; color:#dc2626; }
-.btn-row { display:flex; gap:8px; }
-.footer { text-align:center; padding:12px; font-size:11px; color:#94a3b8; }
+.layout { display:flex; height:100%; }
+.sidebar { width:220px; border-right:1px solid #e2e8f0; background:#fff; display:flex; flex-direction:column; }
+.sidebar-logo { display:flex; align-items:center; gap:8px; padding:16px 20px; border-bottom:1px solid #e2e8f0; }
+.sidebar-logo .icon { width:28px; height:28px; background:#6366F1; border-radius:8px; }
+.sidebar-logo span { font-size:18px; font-weight:800; }
+.nav { padding:12px 12px; flex:1; }
+.nav-section { font-size:10px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#94A3B8; padding:16px 12px 4px; }
+.nav-item { display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:0 8px 8px 0; font-size:13px; font-weight:500; color:#64748b; margin:1px 0; border-left:3px solid transparent; }
+.nav-item.active { background:#F3F0FF; color:#5B5BD6; border-left-color:#5B5BD6; font-weight:600; }
+.nav-item .dot { width:15px; }
+.user-bottom { padding:12px 16px; border-top:1px solid #e2e8f0; display:flex; align-items:center; gap:10px; }
+.avatar { width:32px; height:32px; border-radius:50%; background:#EDE9FE; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#6366F1; }
+.user-name { font-size:12px; font-weight:600; } .user-email { font-size:10px; color:#94a3b8; }
+.main { flex:1; padding:24px 28px; position:relative; }
+.main h1 { font-size:22px; font-weight:700; margin-bottom:16px; }
+.devis-table { width:100%; border-collapse:collapse; }
+.devis-table th { text-align:left; font-size:11px; font-weight:600; color:#64748b; padding:10px 12px; border-bottom:1px solid #e2e8f0; }
+.devis-table td { padding:12px; font-size:13px; border-bottom:1px solid #f1f5f9; }
+.devis-table tr:hover { background:#f8fafc; }
+.badge { display:inline-flex; padding:3px 10px; border-radius:6px; font-size:10px; font-weight:600; }
+.badge-sent { background:#dbeafe; color:#2563eb; }
+.badge-signed { background:#dcfce7; color:#16a34a; }
+.badge-draft { background:#f1f5f9; color:#64748b; }
+.badge-paid { background:#f3e8ff; color:#7c3aed; }
+/* Modal overlay */
+.overlay { position:absolute; inset:0; background:rgba(0,0,0,0.4); display:flex; align-items:center; justify-content:center; z-index:100; backdrop-filter:blur(2px); }
+.modal { background:#fff; border-radius:16px; padding:32px; width:460px; box-shadow:0 20px 60px rgba(0,0,0,0.2); position:relative; }
+.modal-title { font-size:18px; font-weight:700; margin-bottom:20px; }
+.modal-close { position:absolute; top:16px; right:16px; width:28px; height:28px; border-radius:50%; border:1px solid #e2e8f0; background:#fff; display:flex; align-items:center; justify-content:center; font-size:14px; color:#64748b; cursor:pointer; }
+.link-box { display:flex; align-items:center; gap:8px; padding:12px 16px; border:2px solid #6366F1; border-radius:10px; background:#f8f7ff; margin-bottom:20px; }
+.link-box input { flex:1; border:none; background:transparent; font-size:13px; color:#6366F1; font-weight:500; outline:none; font-family:monospace; }
+.link-box .copy-btn { width:32px; height:32px; border-radius:8px; border:1px solid #e2e8f0; background:#fff; display:flex; align-items:center; justify-content:center; font-size:14px; cursor:pointer; }
+.share-btns { display:flex; gap:12px; }
+.share-btn { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; padding:16px; border:1px solid #e2e8f0; border-radius:12px; background:#fff; cursor:pointer; transition:border-color 0.15s; }
+.share-btn:hover { border-color:#6366F1; }
+.share-btn .icon-circle { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; }
+.share-btn .label { font-size:12px; font-weight:600; color:#374151; }
+.share-hint { text-align:center; margin-top:16px; font-size:12px; color:#94a3b8; }
 </style></head><body>
-<div class="page">
-  <div class="page-header">
-    <div class="logo"><div class="icon"></div><span>Devizly</span></div>
-    <div class="status">Envoyé</div>
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-logo"><div class="icon"></div><span>Devizly</span></div>
+    <div class="nav">
+      <div class="nav-item"><span class="dot">📊</span> Dashboard</div>
+      <div class="nav-item"><span class="dot">⚡</span> Briefing IA</div>
+      <div class="nav-section">COMMERCIAL</div>
+      <div class="nav-item active"><span class="dot">📄</span> Devis</div>
+      <div class="nav-item"><span class="dot">📋</span> Templates</div>
+      <div class="nav-item"><span class="dot">🔄</span> Pipeline</div>
+      <div class="nav-section">FINANCES</div>
+      <div class="nav-item"><span class="dot">🧾</span> Factures</div>
+      <div class="nav-section">CLIENTS</div>
+      <div class="nav-item"><span class="dot">👥</span> Clients</div>
+    </div>
+    <div class="user-bottom"><div class="avatar">DZ</div><div><div class="user-name">Devizly Demo</div><div class="user-email">demo@devizly.fr</div></div></div>
   </div>
-  <div class="page-body">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-      <div><div class="quote-title">Renovation cuisine professionnelle</div><div class="quote-ref">Devis n° DEV-0009 — 07/03/2026</div></div>
-      <div class="valid">Valide jusqu'au 01/05/2026</div>
+  <div class="main">
+    <h1>Devis</h1>
+    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
+      <table class="devis-table">
+        <thead><tr><th>Numéro</th><th>Titre</th><th>Client</th><th style="text-align:right;">Montant TTC</th><th>Statut</th><th>Date</th></tr></thead>
+        <tbody>
+          <tr><td style="font-family:monospace;font-size:12px;">DEV-0009</td><td style="font-weight:600;">Renovation cuisine pro</td><td>Restaurant Le Gourmet</td><td style="text-align:right;font-weight:600;">30 720,00 €</td><td><span class="badge badge-sent">Envoyé</span></td><td style="color:#64748b;">07/03/2026</td></tr>
+          <tr><td style="font-family:monospace;font-size:12px;">DEV-0008</td><td style="font-weight:600;">Aménagement bureau cabinet</td><td>Sophie Laurent</td><td style="text-align:right;font-weight:600;">14 592,00 €</td><td><span class="badge badge-signed">Signé</span></td><td style="color:#64748b;">05/03/2026</td></tr>
+          <tr style="opacity:0.6;"><td style="font-family:monospace;font-size:12px;">DEV-0007</td><td style="font-weight:600;">Site e-commerce Shopify</td><td>Martin Dupont</td><td style="text-align:right;font-weight:600;">9 350,00 €</td><td><span class="badge badge-sent">Envoyé</span></td><td style="color:#64748b;">03/03/2026</td></tr>
+          <tr style="opacity:0.6;"><td style="font-family:monospace;font-size:12px;">DEV-0006</td><td style="font-weight:600;">Landing page SaaS</td><td>Emma Moreau</td><td style="text-align:right;font-weight:600;">2 400,00 €</td><td><span class="badge badge-paid">Payé</span></td><td style="color:#64748b;">28/02/2026</td></tr>
+          <tr style="opacity:0.5;"><td style="font-family:monospace;font-size:12px;">DEV-0005</td><td style="font-weight:600;">Dashboard analytics</td><td>Tech Solutions SAS</td><td style="text-align:right;font-weight:600;">5 800,00 €</td><td><span class="badge badge-signed">Signé</span></td><td style="color:#64748b;">25/02/2026</td></tr>
+        </tbody>
+      </table>
     </div>
-    <div class="client-box">
-      <div class="client-label">Client</div>
-      <div class="client-name">Restaurant Le Gourmet</div>
-      <div class="client-detail">contact@legourmet-paris.fr</div>
-      <div class="client-detail">8 Rue du Commerce, 33000 Bordeaux</div>
-    </div>
-    <table>
-      <thead><tr><th style="width:50%;">Description</th><th>Qté</th><th>Prix unit.</th><th>Total</th></tr></thead>
-      <tbody>
-        <tr><td>Plan de travail inox professionnel (6m linéaire)</td><td>1</td><td>4 800,00 €</td><td>4 800,00 €</td></tr>
-        <tr><td>Hotte extraction industrielle</td><td>1</td><td>5 200,00 €</td><td>5 200,00 €</td></tr>
-        <tr><td>Installation gaz + raccordements</td><td>1</td><td>3 600,00 €</td><td>3 600,00 €</td></tr>
-        <tr><td>Revêtement sol antidérapant</td><td>35</td><td>120,00 €</td><td>4 200,00 €</td></tr>
-        <tr><td>Plonge double bac + lave-vaisselle pro</td><td>1</td><td>4 800,00 €</td><td>4 800,00 €</td></tr>
-        <tr><td>Mise aux normes électrique</td><td>1</td><td>3 000,00 €</td><td>3 000,00 €</td></tr>
-      </tbody>
-    </table>
-    <div class="totals-area"><div class="totals-box">
-      <div class="t-row"><span>Total HT</span><span>25 600,00 €</span></div>
-      <div class="t-row"><span>TVA (20%)</span><span>5 120,00 €</span></div>
-      <div class="t-row big"><span>Total TTC</span><span>30 720,00 €</span></div>
-    </div></div>
-    <div class="notes-box"><div class="notes-label">Notes</div><div class="notes-text">En attente validation chef cuisinier pour plan définitif.</div></div>
-    <div class="actions">
-      <div class="btn-action" style="width:100%;border-color:#e2e8f0;padding:12px;">⬇️ Télécharger PDF</div>
-      <div class="btn-pay">💳 Payer 30 720,00 € maintenant</div>
-      <div class="btn-row">
-        <div class="btn-action" style="flex:1;">✍️ Accepter et signer</div>
-        <div class="btn-action refuse" style="flex:1;">✕ Refuser</div>
+    <!-- Share modal overlay -->
+    <div class="overlay">
+      <div class="modal">
+        <div class="modal-title">Partager le devis</div>
+        <div class="modal-close">✕</div>
+        <div class="link-box">
+          <input value="https://devizly.fr/devis/a3f8c2e1-9d7b-4e5f..." readonly />
+          <div class="copy-btn">📋</div>
+        </div>
+        <div class="share-btns">
+          <div class="share-btn">
+            <div class="icon-circle" style="background:#dcfce7;color:#16a34a;">💬</div>
+            <span class="label">WhatsApp</span>
+          </div>
+          <div class="share-btn" style="border-color:#6366F1;background:#f8f7ff;">
+            <div class="icon-circle" style="background:#dbeafe;color:#2563eb;">✉️</div>
+            <span class="label">Email</span>
+          </div>
+          <div class="share-btn">
+            <div class="icon-circle" style="background:#fef3c7;color:#d97706;">💬</div>
+            <span class="label">SMS</span>
+          </div>
+        </div>
+        <div class="share-hint">Le client pourra consulter, accepter ou refuser le devis en ligne.</div>
       </div>
     </div>
   </div>
-  <div class="footer">Propulsé par Devizly</div>
 </div>
 </body></html>`;
 

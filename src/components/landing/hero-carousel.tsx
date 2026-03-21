@@ -13,9 +13,9 @@ const slides = [
   },
   {
     src: "/landing-screens/hero-signature.webp",
-    alt: "Signature électronique mobile — le client signe et paie depuis son téléphone",
-    label: "Votre client signe et paie en 1 clic depuis son mobile",
-    url: "devizly.fr/devis/signature",
+    alt: "Partage du devis — envoyez par lien, WhatsApp, Email ou SMS",
+    label: "Partagez par lien, WhatsApp, Email ou SMS en un clic",
+    url: "devizly.fr/devis",
   },
   {
     src: "/landing-screens/hero-pipeline.webp",

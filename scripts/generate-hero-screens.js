@@ -78,8 +78,8 @@ const slide1 = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${BASE}
       <div class="nav-item"><span class="dot">👥</span> Clients</div>
     </div>
     <div class="user-bottom">
-      <div class="avatar">HC</div>
-      <div><div class="user-name">Haroun Chikh</div><div class="user-email">harounchikh71@gmail.com</div></div>
+      <div class="avatar">DZ</div>
+      <div><div class="user-name">Devizly Demo</div><div class="user-email">demo@devizly.fr</div></div>
     </div>
   </div>
   <div class="main">
@@ -157,8 +157,8 @@ const slide1 = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${BASE}
    Reproduces: the real /devis/[token] share page
    ═══════════════════════════════════════════════════ */
 const slide2 = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${BASE}
-body { background:#f8fafc; display:flex; justify-content:center; padding:24px 0; }
-.page { width:680px; background:#fff; border-radius:12px; border:1px solid #e2e8f0; box-shadow:0 4px 24px rgba(0,0,0,0.06); overflow:hidden; }
+body { background:#f8fafc; display:flex; justify-content:center; align-items:flex-start; padding:8px 0; }
+.page { width:680px; background:#fff; border-radius:12px; border:1px solid #e2e8f0; box-shadow:0 4px 24px rgba(0,0,0,0.06); overflow:hidden; transform:scale(0.76); transform-origin:top center; }
 .page-header { padding:20px 28px; display:flex; align-items:center; justify-content:space-between; }
 .logo { display:flex; align-items:center; gap:6px; }
 .logo .icon { width:24px; height:24px; background:#6366F1; border-radius:6px; }
@@ -299,7 +299,7 @@ const slide3 = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${BASE}
       <div class="nav-section">CLIENTS</div>
       <div class="nav-item"><span class="dot">👥</span> Clients</div>
     </div>
-    <div class="user-bottom"><div class="avatar">HC</div><div><div class="user-name">Haroun Chikh</div><div class="user-email">harounchikh71@gmail.com</div></div></div>
+    <div class="user-bottom"><div class="avatar">DZ</div><div><div class="user-name">Devizly Demo</div><div class="user-email">demo@devizly.fr</div></div></div>
   </div>
   <div class="main">
     <h1>Pipeline</h1>

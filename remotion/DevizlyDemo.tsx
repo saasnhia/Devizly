@@ -198,11 +198,11 @@ function SceneTitle({
     >
       <p
         style={{
-          fontSize: 36,
+          fontSize: 48,
           fontWeight: 800,
           color: C.dark,
           fontFamily: font,
-          letterSpacing: -1.5,
+          letterSpacing: -2,
           margin: 0,
           opacity: titleProgress,
           transform: `translateY(${y}px)`,
@@ -213,11 +213,11 @@ function SceneTitle({
       {sub && (
         <p
           style={{
-            fontSize: 18,
+            fontSize: 24,
             fontWeight: 500,
             color: C.muted,
             fontFamily: font,
-            marginTop: 6,
+            marginTop: 8,
             opacity: subOpacity,
           }}
         >
@@ -235,7 +235,7 @@ function ScreenshotScene({
   windowTitle,
   imagePath,
   rotateDir = "right",
-  windowWidth = "92%",
+  windowWidth = "96%",
 }: {
   title: string;
   subtitle?: string;
@@ -456,8 +456,8 @@ function SceneAITyping() {
       <div
         style={{
           transform: `translateY(${y}px) scale(${scale})`,
-          width: "88%",
-          maxWidth: 860,
+          width: "96%",
+          maxWidth: 1100,
         }}
       >
         <MacWindow title="Devizly — Nouveau devis">
@@ -490,7 +490,7 @@ function SceneAITyping() {
                 text="Renovation complete d'une cuisine professionnelle pour un restaurant gastronomique a Bordeaux. Plan de travail inox 6m lineaire, hotte extraction industrielle, installation gaz et raccordements, revetement sol antiderapant 35m², plonge double bac avec lave-vaisselle pro, mise aux normes electrique."
                 delay={15}
                 style={{
-                  fontSize: 17,
+                  fontSize: 20,
                   color: C.dark,
                   fontFamily: font,
                   lineHeight: 1.6,
@@ -595,7 +595,7 @@ function SceneAITyping() {
                     justifyContent: "space-between",
                     padding: "10px 0",
                     borderBottom: "1px solid #F3F4F6",
-                    fontSize: 15,
+                    fontSize: 18,
                     fontFamily: font,
                     opacity: lineOpacity,
                     transform: `translateY(${lineY}px)`,
@@ -615,7 +615,7 @@ function SceneAITyping() {
                 display: "flex",
                 justifyContent: "space-between",
                 padding: "14px 0 8px",
-                fontSize: 20,
+                fontSize: 26,
                 fontFamily: font,
                 fontWeight: 800,
                 opacity: totalOpacity,
@@ -641,7 +641,7 @@ function SceneDashboard() {
       title="Tableau de bord complet"
       subtitle="CA, conversion, top clients — tout en un coup d'oeil"
       windowTitle="Devizly — Dashboard"
-      imagePath="marketing/Dashboard final.png"
+      imagePath="marketing/dashboard devizly.png"
       rotateDir="right"
     />
   );

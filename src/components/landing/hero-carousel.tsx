@@ -12,7 +12,7 @@ const slides = [
     url: "devizly.fr/devis/nouveau",
   },
   {
-    src: "/landing-screens/hero-signature.webp",
+    src: "/landing-screens/hero-share.webp",
     alt: "Partage du devis — envoyez par lien, WhatsApp, Email ou SMS",
     label: "Partagez par lien, WhatsApp, Email ou SMS en un clic",
     url: "devizly.fr/devis",

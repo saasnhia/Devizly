@@ -909,47 +909,26 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
             >
               <span className="text-xs font-bold tracking-[3px] text-blue-400">02</span>
 
-              {/* Mockup: Pipeline kanban */}
-              <div className="mt-4 overflow-hidden rounded-xl border border-white/10 bg-[#0f1428] p-3">
-                <div className="grid grid-cols-4 gap-1.5">
-                  {[
-                    { label: "Prospect", color: "bg-slate-500/30", items: ["Boulangerie Dupont"] },
-                    { label: "Envoyé", color: "bg-blue-500/30", items: ["Marie Petit", "Studio XYZ"] },
-                    { label: "Signé", color: "bg-violet-500/30", items: ["Atelier Bois"] },
-                    { label: "Payé", color: "bg-emerald-500/30", items: ["Cabinet Leroy"] },
-                  ].map((col) => (
-                    <div key={col.label}>
-                      <div className={`mb-1.5 rounded px-1.5 py-0.5 text-center text-[9px] font-semibold text-white ${col.color}`}>
-                        {col.label}
-                      </div>
-                      {col.items.map((item) => (
-                        <div
-                          key={item}
-                          className="mb-1 rounded-md border border-white/5 bg-white/[0.04] px-1.5 py-1 text-[9px] text-slate-400"
-                        >
-                          {item}
-                        </div>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-                {/* Animated card moving */}
-                <div className="mt-2 flex items-center gap-1 text-[9px] text-blue-400">
-                  <div className="h-px flex-1 bg-gradient-to-r from-blue-500/50 to-violet-500/50" />
-                  <span className="animate-pulse">Envoyé → Signé</span>
-                  <div className="h-px flex-1 bg-gradient-to-r from-violet-500/50 to-emerald-500/50" />
-                </div>
+              {/* Mockup: Share modal screenshot */}
+              <div className="mt-4 overflow-hidden rounded-xl border border-white/10">
+                <Image
+                  src="/landing-screens/hero-share.webp"
+                  alt="Modale de partage de devis — lien, WhatsApp, Email, SMS"
+                  width={700}
+                  height={390}
+                  className="w-full"
+                />
               </div>
 
               <h3 className="mt-5 text-xl font-bold text-white">
-                Envoyez en un clic
+                Partagez en 1 clic
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-slate-400">
-                Partagez par email, lien direct ou QR code. Suivez chaque devis
-                dans votre pipeline.
+                Lien, QR Code, Email ou WhatsApp. Le client consulte, signe ou
+                refuse en ligne.
               </p>
               <p className="mt-2 text-xs font-medium text-blue-400">
-                prospect → envoyé → signé → payé
+                envoyé → consulté → signé → payé
               </p>
             </motion.div>
 

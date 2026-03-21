@@ -653,10 +653,10 @@ function SceneDashboard() {
 function SceneDevisList() {
   return (
     <ScreenshotScene
-      title="Partagez en un clic"
-      subtitle="Lien, Email, WhatsApp ou SMS — le client consulte et signe en ligne"
-      windowTitle="Devizly — Partager le devis"
-      imagePath="landing-screens/hero-share.webp"
+      title="Vue client du devis"
+      subtitle="Votre client consulte, signe et paie depuis son navigateur"
+      windowTitle="Devizly — Devis envoye"
+      imagePath="landing-screens/hero-devis-client.webp"
       rotateDir="left"
     />
   );
@@ -782,10 +782,10 @@ function SceneShare() {
 function SceneClients() {
   return (
     <ScreenshotScene
-      title="Vue client du devis"
-      subtitle="Votre client consulte, signe et paie depuis son navigateur"
-      windowTitle="Devizly — Devis client"
-      imagePath="landing-screens/hero-devis-client.webp"
+      title="Relances automatiques"
+      subtitle="J+2, J+5, J+7 — vos clients sont relances sans effort"
+      windowTitle="Devizly — Relances"
+      imagePath="landing-screens/bento-relance.webp"
       rotateDir="left"
     />
   );

@@ -7,8 +7,8 @@ import { Building2, Loader2 } from "lucide-react";
 interface CompanyResult {
   nom_complet: string;
   siren: string;
-  siret: string;
   siege: {
+    siret: string;
     adresse: string;
     code_postal: string;
     libelle_commune: string;
@@ -152,7 +152,7 @@ export function CompanyAutocomplete({
 
     const data: CompanyData = {
       name: company.nom_complet,
-      siret: company.siret,
+      siret: siege.siret || "",
       siren: company.siren,
       address: addressParts || siege.adresse || "",
       city: siege.libelle_commune || "",
@@ -219,7 +219,7 @@ export function CompanyAutocomplete({
         <div className="absolute z-50 mt-1 w-full overflow-hidden rounded-xl border border-white/10 bg-slate-900/95 shadow-2xl shadow-black/40 backdrop-blur-xl">
           {results.map((company) => (
             <button
-              key={company.siret}
+              key={company.siege?.siret || company.siren}
               type="button"
               className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-white/5"
               onClick={() => handleSelect(company)}
@@ -232,7 +232,7 @@ export function CompanyAutocomplete({
                   {company.nom_complet}
                 </p>
                 <p className="mt-0.5 truncate text-xs text-slate-400">
-                  SIRET {company.siret}
+                  SIRET {company.siege?.siret || company.siren}
                   {company.siege?.libelle_commune && ` · ${company.siege.libelle_commune}`}
                 </p>
                 <p className="text-xs text-slate-500">

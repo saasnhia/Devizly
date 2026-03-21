@@ -162,7 +162,6 @@ export function CompanyAutocomplete({
     };
 
     onSelect(data);
-    onChange(data.name);
     setOpen(false);
     setResults([]);
   }

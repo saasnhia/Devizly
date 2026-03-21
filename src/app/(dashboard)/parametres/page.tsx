@@ -419,6 +419,11 @@ export default function ParametresPage() {
                     SNC: "SNC",
                   };
                   const lf = legalMap[c.legal_form] || "";
+                  const siren = c.siren?.replace(/\s/g, "") || "";
+                  const sirenFmt = siren.replace(/(\d{3})(\d{3})(\d{3})/, "$1 $2 $3");
+                  const rcs = c.city && siren
+                    ? `RCS ${c.city.toUpperCase()} B ${sirenFmt}`
+                    : "";
                   setProfile((prev) => ({
                     ...prev,
                     company_name: c.name,
@@ -426,6 +431,7 @@ export default function ParametresPage() {
                     company_address: [c.address, c.postal_code, c.city].filter(Boolean).join(", "),
                     tva_number: c.vat_number,
                     legal_form: lf || prev.legal_form,
+                    rcs_number: rcs || prev.rcs_number,
                   }));
                 }}
                 placeholder="Ma Société SAS"

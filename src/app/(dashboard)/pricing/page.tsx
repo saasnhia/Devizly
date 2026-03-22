@@ -112,7 +112,7 @@ const faqs = [
 const guarantees = [
   { icon: Shield, text: "Annulation à tout moment" },
   { icon: Zap, text: "Activation instantanée" },
-  { icon: Star, text: "Satisfait ou remboursé 30j" },
+  { icon: Star, text: "Satisfait ou remboursé 14 jours" },
 ];
 
 // BETA_MODE flag — set to "false" on Vercel before LinkedIn launch

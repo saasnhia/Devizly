@@ -107,14 +107,19 @@ export default function CGVPage() {
         est renouvelé automatiquement à chaque échéance mensuelle.
       </p>
 
-      <h2>6. Droit de rétractation</h2>
+      <h2>6. Garantie satisfait ou remboursé</h2>
       <p>
-        Conformément à l&apos;article L.221-28 du Code de la consommation,
-        le droit de rétractation ne s&apos;applique pas aux contrats de
-        fourniture de contenu numérique non fourni sur un support matériel dont
-        l&apos;exécution a commencé avec l&apos;accord préalable du
-        consommateur. En acceptant les CGV et en commençant à utiliser le
-        service, le client renonce expressément à son droit de rétractation.
+        Conformément au droit de rétractation européen, l&apos;utilisateur
+        bénéficie d&apos;une garantie satisfait ou remboursé de 14 jours à
+        compter de la date de souscription. Le remboursement intégral est
+        effectué sur simple demande à contact@devizly.fr, sans justification
+        nécessaire.
+      </p>
+      <p>
+        Passé ce délai de 14 jours, conformément à l&apos;article L.221-28
+        du Code de la consommation, le droit de rétractation ne s&apos;applique
+        plus aux contrats de fourniture de contenu numérique dont
+        l&apos;exécution a commencé avec l&apos;accord du consommateur.
       </p>
 
       <h2>7. Résiliation</h2>

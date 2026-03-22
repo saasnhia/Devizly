@@ -11,7 +11,6 @@ import CountUp from "react-countup";
 import confetti from "canvas-confetti";
 import { DevizlyLogo } from "@/components/devizly-logo";
 import { HeroCarousel } from "@/components/landing/hero-carousel";
-import { BlurText } from "@/components/landing/blur-text";
 import { BetaBanner } from "@/components/landing/beta-banner";
 import {
   Sparkles,
@@ -393,9 +392,6 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
     });
   }, []);
 
-  // BETA_MODE — set to "false" on Vercel before launch
-  // When true: shows "BÊTA" badge next to logo in navbar
-  // When false: clean production navbar
   const isBeta = process.env.NEXT_PUBLIC_BETA_MODE === "true";
 
   return (
@@ -543,8 +539,8 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
           >
             {/* Badge */}
             <motion.div variants={fadeUp}>
-              <span className="liquid-glass inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-medium text-violet-200">
-                <Sparkles className="h-3.5 w-3.5 text-violet-400" />
+              <span className="inline-flex items-center gap-2 rounded-full border border-violet-500/30 bg-violet-500/10 px-4 py-1.5 text-sm text-violet-300">
+                <Sparkles className="h-3.5 w-3.5" />
                 {copy ? copy.badge : "Propulsé par l\u2019IA Mistral — hébergée en France"}
               </span>
             </motion.div>
@@ -564,11 +560,11 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
                 </>
               ) : (
                 <>
-                  <BlurText text="Créez des devis." delay={0.2} />
+                  Créez des devis.{" "}
                   <br className="hidden sm:block" />
-                  <BlurText text="Signez. Encaissez." delay={0.6} />{" "}
+                  Signez. Encaissez.{" "}
                   <span className="bg-gradient-to-r from-violet-400 via-indigo-400 to-emerald-400 bg-clip-text text-transparent">
-                    <BlurText text="En 30 secondes." delay={1.0} />
+                    En 2 minutes.
                   </span>
                 </>
               )}
@@ -606,24 +602,23 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
               </button>
             </motion.div>
 
-            {/* Trust indicators — liquid glass pills */}
+            {/* Trust indicators */}
             <motion.div
               variants={fadeUp}
-              className="mt-8 flex flex-wrap items-center justify-center gap-3"
+              className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-slate-500"
             >
-              {[
-                { icon: "🚀", text: "Mistral France" },
-                { icon: "🔒", text: "Stripe sécurisé" },
-                { icon: "🇫🇷", text: "RGPD conforme" },
-              ].map((t) => (
-                <span
-                  key={t.text}
-                  className="liquid-glass inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-medium text-slate-300"
-                >
-                  <span>{t.icon}</span>
-                  {t.text}
-                </span>
-              ))}
+              <span className="flex items-center gap-1.5">
+                <Check className="h-3.5 w-3.5 text-emerald-500" />
+                Sans carte bancaire
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Check className="h-3.5 w-3.5 text-emerald-500" />
+                Plan gratuit inclus
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Check className="h-3.5 w-3.5 text-emerald-500" />
+                Annulable à tout moment
+              </span>
             </motion.div>
           </motion.div>
 
@@ -642,41 +637,37 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
       {/* ══════════════════════════════════════════════
           LOGO TICKER (professions)
           ══════════════════════════════════════════════ */}
-      <section className="border-y border-white/5 bg-white/[0.02] py-10">
-        <div className="mx-auto max-w-4xl px-4 text-center">
-          {/* Partners bar */}
-          <span className="liquid-glass inline-flex items-center rounded-full px-4 py-1.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-400">
-            Propulsé par
-          </span>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
-            {["Mistral AI", "Stripe", "Vercel", "Supabase"].map((name) => (
-              <span
-                key={name}
-                className="text-lg font-bold italic text-slate-500/60 transition-colors hover:text-slate-300"
-              >
-                {name}
-              </span>
-            ))}
-          </div>
-
-          {/* Professions ticker */}
-          <p className="mt-8 text-center text-xs font-medium uppercase tracking-widest text-slate-600">
+      <section className="border-y border-white/5 bg-white/[0.02] py-8">
+        <div className="mx-auto max-w-6xl px-4">
+          <p className="mb-6 text-center text-xs font-medium uppercase tracking-widest text-slate-500">
             Utilisé par les indépendants de tous métiers
           </p>
-          <div className="relative mt-3 overflow-hidden">
+          <div className="relative overflow-hidden">
+            {/* Fade edges */}
             <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-[#0A0A0F] to-transparent" />
             <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-[#0A0A0F] to-transparent" />
-            <div className="animate-ticker flex gap-10 whitespace-nowrap">
+
+            <div className="animate-ticker flex gap-12 whitespace-nowrap">
               {[...professions, ...professions].map((p, i) => (
-                <span key={i} className="text-sm font-medium text-slate-600">{p}</span>
+                <span
+                  key={i}
+                  className="text-sm font-medium text-slate-500/70"
+                >
+                  {p}
+                </span>
               ))}
             </div>
           </div>
         </div>
+
         <style jsx>{`
           @keyframes ticker {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
+            0% {
+              transform: translateX(0);
+            }
+            100% {
+              transform: translateX(-50%);
+            }
           }
           .animate-ticker {
             animation: ticker 30s linear infinite;
@@ -696,7 +687,7 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
           className="mx-auto grid max-w-4xl grid-cols-2 gap-8 px-4 sm:grid-cols-4 sm:px-6"
         >
           {stats.map((stat) => (
-            <motion.div key={stat.label} variants={fadeUp} className="liquid-glass-strong rounded-2xl px-6 py-6 text-center">
+            <motion.div key={stat.label} variants={fadeUp} className="text-center">
               <p className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
                 {statsInView ? (
                   <CountUp
@@ -708,7 +699,7 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
                   `0${stat.suffix}`
                 )}
               </p>
-              <p className="mt-2 text-sm text-slate-400">{stat.label}</p>
+              <p className="mt-2 text-sm text-slate-500">{stat.label}</p>
             </motion.div>
           ))}
         </motion.div>

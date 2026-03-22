@@ -41,7 +41,6 @@ export const metadata: Metadata = {
     "créer facture en ligne gratuit",
   ],
   metadataBase: new URL(SITE_URL),
-  alternates: { canonical: "https://devizly.fr" },
   robots: {
     index: true,
     follow: true,

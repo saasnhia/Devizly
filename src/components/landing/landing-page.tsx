@@ -11,6 +11,7 @@ import CountUp from "react-countup";
 import confetti from "canvas-confetti";
 import { DevizlyLogo } from "@/components/devizly-logo";
 import { HeroCarousel } from "@/components/landing/hero-carousel";
+import { DemoSection } from "@/components/landing/demo-section";
 import { BetaBanner } from "@/components/landing/beta-banner";
 import {
   Sparkles,
@@ -704,6 +705,11 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
           ))}
         </motion.div>
       </section>
+
+      {/* ══════════════════════════════════════════════
+          DEMO INTERACTIVE
+          ══════════════════════════════════════════════ */}
+      <DemoSection />
 
       {/* ══════════════════════════════════════════════
           BENTO FEATURES

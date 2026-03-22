@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Sparkles, Loader2, ArrowRight, Lock } from "lucide-react";
 
 const DEMO_METIERS = [
@@ -16,6 +17,7 @@ const DEMO_METIERS = [
   { value: "redacteur", label: "Rédacteur / Copywriter", icon: "✍️" },
   { value: "coach", label: "Coach / Formateur", icon: "🎯" },
   { value: "artisan", label: "Artisan du bâtiment", icon: "🏗️" },
+  { value: "autre", label: "Autre métier", icon: "✏️" },
 ];
 
 const PLACEHOLDERS: Record<string, string> = {
@@ -63,6 +65,7 @@ function fmt(n: number): string {
 
 export function DemoSection() {
   const [metier, setMetier] = useState("");
+  const [customMetier, setCustomMetier] = useState("");
   const [description, setDescription] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [quote, setQuote] = useState<DemoQuote | null>(null);
@@ -70,8 +73,10 @@ export function DemoSection() {
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [remaining, setRemaining] = useState(3);
 
+  const effectiveMetier = metier === "autre" ? customMetier.trim() : metier;
+
   async function handleGenerate() {
-    if (!metier || description.trim().length < 10) return;
+    if (!effectiveMetier || description.trim().length < 10) return;
 
     setIsGenerating(true);
     setError(null);
@@ -81,7 +86,7 @@ export function DemoSection() {
       const res = await fetch("/api/demo/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ metier, description }),
+        body: JSON.stringify({ metier: effectiveMetier, description }),
       });
 
       const data = await res.json();
@@ -109,7 +114,7 @@ export function DemoSection() {
   }
 
   const canGenerate =
-    metier && description.trim().length >= 10 && !isGenerating;
+    !!effectiveMetier && description.trim().length >= 10 && !isGenerating;
 
   return (
     <section id="demo" className="py-20 sm:py-28">
@@ -157,6 +162,16 @@ export function DemoSection() {
                   </button>
                 ))}
               </div>
+              {metier === "autre" && (
+                <Input
+                  type="text"
+                  placeholder="Décrivez votre métier (ex: photographe, coach, maçon...)"
+                  value={customMetier}
+                  onChange={(e) => setCustomMetier(e.target.value)}
+                  maxLength={50}
+                  className="mt-2 border-white/10 bg-white/[0.03] text-white placeholder:text-slate-500"
+                />
+              )}
             </div>
 
             {/* Description */}
@@ -328,6 +343,11 @@ export function DemoSection() {
                     </div>
                   </div>
                 </div>
+
+                <p className="mt-2 rounded-lg border border-violet-500/20 bg-violet-500/10 px-3 py-2 text-xs text-violet-300">
+                  ✏️ Tout est modifiable — montants, lignes, conditions — une
+                  fois votre compte créé.
+                </p>
 
                 {/* Lines */}
                 <div className="mb-6">

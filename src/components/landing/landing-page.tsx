@@ -393,6 +393,9 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
     });
   }, []);
 
+  // BETA_MODE — set to "false" on Vercel before launch
+  // When true: shows "BÊTA" badge next to logo in navbar
+  // When false: clean production navbar
   const isBeta = process.env.NEXT_PUBLIC_BETA_MODE === "true";
 
   return (

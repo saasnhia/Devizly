@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 
+// BETA_MODE flag — set to "false" on Vercel before LinkedIn launch
+// When true: shows dismissible amber beta banner at top of landing page
+// When false: banner hidden, production mode
 const IS_BETA = process.env.NEXT_PUBLIC_BETA_MODE === "true";
 
 export function BetaBanner() {

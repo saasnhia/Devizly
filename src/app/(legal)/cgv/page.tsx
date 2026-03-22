@@ -90,7 +90,7 @@ export default function CGVPage() {
           </tr>
           <tr>
             <td>Business</td>
-            <td>49 €</td>
+            <td>39 €</td>
             <td>Illimité, facturation récurrente, leads, support prioritaire</td>
           </tr>
         </tbody>

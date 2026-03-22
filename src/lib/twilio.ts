@@ -2,6 +2,11 @@ import twilio from "twilio";
 
 let _client: ReturnType<typeof twilio> | null = null;
 
+const twilioConfigured =
+  !!process.env.TWILIO_ACCOUNT_SID &&
+  !!process.env.TWILIO_AUTH_TOKEN &&
+  !!process.env.TWILIO_PHONE_NUMBER;
+
 export function getTwilioClient() {
   if (!_client) {
     const accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -31,11 +36,12 @@ export function canSendSms(plan: string, smsUsed: number): boolean {
 }
 
 export async function sendSms(to: string, body: string): Promise<boolean> {
-  const fromPhone = process.env.TWILIO_PHONE_NUMBER;
-  if (!fromPhone) {
-    console.error("[SMS] TWILIO_PHONE_NUMBER not configured");
+  if (!twilioConfigured) {
+    console.info("[SMS] Twilio not configured — skipping SMS send");
     return false;
   }
+
+  const fromPhone = process.env.TWILIO_PHONE_NUMBER!;
 
   try {
     const client = getTwilioClient();

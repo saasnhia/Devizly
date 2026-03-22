@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getStripe } from "@/lib/stripe";
 import { getSiteUrl } from "@/lib/url";
+import { checkRateLimit } from "@/lib/ratelimit";
 
 /**
  * GET /api/stripe/checkout-redirect?priceId=xxx
@@ -9,6 +10,9 @@ import { getSiteUrl } from "@/lib/url";
  * Used after Google OAuth signup with a plan selected.
  */
 export async function GET(request: Request) {
+  const limited = await checkRateLimit(request);
+  if (limited) return limited;
+
   const { searchParams } = new URL(request.url);
   const priceId = searchParams.get("priceId");
   const appUrl = getSiteUrl();

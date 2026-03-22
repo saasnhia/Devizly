@@ -103,7 +103,7 @@ const softwareSchema = {
   offers: {
     "@type": "AggregateOffer",
     lowPrice: "0",
-    highPrice: "49",
+    highPrice: "39",
     priceCurrency: "EUR",
   },
   description:

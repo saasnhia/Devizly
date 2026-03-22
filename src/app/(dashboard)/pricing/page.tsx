@@ -115,6 +115,9 @@ const guarantees = [
   { icon: Star, text: "Satisfait ou remboursé 30j" },
 ];
 
+// BETA_MODE flag — set to "false" on Vercel before LinkedIn launch
+// When true: Pro/Business plan buttons disabled, "Bientôt disponible" shown
+// When false: normal production behavior, users can subscribe
 const IS_BETA = process.env.NEXT_PUBLIC_BETA_MODE === "true";
 
 /* ── Component ───────────────────────────────────── */

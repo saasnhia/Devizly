@@ -59,6 +59,7 @@ export default function OnboardingWizard() {
   const [calendlyUrl, setCalendlyUrl] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
   const [stripeStatus, setStripeStatus] = useState("not_connected");
+  const [userPlan, setUserPlan] = useState<string>("free");
   const [demoClientId, setDemoClientId] = useState<string | null>(null);
 
   // Load profile data and detect return from Stripe Connect
@@ -73,9 +74,13 @@ export default function OnboardingWizard() {
 
     const { data: profile } = await supabase
       .from("profiles")
-      .select("stripe_connect_status, calendly_url, onboarding_completed")
+      .select("stripe_connect_status, calendly_url, onboarding_completed, subscription_status")
       .eq("id", user.id)
       .single();
+
+    if (profile?.subscription_status) {
+      setUserPlan(profile.subscription_status);
+    }
 
     if (profile?.onboarding_completed) {
       router.push("/dashboard");
@@ -280,40 +285,74 @@ export default function OnboardingWizard() {
           <div className="space-y-4">
             {step === 1 && (
               <>
-                {stripeConnected ? (
-                  <div className="flex items-center justify-center gap-2 rounded-xl border border-green-200 bg-green-50 p-4 text-green-700">
-                    <Check className="h-5 w-5" />
-                    <span className="font-medium">
-                      Stripe {stripeStatus === "connected" ? "connecté" : "en cours de vérification"}
-                    </span>
+                {userPlan === "free" ? (
+                  /* Free tier: skip Stripe, show discovery step */
+                  <div className="space-y-4">
+                    <div className="rounded-xl bg-violet-50 border border-violet-200 p-5 text-center">
+                      <p className="text-sm text-slate-600 mb-3">
+                        Avec le plan gratuit, vous pouvez créer jusqu&apos;à 3 devis par mois.
+                        La connexion Stripe sera disponible avec le plan Pro.
+                      </p>
+                      <div className="rounded-lg bg-white border border-violet-100 p-4 text-left text-sm">
+                        <p className="font-semibold text-violet-600 mb-2">Avec le plan Pro à 19€/mois</p>
+                        <ul className="space-y-1 text-slate-500">
+                          <li>→ Acomptes 30%/50% encaissés automatiquement</li>
+                          <li>→ Relances automatiques J+2, J+5, J+7</li>
+                          <li>→ Signature électronique eIDAS</li>
+                        </ul>
+                      </div>
+                    </div>
+                    <Button
+                      size="lg"
+                      className="w-full h-14 text-lg font-semibold"
+                      onClick={() => setStep(2)}
+                    >
+                      Continuer
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Button>
                   </div>
                 ) : (
-                  <Button
-                    size="lg"
-                    className={`w-full h-14 text-lg font-semibold bg-gradient-to-r ${currentStep.gradient} hover:opacity-90 transition-opacity`}
-                    onClick={handleStripeConnect}
-                  >
-                    <CreditCard className="mr-2 h-5 w-5" />
-                    Connecter Stripe
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
+                  /* Pro/Business: Stripe Connect required */
+                  <>
+                    {stripeConnected ? (
+                      <div className="flex items-center justify-center gap-2 rounded-xl border border-green-200 bg-green-50 p-4 text-green-700">
+                        <Check className="h-5 w-5" />
+                        <span className="font-medium">
+                          Stripe {stripeStatus === "connected" ? "connecté" : "en cours de vérification"}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <Button
+                          size="lg"
+                          className={`w-full h-14 text-lg font-semibold bg-gradient-to-r ${currentStep.gradient} hover:opacity-90 transition-opacity`}
+                          onClick={handleStripeConnect}
+                        >
+                          <CreditCard className="mr-2 h-5 w-5" />
+                          Connecter Stripe
+                          <ArrowRight className="ml-2 h-5 w-5" />
+                        </Button>
+                        <p className="text-xs text-center text-amber-600">
+                          Stripe est requis pour encaisser vos acomptes avec le plan {userPlan === "business" ? "Business" : "Pro"}.
+                        </p>
+                      </div>
+                    )}
+                    <Button
+                      variant="ghost"
+                      className="w-full text-muted-foreground"
+                      onClick={() => setStep(2)}
+                    >
+                      {stripeConnected ? (
+                        <>Continuer <ArrowRight className="ml-1 h-4 w-4" /></>
+                      ) : (
+                        <>
+                          <SkipForward className="mr-1 h-4 w-4" />
+                          Configurer plus tard
+                        </>
+                      )}
+                    </Button>
+                  </>
                 )}
-                <Button
-                  variant="ghost"
-                  className="w-full text-muted-foreground"
-                  onClick={() => setStep(2)}
-                >
-                  {stripeConnected ? (
-                    <>
-                      Continuer <ArrowRight className="ml-1 h-4 w-4" />
-                    </>
-                  ) : (
-                    <>
-                      <SkipForward className="mr-1 h-4 w-4" />
-                      Passer pour le moment
-                    </>
-                  )}
-                </Button>
               </>
             )}
 

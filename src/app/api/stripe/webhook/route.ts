@@ -56,7 +56,7 @@ export async function POST(request: Request) {
       if (session.metadata?.invoice_payment === "true") {
         const invoiceNumber = session.metadata.invoice_number;
         if (invoiceNumber) {
-          await supabase
+          const { error: invErr } = await supabase
             .from("invoices")
             .update({
               status: "paid",
@@ -64,6 +64,7 @@ export async function POST(request: Request) {
               stripe_payment_intent_id: (session.payment_intent as string) || null,
             })
             .eq("invoice_number", invoiceNumber);
+          if (invErr) console.error("[Webhook] Invoice update failed:", { invoiceNumber, error: invErr.message });
         }
         break;
       }
@@ -83,7 +84,7 @@ export async function POST(request: Request) {
             ? parseInt(session.metadata.deposit_percent, 10)
             : null;
 
-          await supabase
+          const { error: quoteErr } = await supabase
             .from("quotes")
             .update({
               status: "payé",
@@ -93,6 +94,7 @@ export async function POST(request: Request) {
               ...(depositPercent ? { deposit_paid_at: new Date().toISOString() } : {}),
             })
             .eq("id", quoteId);
+          if (quoteErr) console.error("[Webhook] Quote payment update failed:", { quoteId, error: quoteErr.message });
 
           // Automation: auto-generate paid invoice receipt (non-blocking)
           if (quoteData?.user_id) {
@@ -183,7 +185,7 @@ export async function POST(request: Request) {
       const priceId = subscription.items.data[0]?.price?.id || "";
       const plan = planFromPriceId(priceId);
 
-      await supabase
+      const { error: subErr } = await supabase
         .from("profiles")
         .update({
           subscription_status: plan,
@@ -191,6 +193,7 @@ export async function POST(request: Request) {
           stripe_customer_id: session.customer as string,
         })
         .eq("id", userId);
+      if (subErr) console.error("[Webhook] Subscription activation failed:", { userId, plan, error: subErr.message });
       break;
     }
 
@@ -202,13 +205,14 @@ export async function POST(request: Request) {
         ? planFromPriceId(priceId)
         : "free";
 
-      await supabase
+      const { error: updErr } = await supabase
         .from("profiles")
         .update({
           subscription_status: plan,
           subscription_id: subscription.id,
         })
         .eq("stripe_customer_id", customerId);
+      if (updErr) console.error("[Webhook] Subscription update failed:", { customerId, plan, error: updErr.message });
       break;
     }
 
@@ -216,7 +220,7 @@ export async function POST(request: Request) {
       const subscription = event.data.object as Stripe.Subscription;
       const customerId = subscription.customer as string;
 
-      await supabase
+      const { error: delErr } = await supabase
         .from("profiles")
         .update({
           subscription_status: "free",
@@ -224,6 +228,7 @@ export async function POST(request: Request) {
           devis_used: 0,
         })
         .eq("stripe_customer_id", customerId);
+      if (delErr) console.error("[Webhook] Subscription deletion failed:", { customerId, error: delErr.message });
       break;
     }
 

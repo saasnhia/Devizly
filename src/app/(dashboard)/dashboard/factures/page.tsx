@@ -32,11 +32,15 @@ export default async function FacturesPage() {
   if (!user) redirect("/login");
 
   // Fetch invoices with client info
-  const { data: invoices } = await supabase
+  const { data: invoices, error: invoicesError } = await supabase
     .from("invoices")
     .select("*, clients(name, email)")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
+
+  if (invoicesError) {
+    console.error("[Factures] Fetch failed:", invoicesError.message);
+  }
 
   const allInvoices = (invoices || []).map((inv) => {
     const client = Array.isArray(inv.clients) ? inv.clients[0] : inv.clients;

@@ -2,8 +2,12 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getStripe } from "@/lib/stripe";
 import { getSiteUrl } from "@/lib/url";
+import { checkRateLimit } from "@/lib/ratelimit";
 
 export async function POST(request: Request) {
+  const limited = await checkRateLimit(request);
+  if (limited) return limited;
+
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 

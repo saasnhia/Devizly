@@ -1201,7 +1201,7 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
                   {plan.cta}
                 </Link>
                 <p className="mt-2 text-center text-xs text-slate-500">
-                  Sans carte bancaire
+                  {plan.price === 0 ? "Sans carte bancaire" : "Résiliable à tout moment"}
                 </p>
               </motion.div>
             ))}

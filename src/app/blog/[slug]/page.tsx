@@ -72,8 +72,18 @@ export default async function BlogPostPage({
     "@type": "Article",
     headline: post.title,
     description: post.description,
-    datePublished: post.date,
-    author: { "@type": "Organization", name: "Devizly" },
+    datePublished: `${post.date}T00:00:00+01:00`,
+    image: {
+      "@type": "ImageObject",
+      url: "https://devizly.fr/og-image.png",
+      width: 1200,
+      height: 630,
+    },
+    author: {
+      "@type": "Organization",
+      name: "Devizly",
+      url: "https://devizly.fr",
+    },
     publisher: {
       "@type": "Organization",
       name: "Devizly",

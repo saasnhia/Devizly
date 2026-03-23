@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getAllPosts } from "@/lib/blog";
+import { METIERS } from "@/lib/seo/metiers";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://devizly.fr";
 
@@ -11,6 +12,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: new Date(post.date),
     changeFrequency: "monthly" as const,
     priority: 0.7,
+  }));
+
+  const metierPages = METIERS.map((m) => ({
+    url: `${SITE_URL}/logiciel-devis/${m.slug}`,
+    lastModified: now,
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
   }));
 
   return [
@@ -27,6 +35,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/devis-batiment-gratuit`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${SITE_URL}/creer-devis-en-ligne`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${SITE_URL}/generateur-devis-ia`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
+
+    // Programmatic SEO — metiers
+    ...metierPages,
 
     // Blog
     { url: `${SITE_URL}/blog`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },

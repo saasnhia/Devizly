@@ -167,8 +167,24 @@ export default function LogicielDevisArtisanPage() {
           </Link>
         </div>
 
-        {/* Internal links */}
+        {/* Internal links — metiers */}
         <div className="mt-12 flex flex-wrap gap-3 text-sm">
+          <span className="text-slate-500">Devis par métier :</span>
+          <Link href="/logiciel-devis/plombier" className="text-violet-400 hover:text-violet-300">Plombier</Link>
+          <span className="text-slate-600">·</span>
+          <Link href="/logiciel-devis/electricien" className="text-violet-400 hover:text-violet-300">Électricien</Link>
+          <span className="text-slate-600">·</span>
+          <Link href="/logiciel-devis/peintre" className="text-violet-400 hover:text-violet-300">Peintre</Link>
+          <span className="text-slate-600">·</span>
+          <Link href="/logiciel-devis/couvreur" className="text-violet-400 hover:text-violet-300">Couvreur</Link>
+          <span className="text-slate-600">·</span>
+          <Link href="/logiciel-devis/macon" className="text-violet-400 hover:text-violet-300">Maçon</Link>
+          <span className="text-slate-600">·</span>
+          <Link href="/logiciel-devis/menuisier" className="text-violet-400 hover:text-violet-300">Menuisier</Link>
+        </div>
+
+        {/* Internal links */}
+        <div className="mt-4 flex flex-wrap gap-3 text-sm">
           <span className="text-slate-500">Voir aussi :</span>
           <Link href="/devis-batiment-gratuit" className="text-violet-400 hover:text-violet-300">Devis bâtiment gratuit</Link>
           <span className="text-slate-600">·</span>

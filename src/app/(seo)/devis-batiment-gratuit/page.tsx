@@ -172,8 +172,24 @@ export default function DevisBatimentGratuitPage() {
           </Link>
         </div>
 
-        {/* Internal links */}
+        {/* Internal links — metiers BTP */}
         <div className="mt-12 flex flex-wrap gap-3 text-sm">
+          <span className="text-slate-500">Devis par métier :</span>
+          <Link href="/logiciel-devis/plombier" className="text-violet-400 hover:text-violet-300">Plombier</Link>
+          <span className="text-slate-600">·</span>
+          <Link href="/logiciel-devis/couvreur" className="text-violet-400 hover:text-violet-300">Couvreur</Link>
+          <span className="text-slate-600">·</span>
+          <Link href="/logiciel-devis/macon" className="text-violet-400 hover:text-violet-300">Maçon</Link>
+          <span className="text-slate-600">·</span>
+          <Link href="/logiciel-devis/carreleur" className="text-violet-400 hover:text-violet-300">Carreleur</Link>
+          <span className="text-slate-600">·</span>
+          <Link href="/logiciel-devis/isolation" className="text-violet-400 hover:text-violet-300">Isolation</Link>
+          <span className="text-slate-600">·</span>
+          <Link href="/logiciel-devis/renovation" className="text-violet-400 hover:text-violet-300">Rénovation</Link>
+        </div>
+
+        {/* Internal links */}
+        <div className="mt-4 flex flex-wrap gap-3 text-sm">
           <span className="text-slate-500">Voir aussi :</span>
           <Link href="/logiciel-devis-artisan" className="text-violet-400 hover:text-violet-300">Logiciel devis artisan</Link>
           <span className="text-slate-600">·</span>

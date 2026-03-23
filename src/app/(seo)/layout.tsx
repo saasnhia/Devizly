@@ -43,8 +43,22 @@ export default function SeoLayout({ children }: { children: React.ReactNode }) {
           <Link href="/devis-batiment-gratuit" className="transition-colors hover:text-white">Devis bâtiment</Link>
           <Link href="/creer-devis-en-ligne" className="transition-colors hover:text-white">Créer devis en ligne</Link>
           <Link href="/generateur-devis-ia" className="transition-colors hover:text-white">Générateur IA</Link>
-          <Link href="/mentions-legales" className="transition-colors hover:text-white">Mentions légales</Link>
-          <Link href="/confidentialite" className="transition-colors hover:text-white">Confidentialité</Link>
+        </div>
+        <div className="mx-auto mt-4 flex max-w-5xl flex-wrap items-center justify-center gap-4 px-4 text-xs text-slate-600 sm:px-6">
+          <Link href="/logiciel-devis/plombier" className="transition-colors hover:text-slate-400">Devis plombier</Link>
+          <Link href="/logiciel-devis/electricien" className="transition-colors hover:text-slate-400">Devis électricien</Link>
+          <Link href="/logiciel-devis/peintre" className="transition-colors hover:text-slate-400">Devis peintre</Link>
+          <Link href="/logiciel-devis/couvreur" className="transition-colors hover:text-slate-400">Devis couvreur</Link>
+          <Link href="/logiciel-devis/macon" className="transition-colors hover:text-slate-400">Devis maçon</Link>
+          <Link href="/logiciel-devis/menuisier" className="transition-colors hover:text-slate-400">Devis menuisier</Link>
+          <Link href="/logiciel-devis/carreleur" className="transition-colors hover:text-slate-400">Devis carreleur</Link>
+          <Link href="/logiciel-devis/climatisation" className="transition-colors hover:text-slate-400">Devis climatisation</Link>
+          <Link href="/logiciel-devis/isolation" className="transition-colors hover:text-slate-400">Devis isolation</Link>
+          <Link href="/logiciel-devis/renovation" className="transition-colors hover:text-slate-400">Devis rénovation</Link>
+        </div>
+        <div className="mx-auto mt-4 flex max-w-5xl flex-wrap items-center justify-center gap-6 px-4 text-xs text-slate-600 sm:px-6">
+          <Link href="/mentions-legales" className="transition-colors hover:text-slate-400">Mentions légales</Link>
+          <Link href="/confidentialite" className="transition-colors hover:text-slate-400">Confidentialité</Link>
         </div>
         <p className="mt-4 text-center text-xs text-slate-600">
           &copy; {new Date().getFullYear()} Devizly. Tous droits réservés.

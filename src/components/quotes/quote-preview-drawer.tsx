@@ -520,7 +520,7 @@ export function QuotePreviewDrawer({
                   <div className="rounded-lg border bg-white p-3">
                     <Image
                       src={quote.signature_data}
-                      alt="Signature"
+                      alt="Signature électronique du client"
                       width={250}
                       height={100}
                       className="max-h-[100px] w-auto"

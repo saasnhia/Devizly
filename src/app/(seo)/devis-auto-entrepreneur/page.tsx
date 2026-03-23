@@ -8,6 +8,19 @@ export const metadata: Metadata = {
   description:
     "Créez vos devis auto-entrepreneur conformes en 2 minutes. Franchise TVA, mentions obligatoires, SIRET. Logiciel gratuit et simple pour micro-entrepreneurs.",
   alternates: { canonical: "https://devizly.fr/devis-auto-entrepreneur" },
+  openGraph: {
+    title: "Créer un Devis Auto-Entrepreneur Gratuit",
+    description:
+      "Devis auto-entrepreneur conformes en 2 minutes. Franchise TVA, mentions obligatoires, SIRET. Gratuit pour micro-entrepreneurs.",
+    url: "https://devizly.fr/devis-auto-entrepreneur",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Devizly — Devis auto-entrepreneur gratuit" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Créer un Devis Auto-Entrepreneur Gratuit",
+    description: "Devis conformes en 2 min. Franchise TVA, SIRET, mentions obligatoires. Gratuit, sans CB.",
+    images: ["/og-image.png"],
+  },
 };
 
 const schema = {

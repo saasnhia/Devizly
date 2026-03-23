@@ -351,7 +351,7 @@ export default function PublicQuotePage({
                 <div className="rounded-lg border bg-white p-3">
                   <Image
                     src={quote.signature_data}
-                    alt="Signature"
+                    alt="Signature électronique du client"
                     width={300}
                     height={120}
                     className="max-h-[120px] w-auto"

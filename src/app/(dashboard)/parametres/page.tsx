@@ -344,7 +344,7 @@ export default function ParametresPage() {
                   <div className="relative h-12 w-24 rounded border bg-white p-1">
                     <Image
                       src={logoUrl}
-                      alt="Logo"
+                      alt="Logo de votre entreprise"
                       fill
                       className="object-contain"
                       unoptimized

@@ -8,6 +8,19 @@ export const metadata: Metadata = {
   description:
     "Créez vos devis bâtiment gratuits en ligne en 2 minutes. TVA travaux 10%/20%, garantie décennale, acompte Stripe. Logiciel conforme pour entreprises du BTP.",
   alternates: { canonical: "https://devizly.fr/devis-batiment-gratuit" },
+  openGraph: {
+    title: "Devis Bâtiment Gratuit en Ligne — Devizly",
+    description:
+      "Devis BTP en 2 minutes. TVA travaux 5,5%/10%/20%, garantie décennale, acompte Stripe intégré. Conforme pour entreprises du bâtiment.",
+    url: "https://devizly.fr/devis-batiment-gratuit",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Devizly — Devis bâtiment gratuit en ligne" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Devis Bâtiment Gratuit en Ligne",
+    description: "Devis BTP en 2 min. TVA travaux auto, décennale, acompte Stripe. Gratuit, sans CB.",
+    images: ["/og-image.png"],
+  },
 };
 
 const schema = {

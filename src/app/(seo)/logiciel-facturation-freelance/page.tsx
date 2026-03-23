@@ -8,6 +8,19 @@ export const metadata: Metadata = {
   description:
     "Logiciel de facturation gratuit pour freelances. Devis, factures, relances automatiques, paiement Stripe intégré. Conforme loi française. Essai gratuit sans CB.",
   alternates: { canonical: "https://devizly.fr/logiciel-facturation-freelance" },
+  openGraph: {
+    title: "Logiciel de Facturation pour Freelance Gratuit — Devizly",
+    description:
+      "Facturation freelance : devis, factures, relances auto, paiement Stripe intégré. Conforme loi française. Gratuit, sans CB.",
+    url: "https://devizly.fr/logiciel-facturation-freelance",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Devizly — Logiciel facturation freelance gratuit" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Logiciel de Facturation pour Freelance Gratuit",
+    description: "Devis + factures + relances auto + paiement Stripe. Conforme loi FR. Gratuit, sans CB.",
+    images: ["/og-image.png"],
+  },
 };
 
 const schema = {

@@ -137,7 +137,7 @@ export default function PortalPage({
               <div className="relative h-10 w-20">
                 <Image
                   src={company.logo_url}
-                  alt="Logo"
+                  alt="Logo de l'entreprise"
                   fill
                   className="object-contain"
                   unoptimized

@@ -8,6 +8,19 @@ export const metadata: Metadata = {
   description:
     "Générez vos devis professionnels par intelligence artificielle en 2 minutes. L'IA structure vos prestations, ajoute les mentions légales. Gratuit, hébergé en France.",
   alternates: { canonical: "https://devizly.fr/generateur-devis-ia" },
+  openGraph: {
+    title: "Générateur de Devis IA Gratuit — Devizly",
+    description:
+      "Devis professionnels générés par IA en 30 secondes. Prestations structurées, mentions légales auto. Hébergé en France, RGPD.",
+    url: "https://devizly.fr/generateur-devis-ia",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Devizly — Générateur de devis par intelligence artificielle" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Générateur de Devis IA Gratuit",
+    description: "Devis IA en 30s. L'IA structure vos prestations et ajoute les mentions légales. Gratuit, hébergé en France.",
+    images: ["/og-image.png"],
+  },
 };
 
 const schema = {

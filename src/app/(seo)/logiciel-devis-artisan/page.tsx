@@ -8,6 +8,19 @@ export const metadata: Metadata = {
   description:
     "Créez vos devis artisan en 2 minutes avec l'IA. Mentions obligatoires, TVA, signature électronique. Logiciel gratuit pour électriciens, plombiers, maçons et tous les métiers du bâtiment.",
   alternates: { canonical: "https://devizly.fr/logiciel-devis-artisan" },
+  openGraph: {
+    title: "Logiciel de Devis Gratuit pour Artisans — Devizly",
+    description:
+      "Devis artisan en 2 minutes avec l'IA. TVA, mentions obligatoires, signature électronique. Pour électriciens, plombiers, maçons.",
+    url: "https://devizly.fr/logiciel-devis-artisan",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Devizly — Logiciel devis gratuit pour artisans" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Logiciel de Devis Gratuit pour Artisans",
+    description: "Devis artisan en 2 min. IA + TVA auto + signature électronique. Gratuit pour tous les métiers du bâtiment.",
+    images: ["/og-image.png"],
+  },
 };
 
 const schema = {

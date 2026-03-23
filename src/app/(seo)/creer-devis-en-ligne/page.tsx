@@ -8,6 +8,19 @@ export const metadata: Metadata = {
   description:
     "Créez un devis professionnel en ligne gratuitement en 2 minutes. Mentions légales automatiques, signature électronique, envoi par email. Sans inscription longue, sans CB.",
   alternates: { canonical: "https://devizly.fr/creer-devis-en-ligne" },
+  openGraph: {
+    title: "Créer un Devis en Ligne Gratuit et Professionnel",
+    description:
+      "Créez un devis professionnel en ligne gratuitement en 2 minutes. Mentions légales automatiques, signature électronique, envoi par email.",
+    url: "https://devizly.fr/creer-devis-en-ligne",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Devizly — Créer un devis en ligne gratuit" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Créer un Devis en Ligne Gratuit et Professionnel",
+    description: "Devis professionnel en 2 minutes. Mentions légales auto, signature électronique, envoi par email.",
+    images: ["/og-image.png"],
+  },
 };
 
 const schema = {

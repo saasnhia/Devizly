@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
-import { getAllPosts, getPostBySlug } from "@/lib/blog";
+import { getAllPosts, getPostBySlug, extractHeadings } from "@/lib/blog";
 import { JsonLd } from "@/components/seo/json-ld";
 import { DevizlyLogo } from "@/components/devizly-logo";
+import { TableOfContents } from "@/components/blog/table-of-contents";
+import { mdxComponents } from "@/components/blog/mdx-components";
 import {
   ArrowLeft,
   ArrowRight,
@@ -12,7 +14,6 @@ import {
   Tag,
   ChevronRight,
   Sparkles,
-  BookOpen,
 } from "lucide-react";
 
 export function generateStaticParams() {
@@ -64,6 +65,8 @@ export default async function BlogPostPage({
     .filter((p) => p.category === post.category && p.slug !== post.slug)
     .slice(0, 3);
 
+  const headings = extractHeadings(post.content);
+
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -107,7 +110,7 @@ export default async function BlogPostPage({
       </nav>
 
       <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
-        {/* Breadcrumb */}
+        {/* ── Breadcrumb ── */}
         <nav className="mb-8 flex items-center gap-1.5 text-sm text-slate-500">
           <Link href="/" className="transition-colors hover:text-white">
             Accueil
@@ -128,28 +131,36 @@ export default async function BlogPostPage({
           </span>
         </nav>
 
+        {/* ── Hero gradient banner ── */}
+        <div className="mb-10 overflow-hidden rounded-2xl bg-gradient-to-br from-violet-600/30 via-indigo-500/20 to-fuchsia-500/10 ring-1 ring-white/10">
+          <div className="flex min-h-[200px] flex-col justify-end p-6 sm:min-h-[260px] sm:p-10">
+            <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-violet-200 backdrop-blur-sm">
+              <Tag className="h-3 w-3" />
+              {post.category}
+            </span>
+            <h1 className="mt-4 max-w-2xl text-2xl font-extrabold leading-tight tracking-tight sm:text-3xl lg:text-[42px] lg:leading-[1.15]">
+              {post.title}
+            </h1>
+          </div>
+        </div>
+
         {/* ── Grid: Article + Sidebar ── */}
-        <div className="grid gap-10 lg:grid-cols-[1fr_240px]">
+        <div className="grid gap-10 lg:grid-cols-[1fr_260px]">
           {/* Left column: article */}
-          <div>
+          <div className="min-w-0">
             {/* ── Article header ── */}
-            <header className="mb-12">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-500/20 px-3 py-1 text-xs font-medium text-violet-300">
-                <Tag className="h-3 w-3" />
-                {post.category}
-              </span>
-              <h1 className="mt-5 text-3xl font-extrabold leading-[1.2] tracking-tight sm:text-4xl lg:text-[42px]">
-                {post.title}
-              </h1>
-              <p className="mt-4 text-lg leading-relaxed text-slate-400">
+            <header className="mb-10">
+              <p className="text-lg leading-relaxed text-slate-400">
                 {post.description}
               </p>
-              <div className="mt-6 flex items-center gap-4 text-sm text-slate-500">
+              <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-500">
                 <div className="flex items-center gap-2">
                   <div className="flex h-7 w-7 items-center justify-center rounded-full bg-violet-500/20 text-[10px] font-bold text-violet-300">
                     DZ
                   </div>
-                  <span className="font-medium text-slate-300">Devizly</span>
+                  <span className="font-medium text-slate-300">
+                    Par Devizly
+                  </span>
                 </div>
                 <span className="text-slate-600">&middot;</span>
                 <time dateTime={post.date}>
@@ -173,27 +184,28 @@ export default async function BlogPostPage({
               className="
                 prose prose-invert max-w-none
 
-                prose-headings:font-extrabold
+                prose-headings:font-bold
                 prose-headings:tracking-tight
 
                 prose-h1:hidden
 
-                prose-h2:mt-14
-                prose-h2:mb-5
-                prose-h2:text-[26px]
-                prose-h2:leading-tight
-                prose-h2:border-l-[3px]
-                prose-h2:border-violet-500
-                prose-h2:pl-4
+                prose-h2:mt-10
+                prose-h2:mb-4
+                prose-h2:pt-6
+                prose-h2:text-xl
+                prose-h2:border-t
+                prose-h2:border-white/10
+                prose-h2:text-[#5B5BD6]
 
                 prose-h3:mt-8
                 prose-h3:mb-3
                 prose-h3:text-lg
+                prose-h3:font-semibold
 
-                prose-p:text-[16.5px]
-                prose-p:leading-[1.85]
+                prose-p:text-base
+                prose-p:leading-8
                 prose-p:text-slate-300
-                prose-p:mb-5
+                prose-p:mb-6
 
                 prose-a:text-violet-400
                 prose-a:font-medium
@@ -204,24 +216,17 @@ export default async function BlogPostPage({
                 prose-strong:text-white
                 prose-strong:font-semibold
 
-                prose-li:text-[16px]
-                prose-li:leading-[1.85]
+                prose-li:text-base
+                prose-li:leading-7
                 prose-li:text-slate-300
                 prose-li:marker:text-violet-500
 
-                prose-ul:my-5
-                prose-ul:space-y-1
-                prose-ol:my-5
-                prose-ol:space-y-1
-
-                prose-blockquote:border-violet-500
-                prose-blockquote:bg-violet-500/10
-                prose-blockquote:py-3
-                prose-blockquote:px-5
-                prose-blockquote:rounded-r-xl
-                prose-blockquote:not-italic
-                prose-blockquote:text-slate-300
-                prose-blockquote:my-6
+                prose-ul:mb-6
+                prose-ul:space-y-2
+                prose-ul:pl-6
+                prose-ol:mb-6
+                prose-ol:space-y-2
+                prose-ol:pl-6
 
                 prose-code:text-violet-300
                 prose-code:bg-violet-500/15
@@ -229,6 +234,7 @@ export default async function BlogPostPage({
                 prose-code:py-0.5
                 prose-code:rounded
                 prose-code:text-sm
+                prose-code:font-mono
                 prose-code:before:content-none
                 prose-code:after:content-none
 
@@ -236,7 +242,7 @@ export default async function BlogPostPage({
                 prose-hr:my-10
               "
             >
-              <MDXRemote source={post.content} />
+              <MDXRemote source={post.content} components={mdxComponents} />
             </article>
 
             {/* ── Devizly tip ── */}
@@ -256,21 +262,34 @@ export default async function BlogPostPage({
               </div>
             </div>
 
+            {/* ── Tags ── */}
+            <div className="mt-10 flex flex-wrap gap-2">
+              <span className="rounded-full bg-violet-500/15 px-3 py-1 text-xs font-medium text-violet-300">
+                {post.category}
+              </span>
+              <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-slate-400">
+                Devis
+              </span>
+              <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-slate-400">
+                Freelance
+              </span>
+            </div>
+
             {/* ── Article feedback ── */}
-            <div className="mt-12 flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] p-5">
+            <div className="mt-8 flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] p-5">
               <span className="text-sm text-slate-400">
                 Cet article vous a été utile ?
               </span>
               <div className="flex gap-3">
                 <button
                   type="button"
-                  className="rounded-lg border border-white/10 px-4 py-2 text-sm transition-colors hover:bg-white/5"
+                  className="rounded-lg border border-white/10 px-4 py-2 text-sm transition-colors hover:border-emerald-500/50 hover:bg-emerald-500/10"
                 >
                   👍 Oui
                 </button>
                 <button
                   type="button"
-                  className="rounded-lg border border-white/10 px-4 py-2 text-sm transition-colors hover:bg-white/5"
+                  className="rounded-lg border border-white/10 px-4 py-2 text-sm transition-colors hover:border-red-500/50 hover:bg-red-500/10"
                 >
                   👎 Non
                 </button>
@@ -290,7 +309,7 @@ export default async function BlogPostPage({
                 href="/signup"
                 className="mt-6 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-500 px-8 py-3.5 text-base font-semibold text-white shadow-xl shadow-violet-500/25 transition-all hover:shadow-violet-500/40 hover:brightness-110"
               >
-                Essayer gratuitement
+                Commencer gratuitement
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -339,28 +358,8 @@ export default async function BlogPostPage({
           {/* ── Right sidebar (desktop only) ── */}
           <aside className="hidden lg:block">
             <div className="sticky top-20 space-y-6">
-              {/* Dans cet article */}
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-5">
-                <h3 className="flex items-center gap-2 text-sm font-semibold text-white">
-                  <BookOpen className="h-4 w-4 text-violet-400" />
-                  Dans cet article
-                </h3>
-                <div className="mt-3">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-500/20 px-2.5 py-0.5 text-[11px] font-medium text-violet-300">
-                    <Tag className="h-3 w-3" />
-                    {post.category}
-                  </span>
-                  <p className="mt-3 text-xs leading-relaxed text-slate-500">
-                    {post.readingTime}
-                    {" · "}
-                    {new Date(post.date).toLocaleDateString("fr-FR", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
-                  </p>
-                </div>
-              </div>
+              {/* Table of Contents */}
+              <TableOfContents headings={headings} />
 
               {/* CTA card */}
               <div className="rounded-xl bg-gradient-to-br from-violet-600/30 to-indigo-500/30 p-5">
@@ -379,31 +378,6 @@ export default async function BlogPostPage({
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
-
-              {/* Articles similaires (compact sidebar version) */}
-              {related.length > 0 && (
-                <div className="rounded-xl border border-white/10 bg-white/[0.03] p-5">
-                  <h3 className="text-sm font-semibold text-white">
-                    Articles similaires
-                  </h3>
-                  <div className="mt-3 space-y-3">
-                    {related.map((r) => (
-                      <Link
-                        key={r.slug}
-                        href={`/blog/${r.slug}`}
-                        className="group block"
-                      >
-                        <p className="text-xs leading-snug text-slate-300 transition-colors group-hover:text-violet-300">
-                          {r.title}
-                        </p>
-                        <p className="mt-0.5 text-[10px] text-slate-600">
-                          {r.readingTime}
-                        </p>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           </aside>
         </div>

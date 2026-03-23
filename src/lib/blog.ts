@@ -30,6 +30,29 @@ export function getAllPosts(): BlogPost[] {
   );
 }
 
+export function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+}
+
+export function extractHeadings(
+  content: string,
+): { id: string; text: string }[] {
+  return content
+    .split("\n")
+    .filter((line) => line.startsWith("## "))
+    .map((line) => {
+      const text = line.slice(3).replace(/\*\*/g, "");
+      return { id: slugify(text), text };
+    });
+}
+
 export function getPostBySlug(slug: string): BlogPost {
   const filePath = path.join(BLOG_DIR, `${slug}.mdx`);
   const raw = fs.readFileSync(filePath, "utf-8");

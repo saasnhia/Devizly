@@ -3,6 +3,9 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { getMistral, parseAIResponse } from "@/lib/mistral";
 
+// Allow up to 30s on Vercel Pro (ignored on Hobby)
+export const maxDuration = 30;
+
 // Separate rate limiter: 3 demo generations per IP per hour
 const demoRatelimit = new Ratelimit({
   redis: new Redis({
@@ -72,48 +75,67 @@ export async function POST(request: Request) {
     );
   }
 
-  // 3. Generate with Mistral
-  try {
-    const mistral = getMistral();
-    const completion = await mistral.chat.complete({
-      model: "mistral-small-latest",
-      responseFormat: { type: "json_object" },
-      messages: [
+  // 3. Generate with Mistral (with timeout + 1 retry)
+  const MAX_RETRIES = 1;
+
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const mistral = getMistral();
+      const completion = await mistral.chat.complete(
         {
-          role: "system",
-          content: `[STRICT MODE] Tu génères des devis professionnels français.
+          model: "mistral-small-latest",
+          responseFormat: { type: "json_object" },
+          messages: [
+            {
+              role: "system",
+              content: `[STRICT MODE] Tu génères des devis professionnels français.
 Réponds UNIQUEMENT en JSON brut valide. Pas de markdown, pas de backticks.
 Structure : { "title": string, "lines": [{ "description": string, "quantity": number, "unit": string, "unitPrice": number, "total": number }], "subtotal": number, "vatRate": 20, "vatAmount": number, "total": number, "validityDays": 30, "paymentConditions": string, "notes": string }
 Règles : 3-6 lignes réalistes, prix marché français 2026, montants en euros HT, descriptions courtes (10 mots max).`,
+            },
+            {
+              role: "user",
+              content: `Métier : ${metier}\nPrestation : ${description}`,
+            },
+          ],
+          temperature: 0.7,
+          maxTokens: 800,
         },
-        {
-          role: "user",
-          content: `Métier : ${metier}\nPrestation : ${description}`,
-        },
-      ],
-      temperature: 0.7,
-      maxTokens: 800,
-    });
+        { timeoutMs: 25_000 }
+      );
 
-    const content = completion.choices?.[0]?.message?.content;
-    if (!content || typeof content !== "string") {
+      const content = completion.choices?.[0]?.message?.content;
+      if (!content || typeof content !== "string") {
+        if (attempt < MAX_RETRIES) continue;
+        return NextResponse.json(
+          { error: "Réponse IA vide — veuillez réessayer" },
+          { status: 500 }
+        );
+      }
+
+      const quote = parseAIResponse<DemoQuote>(content);
+
+      return NextResponse.json({
+        quote,
+        remainingGenerations: remaining,
+      });
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : String(err);
+      const errStatus = (err as Record<string, unknown>)?.statusCode ?? (err as Record<string, unknown>)?.status;
+      console.error(`[Demo] Generation failed (attempt ${attempt + 1}/${MAX_RETRIES + 1}):`, errMsg, errStatus ?? "");
+
+      // Retry on timeout or transient errors
+      if (attempt < MAX_RETRIES) continue;
+
       return NextResponse.json(
-        { error: "Réponse IA vide — veuillez réessayer" },
+        {
+          error: "Génération impossible. Réessayez dans quelques secondes.",
+          ...(process.env.NODE_ENV !== "production" && {
+            debug: { message: errMsg, status: errStatus ?? null },
+          }),
+        },
         { status: 500 }
       );
     }
-
-    const quote = parseAIResponse<DemoQuote>(content);
-
-    return NextResponse.json({
-      quote,
-      remainingGenerations: remaining,
-    });
-  } catch (err) {
-    console.error("[Demo] Generation failed:", err);
-    return NextResponse.json(
-      { error: "Génération impossible. Réessayez dans quelques secondes." },
-      { status: 500 }
-    );
   }
 }

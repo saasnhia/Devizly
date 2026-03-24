@@ -75,6 +75,14 @@ export function DemoSection() {
 
   const effectiveMetier = metier === "autre" ? customMetier.trim() : metier;
 
+  async function callDemoApi(): Promise<Response> {
+    return fetch("/api/demo/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ metier: effectiveMetier, description }),
+    });
+  }
+
   async function handleGenerate() {
     if (!effectiveMetier || description.trim().length < 10) return;
 
@@ -82,32 +90,42 @@ export function DemoSection() {
     setError(null);
     setQuote(null);
 
+    const MAX_CLIENT_RETRIES = 1;
+
     try {
-      const res = await fetch("/api/demo/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ metier: effectiveMetier, description }),
-      });
+      for (let attempt = 0; attempt <= MAX_CLIENT_RETRIES; attempt++) {
+        try {
+          const res = await callDemoApi();
+          const data = await res.json();
 
-      const data = await res.json();
+          if (res.status === 429) {
+            setShowUpgrade(true);
+            setError(data.message);
+            return;
+          }
 
-      if (res.status === 429) {
-        setShowUpgrade(true);
-        setError(data.message);
-        return;
+          if (!res.ok) {
+            if (res.status >= 500 && attempt < MAX_CLIENT_RETRIES) {
+              await new Promise((r) => setTimeout(r, 1000));
+              continue;
+            }
+            setError(data.error ?? "Une erreur est survenue. Réessayez.");
+            return;
+          }
+
+          setQuote(data.quote);
+          if (data.remainingGenerations !== undefined) {
+            setRemaining(data.remainingGenerations);
+          }
+          return;
+        } catch {
+          if (attempt < MAX_CLIENT_RETRIES) {
+            await new Promise((r) => setTimeout(r, 1000));
+            continue;
+          }
+          setError("Connexion impossible. Vérifiez votre connexion internet.");
+        }
       }
-
-      if (!res.ok) {
-        setError(data.error ?? "Une erreur est survenue. Réessayez.");
-        return;
-      }
-
-      setQuote(data.quote);
-      if (data.remainingGenerations !== undefined) {
-        setRemaining(data.remainingGenerations);
-      }
-    } catch {
-      setError("Connexion impossible. Vérifiez votre connexion internet.");
     } finally {
       setIsGenerating(false);
     }

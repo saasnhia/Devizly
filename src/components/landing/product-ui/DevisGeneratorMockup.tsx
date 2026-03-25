@@ -128,10 +128,10 @@ export function DevisGeneratorMockup() {
 
   return (
     <div
-      className="overflow-hidden rounded-xl"
+      className="w-full overflow-visible rounded-xl"
       style={{
         boxShadow:
-          "0 0 0 1px rgba(255,255,255,0.05), 0 70px 130px -20px rgba(0,0,0,0.7)",
+          "0 0 0 1px rgba(255,255,255,0.05), 0 -20px 80px -20px rgba(94,106,210,0.08)",
       }}
     >
       {/* Browser chrome */}

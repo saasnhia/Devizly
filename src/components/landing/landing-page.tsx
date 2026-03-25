@@ -432,22 +432,20 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
                 {copy ? copy.badge : "Propulsé par l\u2019IA Mistral — hébergée en France"}
               </p>
               <h1
-                className="mt-5 font-bold leading-[0.95] tracking-[-0.03em]"
-                style={{ fontSize: "clamp(3rem, 6vw, 5.5rem)" }}
+                className="mt-5 font-extrabold leading-[0.9] tracking-[-0.04em] text-[#e8e9f0]"
+                style={{ fontSize: "clamp(3.5rem, 6vw, 7rem)" }}
               >
                 {copy ? (
                   <>
-                    {copy.hero}.{" "}
-                    <br className="hidden sm:block" />
-                    <span className="text-[#5e6ad2]">Signez. Encaissez.</span>
+                    {copy.hero}, signez
+                    <br />
+                    et encaissez. En 2 minutes.
                   </>
                 ) : (
                   <>
-                    Créez des devis.{" "}
-                    <br className="hidden sm:block" />
-                    Signez. Encaissez.{" "}
-                    <br className="hidden sm:block" />
-                    <span className="text-[#5e6ad2]">En 2 minutes.</span>
+                    Créez des devis, signez
+                    <br />
+                    et encaissez. En 2 minutes.
                   </>
                 )}
               </h1>
@@ -477,7 +475,7 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
           </div>
 
           {/* Product mockup — full width, overflows below fold */}
-          <div className="mt-16 sm:mt-20">
+          <div className="mt-16 overflow-visible sm:mt-20">
             <DevisGeneratorMockup />
           </div>
         </div>
@@ -486,13 +484,13 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
       {/* ══════════════════════════════════════════════
           TICKER MÉTIERS
           ══════════════════════════════════════════════ */}
-      <section className="mt-20 border-y border-white/[0.06] py-6 sm:mt-28">
+      <section className="mt-20 py-5 sm:mt-28">
         <div className="relative overflow-hidden">
           <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-[#08090a] to-transparent" />
           <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-[#08090a] to-transparent" />
           <div className="animate-ticker flex gap-8 whitespace-nowrap">
             {[...professions, ...professions].map((p, i) => (
-              <span key={i} className="text-[13px] tracking-[0.05em] text-[#8b8fa8]/60">
+              <span key={i} className="text-[12px] tracking-[0.05em] text-white/30">
                 {i > 0 && <span className="mr-8">·</span>}
                 {p}
               </span>

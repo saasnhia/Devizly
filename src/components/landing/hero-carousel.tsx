@@ -48,24 +48,24 @@ export function HeroCarousel() {
 
   return (
     <div
-      className="relative mx-auto max-w-5xl"
+      className="relative mx-auto"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
       {/* Browser chrome */}
-      <div className="flex items-center gap-2 rounded-t-xl border border-b-0 border-white/10 bg-white/[0.06] px-4 py-3 backdrop-blur-sm">
+      <div className="flex items-center gap-2 rounded-t-xl border border-b-0 border-white/[0.06] bg-[#0f0f10] px-4 py-3">
         <div className="flex gap-1.5">
-          <div className="h-2.5 w-2.5 rounded-full bg-red-400/60" />
-          <div className="h-2.5 w-2.5 rounded-full bg-yellow-400/60" />
-          <div className="h-2.5 w-2.5 rounded-full bg-green-400/60" />
+          <div className="h-2.5 w-2.5 rounded-full bg-[#8b8fa8]/30" />
+          <div className="h-2.5 w-2.5 rounded-full bg-[#8b8fa8]/30" />
+          <div className="h-2.5 w-2.5 rounded-full bg-[#8b8fa8]/30" />
         </div>
-        <div className="ml-3 flex-1 rounded-md bg-white/5 px-3 py-1 text-xs text-slate-500">
+        <div className="ml-3 flex-1 rounded-md bg-white/[0.03] px-3 py-1 text-xs text-[#8b8fa8]">
           {slide.url}
         </div>
       </div>
 
       {/* Image area */}
-      <div className="relative overflow-hidden rounded-b-xl border border-t-0 border-white/10">
+      <div className="relative overflow-hidden rounded-b-xl border border-t-0 border-white/[0.06]">
         <div
           className="flex transition-transform duration-500 ease-out"
           style={{ transform: `translateX(-${current * 100}%)` }}
@@ -87,14 +87,14 @@ export function HeroCarousel() {
         {/* Nav arrows */}
         <button
           onClick={prev}
-          className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white/70 backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-white"
+          className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white/70 backdrop-blur-sm transition-opacity duration-200 hover:opacity-80"
           aria-label="Slide précédent"
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
         <button
           onClick={next}
-          className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white/70 backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-white"
+          className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white/70 backdrop-blur-sm transition-opacity duration-200 hover:opacity-80"
           aria-label="Slide suivant"
         >
           <ChevronRight className="h-5 w-5" />
@@ -103,7 +103,7 @@ export function HeroCarousel() {
 
       {/* Caption + dots */}
       <div className="mt-4 flex flex-col items-center gap-3">
-        <p className="text-center text-sm font-medium text-slate-400">
+        <p className="text-center text-sm font-medium text-[#8b8fa8]">
           {slide.label}
         </p>
         <div className="flex gap-2">
@@ -113,17 +113,14 @@ export function HeroCarousel() {
               onClick={() => setCurrent(i)}
               className={`h-2 rounded-full transition-all ${
                 i === current
-                  ? "w-6 bg-violet-500"
-                  : "w-2 bg-white/20 hover:bg-white/40"
+                  ? "w-6 bg-[#5e6ad2]"
+                  : "w-2 bg-white/[0.12] hover:bg-white/[0.24]"
               }`}
               aria-label={`Slide ${i + 1}`}
             />
           ))}
         </div>
       </div>
-
-      {/* Glow behind */}
-      <div className="pointer-events-none absolute -inset-6 -z-10 rounded-3xl bg-gradient-to-b from-violet-500/15 via-indigo-500/10 to-transparent blur-2xl" />
     </div>
   );
 }

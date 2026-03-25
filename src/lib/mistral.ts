@@ -15,19 +15,15 @@ export function getMistral(): Mistral {
 
 /**
  * Clean malformed JSON returned by LLMs:
- * - Strip markdown code fences
- * - Replace single quotes with double quotes
+ * - Strip markdown code fences (even mid-string)
+ * - Strip text before first { and after last }
  * - Remove trailing commas before } or ]
  */
 export function cleanJSON(str: string): string {
   let cleaned = str
-    .replace(/^```json\s*/i, "")
-    .replace(/^```\s*/i, "")
-    .replace(/```\s*$/i, "")
+    .replace(/```json\s*/gi, "")
+    .replace(/```\s*/gi, "")
     .trim();
-
-  // Replace single quotes with double quotes
-  cleaned = cleaned.replace(/'/g, '"');
 
   // Remove trailing commas before } or ]
   cleaned = cleaned.replace(/,\s*([}\]])/g, "$1");

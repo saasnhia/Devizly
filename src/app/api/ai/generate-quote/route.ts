@@ -45,7 +45,7 @@ export async function POST(request: Request) {
   try {
     const mistral = getMistral();
     const completion = await mistral.chat.complete({
-      model: "mistral-medium-latest",
+      model: "mistral-small-latest",
       responseFormat: { type: "json_object" },
       messages: [
         {

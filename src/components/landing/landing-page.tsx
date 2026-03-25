@@ -5,14 +5,17 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { DevizlyLogo } from "@/components/devizly-logo";
-import { HeroCarousel } from "@/components/landing/hero-carousel";
 import { DemoSection } from "@/components/landing/demo-section";
 import { BetaBanner } from "@/components/landing/beta-banner";
+import { DevisGeneratorMockup } from "@/components/landing/product-ui/DevisGeneratorMockup";
+import { KanbanMockup } from "@/components/landing/product-ui/KanbanMockup";
+import { SignatureMockup } from "@/components/landing/product-ui/SignatureMockup";
+import { PaymentMockup } from "@/components/landing/product-ui/PaymentMockup";
+import { RelancesMockup } from "@/components/landing/product-ui/RelancesMockup";
 import {
   Check,
   ArrowRight,
   Shield,
-  Zap,
   FileText,
   Receipt,
   LayoutDashboard,
@@ -23,7 +26,6 @@ import {
   CreditCard,
   Bot,
   Send,
-  Play,
   MessageCircle,
   BookOpen,
 } from "lucide-react";
@@ -47,49 +49,54 @@ const professions = [
   "Vidéastes",
 ];
 
-const stats = [
-  { value: 30, suffix: "s", label: "pour créer un devis" },
-  { value: 10, suffix: "s", label: "pour signer en ligne" },
-  { value: 48, suffix: "h", label: "pour recevoir le paiement" },
-  { value: 100, suffix: "%", label: "hébergé en France" },
-];
-
-const features = [
+const featureSections = [
   {
+    label: "Génération IA",
     icon: Bot,
     title: "IA Mistral française",
     description:
       "Décrivez votre prestation en langage naturel. L'IA structure votre devis et propose des prix marché comme point de départ — vous ajustez librement chaque ligne, chaque tarif. 100% hébergé en France.",
+    mockup: "devis" as const,
   },
   {
+    label: "Signature",
     icon: PenTool,
     title: "Signature électronique",
     description:
       "Votre client signe depuis son téléphone. Valeur juridique, zéro friction.",
+    mockup: "signature" as const,
   },
   {
+    label: "Pipeline",
     icon: LayoutDashboard,
     title: "Pipeline Kanban",
     description:
       "Visualisez chaque opportunité : prospect → envoyé → signé → payé. Drag & drop intuitif.",
+    mockup: "kanban" as const,
   },
   {
-    icon: Receipt,
-    title: "Facturation automatique",
-    description:
-      "À la signature, la facture est générée, numérotée et envoyée. Export CSV compatible comptable.",
-  },
-  {
+    label: "Paiement",
     icon: CreditCard,
     title: "Acompte Stripe intégré",
     description:
       "Acompte 30/50%, paiement par carte. Fonds sur votre compte en 48h via Stripe Connect.",
+    mockup: "payment" as const,
   },
   {
+    label: "Relances",
     icon: Send,
     title: "Relances automatiques",
     description:
       "J+2, J+5, J+7 — vos clients sont relancés automatiquement. Vous ne levez pas le petit doigt.",
+    mockup: "relances" as const,
+  },
+  {
+    label: "Facturation",
+    icon: Receipt,
+    title: "Facturation automatique",
+    description:
+      "À la signature, la facture est générée, numérotée et envoyée. Export CSV compatible comptable.",
+    mockup: null,
   },
 ];
 
@@ -183,10 +190,6 @@ const faqs = [
   },
 ];
 
-/* ══════════════════════════════════════════════════
-   SEGMENT CTA MAPPING (A4)
-   ══════════════════════════════════════════════════ */
-
 const segmentCopy: Record<string, { hero: string; badge: string }> = {
   graphiste: { hero: "Devis pros pour graphistes", badge: "Designers & créatifs" },
   dev: { hero: "Devis pros pour développeurs", badge: "Développeurs web" },
@@ -199,6 +202,60 @@ const segmentCopy: Record<string, { hero: string; badge: string }> = {
 /* ══════════════════════════════════════════════════
    SUB-COMPONENTS
    ══════════════════════════════════════════════════ */
+
+function FeatureMockup({ type }: { type: string | null }) {
+  switch (type) {
+    case "devis":
+      return <DevisGeneratorMockup />;
+    case "kanban":
+      return <KanbanMockup />;
+    case "signature":
+      return <SignatureMockup />;
+    case "payment":
+      return <PaymentMockup />;
+    case "relances":
+      return <RelancesMockup />;
+    default:
+      // Facturation — simple static mockup
+      return (
+        <div className="rounded-xl border border-white/[0.06] bg-[#0f0f10] p-4">
+          <div className="mb-3 text-xs font-medium uppercase tracking-widest text-[#8b8fa8]">
+            Facture auto-générée
+          </div>
+          <div className="space-y-2 rounded-lg border border-white/[0.06] bg-[#08090a] p-3">
+            <div className="flex justify-between text-[11px]">
+              <span className="font-medium text-[#e8e9f0]">FACT-2026-018</span>
+              <span className="text-[#8b8fa8]">25/03/2026</span>
+            </div>
+            <div className="h-px bg-white/[0.06]" />
+            {["Design UX/UI", "Développement Next.js", "Hébergement"].map((l) => (
+              <div key={l} className="flex justify-between text-[10px]">
+                <span className="text-[#8b8fa8]">{l}</span>
+                <span className="h-2 w-10 rounded bg-white/[0.06]" />
+              </div>
+            ))}
+            <div className="h-px bg-white/[0.06]" />
+            <div className="flex justify-between text-xs font-bold">
+              <span className="text-[#e8e9f0]">Total TTC</span>
+              <span className="text-[#e8e9f0]">6 100 €</span>
+            </div>
+          </div>
+          <div className="mt-3 flex items-center gap-1.5 text-[10px] text-[#3dd68c]">
+            <Check className="h-3 w-3" />
+            Envoyée automatiquement à la signature
+          </div>
+          <div className="mt-2 flex gap-2">
+            <div className="rounded bg-white/[0.06] px-2 py-1 text-[9px] text-[#8b8fa8]">
+              📄 PDF
+            </div>
+            <div className="rounded bg-white/[0.06] px-2 py-1 text-[9px] text-[#8b8fa8]">
+              📊 Export CSV
+            </div>
+          </div>
+        </div>
+      );
+  }
+}
 
 function FAQItem({ question, answer }: { question: string; answer: string }) {
   const [open, setOpen] = useState(false);
@@ -259,17 +316,14 @@ export function LandingPage({ recentPosts = [] }: { recentPosts?: RecentPost[] }
 function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [quotesCount, setQuotesCount] = useState(0);
   const [videoOpen, setVideoOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [chatShown, setChatShown] = useState(false);
 
-  // Segment personalization (A4)
   const searchParams = useSearchParams();
   const segment = searchParams.get("for") || "";
   const copy = segmentCopy[segment] || null;
 
-  // Scroll detection for navbar
   useEffect(() => {
     function onScroll() {
       setScrolled(window.scrollY > 50);
@@ -278,20 +332,9 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Fetch live quote count
-  useEffect(() => {
-    fetch("/api/stats/public")
-      .then((r) => r.json())
-      .then((d: { quotes_count: number }) => setQuotesCount(d.quotes_count))
-      .catch(() => {});
-  }, []);
-
-  // Proactive chat: show after 30s
   useEffect(() => {
     if (chatShown) return;
-    const timer = setTimeout(() => {
-      setChatShown(true);
-    }, 30000);
+    const timer = setTimeout(() => setChatShown(true), 30000);
     return () => clearTimeout(timer);
   }, [chatShown]);
 
@@ -302,9 +345,6 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
       className="min-h-screen bg-[#08090a] text-[#e8e9f0]"
       style={{ fontFeatureSettings: '"ss01", "cv01", "cv02"' }}
     >
-      {/* ══════════════════════════════════════════════
-          BETA BANNER
-          ══════════════════════════════════════════════ */}
       <BetaBanner />
 
       {/* ══════════════════════════════════════════════
@@ -327,24 +367,20 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
             )}
           </Link>
 
-          {/* Desktop nav */}
           <div className="hidden items-center gap-8 text-sm md:flex">
-            <a href="#fonctionnalites" className="text-[#8b8fa8] transition-opacity duration-200 hover:text-[#e8e9f0]">
+            <a href="#fonctionnalites" className="text-[#8b8fa8] transition-opacity duration-150 hover:text-[#e8e9f0]">
               Fonctionnalités
             </a>
-            <a href="#tarifs" className="text-[#8b8fa8] transition-opacity duration-200 hover:text-[#e8e9f0]">
+            <a href="#tarifs" className="text-[#8b8fa8] transition-opacity duration-150 hover:text-[#e8e9f0]">
               Tarifs
             </a>
-            <a href="#faq" className="text-[#8b8fa8] transition-opacity duration-200 hover:text-[#e8e9f0]">
+            <a href="#faq" className="text-[#8b8fa8] transition-opacity duration-150 hover:text-[#e8e9f0]">
               FAQ
             </a>
           </div>
 
           <div className="hidden items-center gap-3 md:flex">
-            <Link
-              href="/login"
-              className="rounded-lg px-4 py-2 text-sm text-[#8b8fa8] transition-opacity duration-200 hover:text-[#e8e9f0]"
-            >
+            <Link href="/login" className="rounded-lg px-4 py-2 text-sm text-[#8b8fa8] transition-opacity duration-150 hover:text-[#e8e9f0]">
               Connexion
             </Link>
             <Link
@@ -355,17 +391,11 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
             </Link>
           </div>
 
-          {/* Mobile hamburger */}
-          <button
-            className="text-white md:hidden"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Menu"
-          >
+          <button className="text-white md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Menu">
             {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>
 
-        {/* Mobile menu */}
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
@@ -375,22 +405,11 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
               className="overflow-hidden border-b border-white/[0.06] bg-[#08090a]/95 backdrop-blur-xl md:hidden"
             >
               <div className="flex flex-col gap-4 px-6 py-6">
-                <a href="#fonctionnalites" className="text-[#8b8fa8] hover:text-[#e8e9f0]" onClick={() => setMobileMenuOpen(false)}>
-                  Fonctionnalités
-                </a>
-                <a href="#tarifs" className="text-[#8b8fa8] hover:text-[#e8e9f0]" onClick={() => setMobileMenuOpen(false)}>
-                  Tarifs
-                </a>
-                <a href="#faq" className="text-[#8b8fa8] hover:text-[#e8e9f0]" onClick={() => setMobileMenuOpen(false)}>
-                  FAQ
-                </a>
-                <Link href="/login" className="text-[#8b8fa8] hover:text-[#e8e9f0]">
-                  Connexion
-                </Link>
-                <Link
-                  href="/signup"
-                  className="rounded-lg bg-[#5e6ad2] px-5 py-2.5 text-center text-sm font-medium text-white"
-                >
+                <a href="#fonctionnalites" className="text-[#8b8fa8] hover:text-[#e8e9f0]" onClick={() => setMobileMenuOpen(false)}>Fonctionnalités</a>
+                <a href="#tarifs" className="text-[#8b8fa8] hover:text-[#e8e9f0]" onClick={() => setMobileMenuOpen(false)}>Tarifs</a>
+                <a href="#faq" className="text-[#8b8fa8] hover:text-[#e8e9f0]" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
+                <Link href="/login" className="text-[#8b8fa8] hover:text-[#e8e9f0]">Connexion</Link>
+                <Link href="/signup" className="rounded-lg bg-[#5e6ad2] px-5 py-2.5 text-center text-sm font-medium text-white">
                   Essayer gratuitement
                 </Link>
               </div>
@@ -400,18 +419,22 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
       </nav>
 
       {/* ══════════════════════════════════════════════
-          HERO — 2 colonnes (texte | mockup)
+          HERO IMMERSIF — "Le produit EST la landing"
+          H1 massif gauche + sous-titre droite
+          DevisGeneratorMockup pleine largeur dessous
           ══════════════════════════════════════════════ */}
-      <section className="pb-16 pt-28 sm:pb-24 sm:pt-36">
+      <section className="pb-0 pt-28 sm:pt-36">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="grid items-center gap-12 lg:grid-cols-2">
-            {/* Left — Text */}
+          {/* Top: H1 left + subtitle right */}
+          <div className="grid gap-8 lg:grid-cols-[1.3fr_1fr] lg:items-end">
             <div>
               <p className="text-[11px] font-medium uppercase tracking-widest text-[#8b8fa8]">
                 {copy ? copy.badge : "Propulsé par l\u2019IA Mistral — hébergée en France"}
               </p>
-
-              <h1 className="mt-6 text-4xl font-bold leading-[1.08] tracking-[-0.03em] sm:text-5xl lg:text-6xl">
+              <h1
+                className="mt-5 font-bold leading-[0.95] tracking-[-0.03em]"
+                style={{ fontSize: "clamp(3rem, 6vw, 5.5rem)" }}
+              >
                 {copy ? (
                   <>
                     {copy.hero}.{" "}
@@ -423,77 +446,57 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
                     Créez des devis.{" "}
                     <br className="hidden sm:block" />
                     Signez. Encaissez.{" "}
+                    <br className="hidden sm:block" />
                     <span className="text-[#5e6ad2]">En 2 minutes.</span>
                   </>
                 )}
               </h1>
+            </div>
 
-              <p className="mt-6 max-w-md text-lg leading-relaxed text-[#8b8fa8]">
+            <div className="lg:pb-3">
+              <p className="max-w-sm text-base leading-relaxed text-[#8b8fa8]">
                 L&apos;IA structure vos devis et propose des prix marché — vous
                 ajustez tout à vos tarifs. Vos clients signent et paient en ligne.
                 Relances auto, facturation PDF, pipeline Kanban — tout est inclus.
               </p>
-
-              <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-                <Link
-                  href="/signup"
-                  className="group inline-flex items-center justify-center gap-2 rounded-lg bg-[#5e6ad2] px-8 py-3.5 text-base font-semibold text-white transition-opacity duration-200 hover:opacity-90"
-                >
-                  Commencer gratuitement
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </Link>
-                <button
-                  onClick={() => setVideoOpen(true)}
-                  className="group inline-flex items-center justify-center gap-2 rounded-lg border border-white/[0.06] bg-white/[0.03] px-8 py-3.5 text-base font-medium text-[#e8e9f0] transition-opacity duration-200 hover:opacity-80"
-                >
-                  <Play className="h-4 w-4 text-[#5e6ad2]" />
-                  Voir la démo (90s)
-                </button>
-              </div>
-
-              <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-[#8b8fa8]">
-                <span className="flex items-center gap-1.5">
-                  <Check className="h-3.5 w-3.5 text-[#5e6ad2]" />
-                  Sans carte bancaire
+              <button
+                onClick={() => {
+                  const el = document.getElementById("demo");
+                  el?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="group mt-6 inline-flex items-center gap-2 text-sm font-medium text-[#5e6ad2] transition-opacity duration-150 hover:opacity-80"
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#5e6ad2] opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-[#5e6ad2]" />
                 </span>
-                <span className="flex items-center gap-1.5">
-                  <Check className="h-3.5 w-3.5 text-[#5e6ad2]" />
-                  Plan gratuit inclus
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Check className="h-3.5 w-3.5 text-[#5e6ad2]" />
-                  Annulable à tout moment
-                </span>
-              </div>
+                Démo en direct
+                <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+              </button>
             </div>
+          </div>
 
-            {/* Right — Carousel */}
-            <div>
-              <HeroCarousel />
-            </div>
+          {/* Product mockup — full width, overflows below fold */}
+          <div className="mt-16 sm:mt-20">
+            <DevisGeneratorMockup />
           </div>
         </div>
       </section>
 
       {/* ══════════════════════════════════════════════
-          LOGO TICKER (professions)
+          TICKER MÉTIERS
           ══════════════════════════════════════════════ */}
-      <section className="border-y border-white/[0.06] py-8">
-        <div className="mx-auto max-w-6xl px-4">
-          <p className="mb-6 text-center text-[11px] font-medium uppercase tracking-widest text-[#8b8fa8]">
-            Utilisé par les indépendants de tous métiers
-          </p>
-          <div className="relative overflow-hidden">
-            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-[#08090a] to-transparent" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-[#08090a] to-transparent" />
-
-            <div className="animate-ticker flex gap-12 whitespace-nowrap">
-              {[...professions, ...professions].map((p, i) => (
-                <span key={i} className="text-sm font-medium text-[#8b8fa8]/60">
-                  {p}
-                </span>
-              ))}
-            </div>
+      <section className="mt-20 border-y border-white/[0.06] py-6 sm:mt-28">
+        <div className="relative overflow-hidden">
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-[#08090a] to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-[#08090a] to-transparent" />
+          <div className="animate-ticker flex gap-8 whitespace-nowrap">
+            {[...professions, ...professions].map((p, i) => (
+              <span key={i} className="text-[13px] tracking-[0.05em] text-[#8b8fa8]/60">
+                {i > 0 && <span className="mr-8">·</span>}
+                {p}
+              </span>
+            ))}
           </div>
         </div>
 
@@ -503,287 +506,84 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
             100% { transform: translateX(-50%); }
           }
           .animate-ticker {
-            animation: ticker 30s linear infinite;
+            animation: ticker 35s linear infinite;
           }
         `}</style>
       </section>
 
       {/* ══════════════════════════════════════════════
-          STATS
+          FEATURES — "inline product" avec mockups animés
+          Chaque feature = grande section alternée
           ══════════════════════════════════════════════ */}
-      <section className="py-20 sm:py-28">
-        <div className="mx-auto grid max-w-4xl grid-cols-2 gap-8 px-4 sm:grid-cols-4 sm:px-6">
-          {stats.map((stat) => (
-            <div key={stat.label} className="text-center">
-              <p className="text-4xl font-bold tracking-[-0.03em] text-[#e8e9f0] sm:text-5xl">
-                {stat.value}{stat.suffix}
-              </p>
-              <p className="mt-2 text-sm text-[#8b8fa8]">{stat.label}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════
-          DEMO INTERACTIVE
-          ══════════════════════════════════════════════ */}
-      <DemoSection />
-
-      {/* ══════════════════════════════════════════════
-          FEATURES — layout alterné gauche/droite
-          ══════════════════════════════════════════════ */}
-      <section id="fonctionnalites" className="border-t border-white/[0.06] py-20 sm:py-28">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <p className="text-[11px] font-medium uppercase tracking-widest text-[#8b8fa8]">
-            Fonctionnalités
-          </p>
-          <h2 className="mt-4 text-3xl font-bold tracking-[-0.03em] sm:text-4xl lg:text-5xl">
-            Tout ce qu&apos;il faut pour{" "}
-            <span className="text-[#5e6ad2]">convertir plus vite</span>
-          </h2>
-          <p className="mt-4 max-w-xl text-[#8b8fa8]">
-            De la génération IA à l&apos;encaissement Stripe, Devizly couvre
-            tout le cycle du devis.
-          </p>
-
-          <div className="mt-16">
-            {features.map((feat, i) => (
-              <div key={feat.title} className="border-t border-white/[0.06] py-10 md:py-14">
-                <div className={`md:max-w-[55%] ${i % 2 === 1 ? "md:ml-auto" : ""}`}>
-                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg border border-white/[0.06] bg-[#0f0f10]">
-                    <feat.icon className="h-5 w-5 text-[#5e6ad2]" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-[#e8e9f0]">
+      <section id="fonctionnalites">
+        {featureSections.map((feat, i) => (
+          <div
+            key={feat.title}
+            className="border-t border-white/[0.06] py-24 sm:py-32"
+          >
+            <div className="mx-auto max-w-6xl px-4 sm:px-6">
+              <div
+                className={`grid items-center gap-12 lg:grid-cols-[2fr_3fr] ${
+                  i % 2 === 1 ? "lg:[direction:rtl]" : ""
+                }`}
+              >
+                {/* Text */}
+                <div className={i % 2 === 1 ? "lg:[direction:ltr]" : ""}>
+                  <p className="text-[11px] font-medium uppercase tracking-widest text-[#5e6ad2]">
+                    {feat.label}
+                  </p>
+                  <h2
+                    className="mt-4 font-bold tracking-[-0.02em]"
+                    style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.5rem)" }}
+                  >
                     {feat.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-[#8b8fa8]">
+                  </h2>
+                  <p className="mt-3 max-w-md text-base leading-relaxed text-[#8b8fa8]">
                     {feat.description}
                   </p>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* ══════════════════════════════════════════════
-          3 ÉTAPES — layout alterné avec mockups
-          ══════════════════════════════════════════════ */}
-      <section className="border-t border-white/[0.06] py-20 sm:py-28">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <p className="text-[11px] font-medium uppercase tracking-widest text-[#8b8fa8]">
-            Comment ça marche
-          </p>
-          <h2 className="mt-4 text-3xl font-bold tracking-[-0.03em] sm:text-4xl md:text-5xl">
-            3 étapes. Zéro prise de tête.
-          </h2>
-          <p className="mt-4 max-w-md text-[#8b8fa8]">
-            De la description à l&apos;encaissement, tout est automatisé.
-          </p>
-
-          {/* Step 1 — text left, mockup right */}
-          <div className="mt-16 grid items-start gap-8 border-t border-white/[0.06] py-12 md:grid-cols-2">
-            <div>
-              <span className="text-xs font-bold tracking-[3px] text-[#5e6ad2]">01</span>
-              <h3 className="mt-3 text-xl font-bold text-[#e8e9f0]">
-                Décrivez votre prestation
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-[#8b8fa8]">
-                L&apos;IA comprend votre métier, structure le devis et propose
-                des prix marché.
-              </p>
-              <p className="mt-2 text-xs font-medium text-[#5e6ad2]">
-                Vous ajustez chaque ligne à vos tarifs.
-              </p>
-            </div>
-            <div className="rounded-xl border border-white/[0.06] bg-[#0f0f10] p-4">
-              <div className="flex items-center gap-1.5 pb-3">
-                <div className="h-2 w-2 rounded-full bg-[#8b8fa8]/30" />
-                <div className="h-2 w-2 rounded-full bg-[#8b8fa8]/30" />
-                <div className="h-2 w-2 rounded-full bg-[#8b8fa8]/30" />
-              </div>
-              <div className="mb-3 rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-xs text-[#8b8fa8]">
-                Site vitrine 5 pages pour un restaurant...
-              </div>
-              <div className="space-y-1.5">
-                {[
-                  { d: "Design UX/UI (maquettes)", p: "1 200 €" },
-                  { d: "Développement Next.js", p: "2 800 €" },
-                  { d: "Hébergement + déploiement", p: "350 €" },
-                ].map((line) => (
-                  <div key={line.d} className="flex items-center justify-between rounded-md bg-white/[0.02] px-2.5 py-1.5 text-[11px]">
-                    <span className="text-[#8b8fa8]">{line.d}</span>
-                    <span className="font-semibold text-[#e8e9f0]">{line.p}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/[0.06]">
-                <div className="h-full w-3/4 rounded-full bg-[#5e6ad2]" />
-              </div>
-            </div>
-          </div>
-
-          {/* Step 2 — mockup left, text right */}
-          <div className="grid items-start gap-8 border-t border-white/[0.06] py-12 md:grid-cols-2">
-            <div className="order-2 md:order-1 rounded-xl border border-white/[0.06] bg-[#0f0f10] p-4">
-              <p className="mb-2 text-center text-[10px] font-semibold text-[#e8e9f0]">
-                Partager le devis
-              </p>
-              <div className="mb-3 flex items-center gap-1.5 rounded-lg border border-[#5e6ad2]/30 bg-[#5e6ad2]/10 px-2.5 py-2">
-                <span className="flex-1 truncate font-mono text-[10px] text-[#5e6ad2]/80">
-                  devizly.fr/devis/a3f8c2e1...
-                </span>
-                <div className="flex h-5 w-5 items-center justify-center rounded bg-white/[0.06] text-[8px] text-[#8b8fa8]">📋</div>
-              </div>
-              <div className="flex gap-2">
-                {[
-                  { icon: "💬", label: "WhatsApp", bg: "bg-white/[0.04]" },
-                  { icon: "✉️", label: "Email", bg: "bg-white/[0.06] ring-1 ring-white/[0.06]" },
-                  { icon: "📱", label: "SMS", bg: "bg-white/[0.04]" },
-                ].map((btn) => (
-                  <div key={btn.label} className={`flex flex-1 flex-col items-center gap-1 rounded-lg ${btn.bg} py-2`}>
-                    <span className="text-sm">{btn.icon}</span>
-                    <span className="text-[8px] font-semibold text-[#8b8fa8]">{btn.label}</span>
-                  </div>
-                ))}
-              </div>
-              <p className="mt-2 text-center text-[8px] text-[#8b8fa8]">
-                Le client consulte, signe ou refuse en ligne
-              </p>
-            </div>
-            <div className="order-1 md:order-2">
-              <span className="text-xs font-bold tracking-[3px] text-[#5e6ad2]">02</span>
-              <h3 className="mt-3 text-xl font-bold text-[#e8e9f0]">
-                Partagez en 1 clic
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-[#8b8fa8]">
-                Lien, QR Code, Email ou WhatsApp. Le client consulte, signe ou
-                refuse en ligne.
-              </p>
-              <p className="mt-2 text-xs font-medium text-[#5e6ad2]">
-                envoyé → consulté → signé → payé
-              </p>
-            </div>
-          </div>
-
-          {/* Step 3 — text left, mockup right */}
-          <div className="grid items-start gap-8 border-t border-white/[0.06] py-12 md:grid-cols-2">
-            <div>
-              <span className="text-xs font-bold tracking-[3px] text-[#5e6ad2]">03</span>
-              <h3 className="mt-3 text-xl font-bold text-[#e8e9f0]">
-                Encaissez automatiquement
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-[#8b8fa8]">
-                Votre client signe et paie depuis son navigateur — sans créer de
-                compte.
-              </p>
-              <p className="mt-2 text-xs font-medium text-[#5e6ad2]">
-                Facture générée, relances auto J+2, J+5, J+7.
-              </p>
-            </div>
-            <div className="rounded-xl border border-white/[0.06] bg-[#0f0f10] p-4">
-              <div className="text-center">
-                <p className="text-[10px] font-medium uppercase tracking-wider text-[#8b8fa8]">
-                  Montant TTC
-                </p>
-                <p className="mt-1 text-2xl font-bold text-[#e8e9f0]">
-                  2 850,00 €
-                </p>
-                <div className="mx-auto mt-3 w-full rounded-lg bg-[#5e6ad2] px-4 py-2 text-center text-xs font-semibold text-white">
-                  Payer maintenant
-                </div>
-                <div className="mt-2 flex items-center justify-center gap-1 text-[10px] text-[#5e6ad2]">
-                  <Check className="h-3 w-3" />
-                  <span>Facture auto-générée</span>
+                {/* Mockup */}
+                <div className={`${i % 2 === 1 ? "lg:[direction:ltr]" : ""} w-full`}>
+                  <FeatureMockup type={feat.mockup} />
                 </div>
               </div>
-              <div className="mt-2 flex justify-center gap-2">
-                {["J+2", "J+5", "J+7"].map((d) => (
-                  <span
-                    key={d}
-                    className="rounded bg-white/[0.03] px-2 py-0.5 text-[9px] font-medium text-[#8b8fa8]"
-                  >
-                    Relance {d}
-                  </span>
-                ))}
-              </div>
             </div>
           </div>
-
-          {/* CTA */}
-          <div className="mt-12 text-center">
-            <Link
-              href="/signup"
-              className="group inline-flex items-center gap-2 rounded-lg bg-[#5e6ad2] px-8 py-3.5 text-base font-semibold text-white transition-opacity duration-200 hover:opacity-90"
-            >
-              Essayer maintenant — c&apos;est gratuit
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </Link>
-          </div>
-        </div>
+        ))}
       </section>
 
       {/* ══════════════════════════════════════════════
-          SOCIAL PROOF (live counter)
+          DÉMO LIVE INTERACTIVE
+          Fond avec subtle radial gradient (seule exception)
           ══════════════════════════════════════════════ */}
-      <section className="border-t border-white/[0.06] py-20 sm:py-28">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6">
-          <div className="rounded-xl border border-white/[0.06] bg-[#0f0f10] p-8 sm:p-14">
-            <Zap className="mb-4 h-10 w-10 text-[#5e6ad2]" />
-            <h2 className="text-3xl font-bold tracking-[-0.03em] sm:text-4xl">
-              Gagnez 5 heures par semaine
-            </h2>
-            <p className="mt-4 max-w-lg text-base text-[#8b8fa8]">
-              Un devis classique prend 30 à 45 minutes sous Excel. Avec
-              Devizly, l&apos;IA propose une structure et des prix marché en
-              30 secondes — vous personnalisez, ajustez vos tarifs, et envoyez.
-            </p>
-
-            {quotesCount > 0 && (
-              <div className="mt-8 inline-flex items-center gap-2 rounded-lg border border-white/[0.06] bg-white/[0.03] px-5 py-2">
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#5e6ad2] opacity-75" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-[#5e6ad2]" />
-                </span>
-                <span className="text-sm font-medium text-[#8b8fa8]">
-                  {quotesCount.toLocaleString("fr-FR")}+ devis générés par la
-                  communauté
-                </span>
-              </div>
-            )}
-
-            <div className="mt-10 grid max-w-md grid-cols-3 gap-6">
-              <div>
-                <p className="text-3xl font-bold tracking-[-0.03em] text-[#e8e9f0]">30s</p>
-                <p className="mt-1 text-xs text-[#8b8fa8]">par devis</p>
-              </div>
-              <div>
-                <p className="text-3xl font-bold tracking-[-0.03em] text-[#e8e9f0]">3x</p>
-                <p className="mt-1 text-xs text-[#8b8fa8]">plus de signatures</p>
-              </div>
-              <div>
-                <p className="text-3xl font-bold tracking-[-0.03em] text-[#e8e9f0]">48h</p>
-                <p className="mt-1 text-xs text-[#8b8fa8]">paiement reçu</p>
-              </div>
-            </div>
-          </div>
-        </div>
+      <section
+        id="demo"
+        className="border-t border-white/[0.06] py-24 sm:py-32"
+        style={{
+          background:
+            "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(94,106,210,0.08) 0%, transparent 100%)",
+        }}
+      >
+        <DemoSection />
       </section>
 
       {/* ══════════════════════════════════════════════
-          PRICING
+          PRICING — Linear style
           ══════════════════════════════════════════════ */}
-      <section id="tarifs" className="border-t border-white/[0.06] py-20 sm:py-28">
+      <section id="tarifs" className="border-t border-white/[0.06] py-24 sm:py-32">
         <div className="mx-auto max-w-5xl px-4 sm:px-6">
           <p className="text-[11px] font-medium uppercase tracking-widest text-[#8b8fa8]">
             Tarifs
           </p>
-          <h2 className="mt-4 text-3xl font-bold tracking-[-0.03em] sm:text-4xl">
+          <h2
+            className="mt-4 font-bold tracking-[-0.02em]"
+            style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.5rem)" }}
+          >
             Commencez gratuitement, évoluez à votre rythme
           </h2>
           <p className="mt-4 max-w-lg text-[#8b8fa8]">
-            Pas de surprise. Pas d&apos;engagement. Changez de plan à tout
-            moment.
+            Pas de surprise. Pas d&apos;engagement. Changez de plan à tout moment.
           </p>
 
           <div className="mt-14 grid gap-6 md:grid-cols-3">
@@ -809,20 +609,16 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
                   <span className="text-4xl font-bold tracking-[-0.03em] text-[#e8e9f0]">
                     {plan.price}€
                   </span>
-                  {plan.period && (
-                    <span className="text-[#8b8fa8]">{plan.period}</span>
-                  )}
+                  {plan.period && <span className="text-[#8b8fa8]">{plan.period}</span>}
                   {plan.price === 0 && (
-                    <p className="mt-1 text-xs text-[#8b8fa8]">
-                      Gratuit pour toujours
-                    </p>
+                    <p className="mt-1 text-xs text-[#8b8fa8]">Gratuit pour toujours</p>
                   )}
                 </div>
 
                 <ul className="mt-6 flex-1 space-y-3">
                   {plan.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2.5 text-sm text-[#8b8fa8]">
-                      <Check className="h-4 w-4 shrink-0 text-[#5e6ad2]" />
+                    <li key={f} className="flex items-start gap-2.5 text-sm text-[#8b8fa8]">
+                      <span className="mt-0.5 text-[#5e6ad2]">—</span>
                       {f}
                     </li>
                   ))}
@@ -848,14 +644,17 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
       </section>
 
       {/* ══════════════════════════════════════════════
-          FAQ — lignes simples avec border-bottom
+          FAQ — lignes minimalistes
           ══════════════════════════════════════════════ */}
-      <section id="faq" className="border-t border-white/[0.06] py-20 sm:py-28">
+      <section id="faq" className="border-t border-white/[0.06] py-24 sm:py-32">
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
           <p className="text-[11px] font-medium uppercase tracking-widest text-[#8b8fa8]">
             FAQ
           </p>
-          <h2 className="mt-4 text-3xl font-bold tracking-[-0.03em] sm:text-4xl">
+          <h2
+            className="mt-4 font-bold tracking-[-0.02em]"
+            style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.5rem)" }}
+          >
             Questions fréquentes
           </h2>
 
@@ -871,13 +670,16 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
           DERNIERS ARTICLES
           ══════════════════════════════════════════════ */}
       {recentPosts.length > 0 && (
-        <section className="border-t border-white/[0.06] py-20 sm:py-28">
+        <section className="border-t border-white/[0.06] py-24 sm:py-32">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-widest text-[#8b8fa8]">
               <BookOpen className="h-3.5 w-3.5" />
               Blog
             </div>
-            <h2 className="mt-4 text-3xl font-bold tracking-[-0.03em] sm:text-4xl">
+            <h2
+              className="mt-4 font-bold tracking-[-0.02em]"
+              style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.5rem)" }}
+            >
               Derniers articles
             </h2>
             <p className="mt-4 max-w-lg text-[#8b8fa8]">
@@ -925,11 +727,14 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
       {/* ══════════════════════════════════════════════
           CTA FINAL
           ══════════════════════════════════════════════ */}
-      <section className="py-20 sm:py-28">
+      <section className="py-24 sm:py-32">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
           <div className="rounded-xl border border-white/[0.06] bg-[#0f0f10] p-10 sm:p-16">
             <FileText className="mb-4 h-10 w-10 text-[#5e6ad2]" />
-            <h2 className="text-3xl font-bold tracking-[-0.03em] sm:text-4xl lg:text-5xl">
+            <h2
+              className="font-bold tracking-[-0.02em]"
+              style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.5rem)" }}
+            >
               Prêt à arrêter de perdre du temps
               <br className="hidden sm:block" /> sur vos devis ?
             </h2>
@@ -943,12 +748,18 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
                 href="/signup"
                 className="group inline-flex items-center gap-2 rounded-lg bg-[#5e6ad2] px-8 py-4 text-base font-semibold text-white transition-opacity duration-200 hover:opacity-90"
               >
-                Commencer gratuitementement
+                Commencer gratuitement
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
+              <button
+                onClick={() => setVideoOpen(true)}
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/[0.06] bg-transparent px-8 py-4 text-base font-medium text-[#e8e9f0] transition-opacity duration-200 hover:bg-white/[0.04]"
+              >
+                Voir la démo
+              </button>
             </div>
 
-            <p className="mt-4 text-sm text-[#8b8fa8]">
+            <p className="mt-6 text-sm text-[#8b8fa8]">
               Sans carte bancaire · Accès immédiat · Support français
             </p>
           </div>
@@ -966,32 +777,21 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
             </Link>
 
             <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-[#8b8fa8]">
-              <a href="#fonctionnalites" className="transition-opacity duration-200 hover:text-[#e8e9f0]">
-                Fonctionnalités
-              </a>
-              <a href="#tarifs" className="transition-opacity duration-200 hover:text-[#e8e9f0]">
-                Tarifs
-              </a>
-              <a href="#faq" className="transition-opacity duration-200 hover:text-[#e8e9f0]">
-                FAQ
-              </a>
-              <Link href="/blog" className="transition-opacity duration-200 hover:text-[#e8e9f0]">
-                Blog
-              </Link>
-              <Link href="/login" className="transition-opacity duration-200 hover:text-[#e8e9f0]">
-                Connexion
-              </Link>
+              <a href="#fonctionnalites" className="transition-opacity duration-150 hover:text-[#e8e9f0]">Fonctionnalités</a>
+              <a href="#tarifs" className="transition-opacity duration-150 hover:text-[#e8e9f0]">Tarifs</a>
+              <a href="#faq" className="transition-opacity duration-150 hover:text-[#e8e9f0]">FAQ</a>
+              <Link href="/blog" className="transition-opacity duration-150 hover:text-[#e8e9f0]">Blog</Link>
+              <Link href="/login" className="transition-opacity duration-150 hover:text-[#e8e9f0]">Connexion</Link>
             </div>
 
-            {/* Solutions SEO */}
             <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-[#8b8fa8]/50">
               <span className="font-medium text-[#8b8fa8]/70">Solutions :</span>
-              <Link href="/logiciel-devis-artisan" className="transition-opacity duration-200 hover:text-[#8b8fa8]">Logiciel devis artisan</Link>
-              <Link href="/devis-auto-entrepreneur" className="transition-opacity duration-200 hover:text-[#8b8fa8]">Devis auto-entrepreneur</Link>
-              <Link href="/logiciel-facturation-freelance" className="transition-opacity duration-200 hover:text-[#8b8fa8]">Facturation freelance</Link>
-              <Link href="/devis-batiment-gratuit" className="transition-opacity duration-200 hover:text-[#8b8fa8]">Devis bâtiment</Link>
-              <Link href="/creer-devis-en-ligne" className="transition-opacity duration-200 hover:text-[#8b8fa8]">Créer devis en ligne</Link>
-              <Link href="/generateur-devis-ia" className="transition-opacity duration-200 hover:text-[#8b8fa8]">Générateur devis IA</Link>
+              <Link href="/logiciel-devis-artisan" className="hover:text-[#8b8fa8]">Logiciel devis artisan</Link>
+              <Link href="/devis-auto-entrepreneur" className="hover:text-[#8b8fa8]">Devis auto-entrepreneur</Link>
+              <Link href="/logiciel-facturation-freelance" className="hover:text-[#8b8fa8]">Facturation freelance</Link>
+              <Link href="/devis-batiment-gratuit" className="hover:text-[#8b8fa8]">Devis bâtiment</Link>
+              <Link href="/creer-devis-en-ligne" className="hover:text-[#8b8fa8]">Créer devis en ligne</Link>
+              <Link href="/generateur-devis-ia" className="hover:text-[#8b8fa8]">Générateur devis IA</Link>
             </div>
 
             <div className="flex items-center gap-2 text-xs text-[#8b8fa8]">
@@ -1006,24 +806,12 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
 
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-[#8b8fa8]/50">
-              <Link href="/mentions-legales" className="transition-opacity duration-200 hover:text-[#8b8fa8]">
-                Mentions légales
-              </Link>
-              <Link href="/cgv" className="transition-opacity duration-200 hover:text-[#8b8fa8]">
-                CGV
-              </Link>
-              <Link href="/cgu" className="transition-opacity duration-200 hover:text-[#8b8fa8]">
-                CGU
-              </Link>
-              <Link href="/confidentialite" className="transition-opacity duration-200 hover:text-[#8b8fa8]">
-                Confidentialité
-              </Link>
-              <Link href="/cookies" className="transition-opacity duration-200 hover:text-[#8b8fa8]">
-                Cookies
-              </Link>
-              <Link href="/securite" className="transition-opacity duration-200 hover:text-[#8b8fa8]">
-                Sécurité
-              </Link>
+              <Link href="/mentions-legales" className="hover:text-[#8b8fa8]">Mentions légales</Link>
+              <Link href="/cgv" className="hover:text-[#8b8fa8]">CGV</Link>
+              <Link href="/cgu" className="hover:text-[#8b8fa8]">CGU</Link>
+              <Link href="/confidentialite" className="hover:text-[#8b8fa8]">Confidentialité</Link>
+              <Link href="/cookies" className="hover:text-[#8b8fa8]">Cookies</Link>
+              <Link href="/securite" className="hover:text-[#8b8fa8]">Sécurité</Link>
             </div>
             <p className="text-xs text-[#8b8fa8]/50">
               &copy; {new Date().getFullYear()} NBHC SAS — SIREN 102 637 899 — 55 Rue Henri Clément, 71100 Saint-Rémy
@@ -1033,7 +821,7 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
       </footer>
 
       {/* ══════════════════════════════════════════════
-          VIDEO DEMO MODAL (A1)
+          VIDEO DEMO MODAL
           ══════════════════════════════════════════════ */}
       <AnimatePresence>
         {videoOpen && (
@@ -1068,7 +856,7 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
       </AnimatePresence>
 
       {/* ══════════════════════════════════════════════
-          PROACTIVE CHAT WIDGET (A2)
+          PROACTIVE CHAT WIDGET
           ══════════════════════════════════════════════ */}
       <AnimatePresence>
         {chatShown && !chatOpen && (

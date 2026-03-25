@@ -34,10 +34,42 @@ const schema = {
   url: "https://devizly.fr/generateur-devis-ia",
 };
 
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "Comment fonctionne l'IA de Devizly ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Vous décrivez votre prestation en langage naturel. L'IA analyse la description, identifie les composantes de la prestation, et génère un devis structuré avec des lignes de postes détaillées, des quantités et des prix marché comme point de départ. Tout est modifiable ensuite.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Le devis généré par IA est-il personnalisable ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Oui, à 100 %. L'IA génère une première version que vous pouvez entièrement modifier : descriptions, quantités, prix unitaires, remises, conditions. Le devis final reflète exactement ce que vous souhaitez proposer à votre client.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Le générateur de devis IA est-il gratuit ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Oui. Le plan gratuit de Devizly inclut la génération IA pour 3 devis par mois, sans carte bancaire et sans engagement. Les plans payants offrent un nombre illimité de devis et des fonctionnalités avancées.",
+      },
+    },
+  ],
+};
+
 export default function GenerateurDevisIAPage() {
   return (
     <>
       <JsonLd data={schema} />
+      <JsonLd data={faqSchema} />
 
       <article>
         <h1 className="text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">

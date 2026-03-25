@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "CGU — Conditions Générales d'Utilisation | Devizly",
   description:
-    "Conditions Générales d'Utilisation de Devizly — règles d'utilisation de la plateforme.",
+    "Conditions Générales d'Utilisation de Devizly. Règles d'utilisation de la plateforme de devis IA, responsabilités, propriété intellectuelle et données personnelles.",
   alternates: { canonical: "https://devizly.fr/cgu" },
 };
 

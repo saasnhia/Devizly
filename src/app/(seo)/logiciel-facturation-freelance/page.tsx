@@ -34,10 +34,42 @@ const schema = {
   url: "https://devizly.fr/logiciel-facturation-freelance",
 };
 
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "Comment facturer en freelance ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Après acceptation de votre devis, vous émettez une facture comportant les mentions obligatoires (SIRET, numéro séquentiel, détail des prestations, TVA, conditions de paiement). Devizly automatise ce processus : la facture est générée dès la signature du devis.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Faut-il facturer avec ou sans TVA ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Si vous êtes en franchise de TVA (auto-entrepreneur sous les seuils), vos factures sont en HT uniquement avec la mention « TVA non applicable, art. 293 B du CGI ». Au-delà des seuils, vous facturez TTC avec le taux applicable (20 % pour les services).",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Quel est le délai de paiement légal ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Le délai de paiement légal entre professionnels est de 30 jours à compter de la réception de la facture, extensible à 60 jours ou 45 jours fin de mois par accord contractuel.",
+      },
+    },
+  ],
+};
+
 export default function LogicielFacturationFreelancePage() {
   return (
     <>
       <JsonLd data={schema} />
+      <JsonLd data={faqSchema} />
 
       <article>
         <h1 className="text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">

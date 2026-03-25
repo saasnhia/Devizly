@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "CGV — Conditions Générales de Vente | Devizly",
   description:
-    "Conditions Générales de Vente de Devizly — conditions applicables aux abonnements et services.",
+    "Conditions Générales de Vente de Devizly. Tarifs, modalités d'abonnement, résiliation, remboursement et obligations des parties pour les plans Gratuit, Pro et Business.",
   alternates: { canonical: "https://devizly.fr/cgv" },
 };
 

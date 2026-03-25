@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Politique de cookies | Devizly",
   description:
-    "Politique de cookies de Devizly — cookies essentiels uniquement.",
+    "Politique de cookies de Devizly. Cookies strictement essentiels pour l'authentification et la session. Aucun cookie publicitaire, aucun tracker tiers. Conforme RGPD.",
   alternates: { canonical: "https://devizly.fr/cookies" },
 };
 

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Mentions légales",
-  description: "Mentions légales de Devizly — informations sur l'éditeur du site.",
+  title: "Mentions légales — Devizly",
+  description:
+    "Mentions légales de Devizly, logiciel de devis IA édité par la SAS NBHC. SIREN 102 637 899 — 55 Rue Henri Clément, 71100 Saint-Rémy. Hébergement Vercel et Supabase (UE).",
   alternates: { canonical: "https://devizly.fr/mentions-legales" },
 };
 

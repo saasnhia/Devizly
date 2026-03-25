@@ -34,10 +34,42 @@ const schema = {
   url: "https://devizly.fr/devis-auto-entrepreneur",
 };
 
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "Un auto-entrepreneur doit-il faire des devis ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Oui, le devis est obligatoire pour toute prestation de services dont le montant dépasse 150 € TTC. Même en dessous de ce seuil, il est fortement recommandé pour se protéger en cas de litige.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Quelles sont les mentions obligatoires ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Un devis de micro-entrepreneur doit comporter : nom et prénom, adresse, SIRET, la date, la description détaillée des prestations, les prix unitaires et total, la mention de franchise de TVA, les conditions de paiement et la durée de validité.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Comment facturer en auto-entrepreneur ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Après acceptation du devis, vous émettez une facture avec les mêmes mentions obligatoires, plus un numéro de facture séquentiel unique. Devizly génère automatiquement la facture après signature du devis.",
+      },
+    },
+  ],
+};
+
 export default function DevisAutoEntrepreneurPage() {
   return (
     <>
       <JsonLd data={schema} />
+      <JsonLd data={faqSchema} />
 
       <article>
         <h1 className="text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">

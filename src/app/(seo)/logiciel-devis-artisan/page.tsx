@@ -34,10 +34,42 @@ const schema = {
   url: "https://devizly.fr/logiciel-devis-artisan",
 };
 
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "Un devis artisan est-il obligatoire ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Oui, pour tout travail dont le montant dépasse 150 € TTC, un devis écrit est obligatoire avant le début des travaux. Pour les dépannages et réparations, le devis est obligatoire au-delà de 150 €. En dessous, le professionnel doit informer le client du caractère payant de la prestation et de son prix avant exécution.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Quelle est la durée de validité d'un devis ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "La loi ne fixe pas de durée minimale, mais il est recommandé d'indiquer une durée de validité de 30 à 90 jours. Devizly ajoute automatiquement une durée de validité de 30 jours sur chaque devis. Passé ce délai, le professionnel n'est plus engagé par les prix indiqués.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Comment faire signer un devis à distance ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Avec Devizly, envoyez votre devis par email ou partagez un lien. Votre client le consulte sur son navigateur et le signe électroniquement d'un simple geste sur l'écran. La signature a valeur juridique et est horodatée.",
+      },
+    },
+  ],
+};
+
 export default function LogicielDevisArtisanPage() {
   return (
     <>
       <JsonLd data={schema} />
+      <JsonLd data={faqSchema} />
 
       <article>
         <h1 className="text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">

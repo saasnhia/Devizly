@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Politique de confidentialité | Devizly",
   description:
-    "Politique de confidentialité de Devizly — traitement des données personnelles conforme RGPD.",
+    "Politique de confidentialité de Devizly. Traitement des données personnelles conforme RGPD, hébergement européen Supabase, durées de conservation, droits d'accès et suppression.",
   alternates: { canonical: "https://devizly.fr/confidentialite" },
 };
 

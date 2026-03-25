@@ -34,10 +34,42 @@ const schema = {
   url: "https://devizly.fr/creer-devis-en-ligne",
 };
 
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "Quelles mentions obligatoires sur un devis ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Un devis doit comporter : la date, l'identité du professionnel (nom, SIRET, adresse), l'identité du client, le détail des prestations avec prix unitaires et quantités, le taux de TVA, les montants HT et TTC, les conditions de paiement et la durée de validité.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Comment envoyer un devis par email ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Avec Devizly, cliquez sur « Envoyer » après avoir créé votre devis. Le client reçoit un email avec un lien de consultation. Il peut visualiser, signer et payer directement depuis son navigateur.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Un devis engage-t-il le professionnel ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Oui. Un devis signé par le client engage le professionnel à réaliser la prestation aux conditions et prix indiqués, pendant la durée de validité du devis.",
+      },
+    },
+  ],
+};
+
 export default function CreerDevisEnLignePage() {
   return (
     <>
       <JsonLd data={schema} />
+      <JsonLd data={faqSchema} />
 
       <article>
         <h1 className="text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">

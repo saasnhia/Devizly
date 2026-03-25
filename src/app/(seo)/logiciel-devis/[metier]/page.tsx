@@ -71,10 +71,36 @@ export default async function LogicielDevisMetierPage({
     url: metierUrl(m.slug),
   };
 
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Accueil",
+        item: "https://devizly.fr",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Logiciel devis artisan",
+        item: "https://devizly.fr/logiciel-devis-artisan",
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: `Devis ${m.nom}`,
+        item: metierUrl(m.slug),
+      },
+    ],
+  };
+
   return (
     <>
       <JsonLd data={faqSchema} />
       <JsonLd data={softwareSchema} />
+      <JsonLd data={breadcrumbSchema} />
 
       <article>
         <h1 className="text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">

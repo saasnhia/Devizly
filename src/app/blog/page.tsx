@@ -7,7 +7,7 @@ import { ArrowRight, Clock, Tag, TrendingUp, Sparkles } from "lucide-react";
 export const metadata: Metadata = {
   title: "Blog Devizly — Guides Freelances et Artisans",
   description:
-    "Conseils pratiques pour freelances, artisans et auto-entrepreneurs : devis, facturation, TVA, mentions légales, relances clients.",
+    "Conseils pratiques pour freelances, artisans et auto-entrepreneurs : devis, facturation, TVA, mentions légales, relances clients et gestion.",
   alternates: { canonical: "https://devizly.fr/blog" },
 };
 

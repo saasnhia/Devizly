@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Sécurité | Devizly",
+  title: "Sécurité des données — Devizly",
   description:
-    "Comment Devizly protège vos données — hébergement, chiffrement, paiements sécurisés.",
+    "Découvrez comment Devizly protège vos données : hébergement européen, chiffrement TLS et AES, paiements sécurisés Stripe, IA Mistral hébergée en France. Conforme RGPD.",
   alternates: { canonical: "https://devizly.fr/securite" },
 };
 

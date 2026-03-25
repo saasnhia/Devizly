@@ -34,10 +34,42 @@ const schema = {
   url: "https://devizly.fr/devis-batiment-gratuit",
 };
 
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "Que doit contenir un devis bâtiment ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Un devis bâtiment doit contenir : l'identité de l'entreprise (SIRET, adresse, assurance décennale), la date et durée de validité, le détail des travaux poste par poste, le taux de TVA, les montants HT et TTC, les conditions de paiement et le droit de rétractation.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Quand s'applique la TVA réduite pour travaux ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "La TVA à 10 % s'applique aux travaux de rénovation sur des logements achevés depuis plus de 2 ans. La TVA à 5,5 % concerne spécifiquement les travaux d'amélioration énergétique (isolation, fenêtres, chauffage performant).",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Un devis signé vaut-il contrat ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Oui. Un devis signé par le client avec la mention « bon pour accord » engage les deux parties. Il fait office de contrat et oblige le professionnel à réaliser les travaux aux conditions prévues, et le client à en payer le prix.",
+      },
+    },
+  ],
+};
+
 export default function DevisBatimentGratuitPage() {
   return (
     <>
       <JsonLd data={schema} />
+      <JsonLd data={faqSchema} />
 
       <article>
         <h1 className="text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">

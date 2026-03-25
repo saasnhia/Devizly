@@ -433,21 +433,11 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
               </p>
               <h1
                 className="mt-5 font-extrabold leading-[1.0] tracking-[-0.04em] text-[#e8e9f0]"
-                style={{ fontSize: "clamp(2.8rem, 4.5vw, 5rem)" }}
+                style={{ fontSize: "clamp(2.2rem, 3.8vw, 4.2rem)" }}
               >
-                {copy ? (
-                  <>
-                    {copy.hero}, signez et encaissez
-                    <br />
-                    vos devis en 2 minutes.
-                  </>
-                ) : (
-                  <>
-                    Créez, signez et encaissez
-                    <br />
-                    vos devis en 2 minutes.
-                  </>
-                )}
+                {copy
+                  ? `${copy.hero}, signez et encaissez vos devis en 2 minutes.`
+                  : "Créez, signez et encaissez vos devis en 2 minutes."}
               </h1>
             </div>
 

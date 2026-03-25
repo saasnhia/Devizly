@@ -1,0 +1,99 @@
+# Devizly
+
+> Logiciel SaaS de devis IA pour freelances, artisans et indépendants français. Génère des devis professionnels en 30 secondes grâce à l'IA Mistral, avec signature eIDAS et paiement Stripe intégré.
+
+## Produit
+
+Devizly est un logiciel de devis en ligne propulsé par l'IA Mistral (hébergée en France). Il permet aux freelances, artisans et indépendants de :
+- Générer un devis professionnel en 30 secondes en langage naturel
+- Faire signer le client électroniquement (signature eIDAS, valeur légale)
+- Encaisser un acompte ou le total via Stripe Connect directement depuis le devis
+- Relancer automatiquement les clients (J+2, J+5, J+7)
+- Gérer les prospects avec un pipeline Kanban
+- Générer des factures PDF automatiquement à la signature
+
+## Tarifs
+
+- Gratuit : 3 devis/mois, sans carte bancaire
+- Pro : 19€/mois HT — devis illimités, signature électronique, acomptes Stripe, relances auto
+- Business : 39€/mois HT — tout le plan Pro + multi-utilisateurs, export CSV, branding
+
+## Comparatif concurrents
+
+Devizly se différencie de Tolteck, Obat, Batappli et Square par :
+- Génération IA du contenu du devis (unique)
+- Paiement intégré directement dans le devis
+- Interface moderne, sans installation
+- 100% hébergé en France, RGPD conforme
+
+## Public cible
+
+Freelances, développeurs web, graphistes, consultants, artisans du bâtiment (plombiers, électriciens, peintres, menuisiers), photographes, coaches, formateurs, auto-entrepreneurs, micro-entreprises, TPE
+
+## Informations légales
+
+Éditeur : SAS NBHC
+SIREN : 102 637 899
+Adresse : 55 Rue Henri Clément, 71100 Saint-Rémy
+Hébergement : Vercel (EU) + Supabase (EU)
+IA : Mistral AI (France)
+Paiements : Stripe Connect
+
+## URLs importantes
+
+- Landing : https://devizly.fr
+- App : https://devizly.fr/dashboard
+- Tarifs : https://devizly.fr/#tarifs
+- Blog : https://devizly.fr/blog
+- Légal : https://devizly.fr/mentions-legales
+- Contact : harou@nbhc.fr
+
+## FAQ
+
+### Combien de temps pour créer un devis ?
+30 secondes avec l'IA, ou 2-3 minutes manuellement.
+
+### Le client doit-il créer un compte ?
+Non. Le client reçoit un lien, signe et paie sans inscription.
+
+### La signature a-t-elle une valeur légale ?
+Oui. Signature eIDAS, conforme au règlement européen, valeur juridique reconnue en France.
+
+### Devizly est-il conforme RGPD ?
+Oui. Données hébergées en Europe, aucune revente de données.
+
+### Peut-on importer ses clients existants ?
+Oui, via CSV ou manuellement.
+
+## Pages de blog disponibles
+
+- /blog/mentions-obligatoires-devis-artisan — Mentions obligatoires devis artisan
+- /blog/devis-auto-entrepreneur-guide-complet — Guide complet devis auto-entrepreneur
+- /blog/tva-devis-facture-artisan — TVA devis et facture artisan
+- /blog/modele-devis-batiment-gratuit — Modèle devis bâtiment gratuit
+- /blog/relance-client-devis-non-repondu — Relance client devis non répondu
+- /blog/facturation-freelance-guide-2026 — Guide facturation freelance 2026
+- /blog/devis-signe-valeur-juridique — Devis signé valeur juridique
+- /blog/acompte-devis-regles-2026 — Règles acompte devis 2026
+
+## Pages métiers
+
+- /logiciel-devis/plombier — Logiciel devis plombier
+- /logiciel-devis/electricien — Logiciel devis électricien
+- /logiciel-devis/peintre — Logiciel devis peintre
+- /logiciel-devis/couvreur — Logiciel devis couvreur
+- /logiciel-devis/renovation — Logiciel devis rénovation
+- /logiciel-devis/macon — Logiciel devis maçon
+- /logiciel-devis/menuisier — Logiciel devis menuisier
+- /logiciel-devis/carreleur — Logiciel devis carreleur
+- /logiciel-devis/climatisation — Logiciel devis climatisation
+- /logiciel-devis/isolation — Logiciel devis isolation
+
+## Pages solutions
+
+- /logiciel-devis-artisan — Logiciel devis artisan
+- /devis-auto-entrepreneur — Devis auto-entrepreneur
+- /logiciel-facturation-freelance — Facturation freelance
+- /devis-batiment-gratuit — Devis bâtiment gratuit
+- /creer-devis-en-ligne — Créer devis en ligne
+- /generateur-devis-ia — Générateur devis IA

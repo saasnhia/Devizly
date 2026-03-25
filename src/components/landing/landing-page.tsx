@@ -426,32 +426,32 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
       <section className="pb-0 pt-28 sm:pt-36">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           {/* Top: H1 left + subtitle right */}
-          <div className="grid gap-8 lg:grid-cols-[1.3fr_1fr] lg:items-end">
+          <div className="grid gap-8 lg:grid-cols-[1.3fr_1fr] lg:items-start">
             <div>
               <p className="text-[11px] font-medium uppercase tracking-widest text-[#8b8fa8]">
                 {copy ? copy.badge : "Propulsé par l\u2019IA Mistral — hébergée en France"}
               </p>
               <h1
-                className="mt-5 font-extrabold leading-[0.9] tracking-[-0.04em] text-[#e8e9f0]"
-                style={{ fontSize: "clamp(3.5rem, 6vw, 7rem)" }}
+                className="mt-5 font-extrabold leading-[1.0] tracking-[-0.04em] text-[#e8e9f0]"
+                style={{ fontSize: "clamp(2.8rem, 4.5vw, 5rem)" }}
               >
                 {copy ? (
                   <>
-                    {copy.hero}, signez
+                    {copy.hero}, signez et encaissez
                     <br />
-                    et encaissez. En 2 minutes.
+                    vos devis en 2 minutes.
                   </>
                 ) : (
                   <>
-                    Créez des devis, signez
+                    Créez, signez et encaissez
                     <br />
-                    et encaissez. En 2 minutes.
+                    vos devis en 2 minutes.
                   </>
                 )}
               </h1>
             </div>
 
-            <div className="lg:pb-3">
+            <div className="lg:pt-8">
               <p className="max-w-sm text-base leading-relaxed text-[#8b8fa8]">
                 L&apos;IA structure vos devis et propose des prix marché — vous
                 ajustez tout à vos tarifs. Vos clients signent et paient en ligne.

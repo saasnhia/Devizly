@@ -1,11 +1,21 @@
 import { Composition } from "remotion";
 import { DevizlyAd } from "./DevizlyAd";
 import { DevizlyDemo } from "./DevizlyDemo";
+import { DevizlyBackground } from "./DevizlyBackground";
 import { LinkedInBanner, LinkedInBannerPreview, LinkedInProfilePic } from "./LinkedInAssets";
 
 export const RemotionRoot: React.FC = () => {
   return (
     <>
+      {/* Background video synced with TikTok facecam (1920x1080, 71.9s) */}
+      <Composition
+        id="DevizlyBackground"
+        component={DevizlyBackground}
+        durationInFrames={2157}
+        fps={30}
+        width={1920}
+        height={1080}
+      />
       {/* 90-second full product demo (1920x1080 landscape) */}
       <Composition
         id="DevizlyDemo"

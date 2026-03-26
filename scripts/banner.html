@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1584px;
+    height: 396px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #070b18 0%, #0d1428 50%, #0a1020 100%);
+    font-family: 'Inter', -apple-system, sans-serif;
+    position: relative;
+  }
+
+  /* Dot grid */
+  body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, #1e2545 1px, transparent 1px);
+    background-size: 36px 36px;
+    opacity: 0.6;
+  }
+
+  /* Ambient glows */
+  .orb-purple {
+    position: absolute;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(124,58,237,0.22) 0%, transparent 70%);
+    top: -150px; left: 380px;
+    border-radius: 50%;
+    filter: blur(50px);
+  }
+  .orb-teal {
+    position: absolute;
+    width: 450px; height: 450px;
+    background: radial-gradient(circle, rgba(34,211,165,0.18) 0%, transparent 70%);
+    top: -120px; left: 660px;
+    border-radius: 50%;
+    filter: blur(50px);
+  }
+  .orb-small {
+    position: absolute;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(91,91,214,0.15) 0%, transparent 70%);
+    bottom: 40px; left: 200px;
+    border-radius: 50%;
+    filter: blur(30px);
+  }
+
+  /* LEFT: Identity */
+  .identity {
+    position: absolute;
+    left: 54px;
+    top: 72px;
+    z-index: 10;
+  }
+  .identity h1 {
+    font-size: 50px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -1.5px;
+    line-height: 1;
+    text-shadow: 0 2px 30px rgba(0,0,0,0.5);
+  }
+  .identity .sub {
+    font-size: 16px;
+    color: #7a84a6;
+    margin-top: 12px;
+    font-weight: 400;
+  }
+  .identity .badge {
+    display: inline-block;
+    margin-top: 16px;
+    background: rgba(91,91,214,0.3);
+    color: #a5a5ff;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 16px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(91,91,214,0.4);
+  }
+
+  /* CARDS */
+  .cards {
+    position: absolute;
+    left: 370px;
+    top: 0;
+    width: 780px;
+    height: 344px;
+    perspective: 1200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .card {
+    width: 225px;
+    height: 165px;
+    border-radius: 20px;
+    padding: 18px;
+    position: absolute;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    transition: transform 0.3s;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 12%; right: 12%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+    border-radius: 1px;
+  }
+
+  .card-devizly {
+    background: linear-gradient(145deg, rgba(91,91,214,0.28) 0%, rgba(15,18,40,0.88) 100%);
+    border: 1.5px solid rgba(124,58,237,0.6);
+    box-shadow:
+      0 0 50px rgba(124,58,237,0.35),
+      0 0 100px rgba(124,58,237,0.15),
+      0 8px 32px rgba(0,0,0,0.4),
+      inset 0 1px 0 rgba(255,255,255,0.12);
+    transform: perspective(1200px) rotateY(16deg) rotateX(-5deg) translateX(-55px) translateY(8px);
+    z-index: 3;
+  }
+
+  .card-worthifast {
+    background: linear-gradient(145deg, rgba(34,211,165,0.22) 0%, rgba(12,18,35,0.9) 100%);
+    border: 1.5px solid rgba(34,211,165,0.55);
+    box-shadow:
+      0 0 50px rgba(34,211,165,0.3),
+      0 0 100px rgba(34,211,165,0.12),
+      0 8px 32px rgba(0,0,0,0.4),
+      inset 0 1px 0 rgba(255,255,255,0.1);
+    transform: perspective(1200px) rotateY(-10deg) rotateX(3deg) translateX(105px) translateY(25px);
+    z-index: 4;
+  }
+
+  .card-soon {
+    background: rgba(255,255,255,0.025);
+    border: 2px dashed rgba(55,65,105,0.55);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    transform: perspective(1200px) rotateY(-22deg) rotateX(-2deg) translateX(268px) translateY(3px);
+    z-index: 2;
+  }
+
+  .card-logo {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    overflow: hidden;
+    float: left;
+    margin-right: 12px;
+  }
+  .card-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.1;
+    padding-top: 3px;
+  }
+  .card-desc {
+    font-size: 12px;
+    color: rgba(145,158,195,0.85);
+    margin-top: 6px;
+    clear: both;
+    padding-top: 6px;
+  }
+  .card-badge {
+    position: absolute;
+    bottom: 14px; left: 16px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 8px;
+  }
+  .badge-live {
+    background: rgba(91,91,214,0.3);
+    color: #a0a8ff;
+    border: 1px solid rgba(91,91,214,0.45);
+  }
+  .badge-beta {
+    background: rgba(34,211,165,0.2);
+    color: #5eedcc;
+    border: 1px solid rgba(34,211,165,0.35);
+  }
+  .badge-coming {
+    background: rgba(35,42,80,0.4);
+    color: #4a5580;
+    border: 1px solid rgba(55,65,105,0.3);
+  }
+
+  .soon-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: rgba(20,26,55,0.8);
+    border: 1px solid rgba(55,65,105,0.5);
+    display: flex; align-items: center; justify-content: center;
+    float: left; margin-right: 12px;
+    font-size: 20px; color: #3a4470; font-weight: 700;
+  }
+  .soon-name { font-size: 20px; font-weight: 700; color: #3a4470; padding-top: 3px; }
+  .soon-desc { font-size: 12px; color: #262e52; clear: both; padding-top: 6px; margin-top: 6px; }
+
+  /* RIGHT: NBHC */
+  .nbhc {
+    position: absolute;
+    right: 54px;
+    top: 68px;
+    text-align: right;
+    z-index: 10;
+  }
+  .nbhc h2 {
+    font-size: 46px;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: 3px;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.4);
+  }
+  .nbhc-line {
+    height: 2.5px;
+    background: linear-gradient(90deg, transparent, #5b5bd6);
+    margin: 8px 0;
+    border-radius: 2px;
+  }
+  .nbhc .studio { font-size: 17px; color: #5b5bd6; font-weight: 600; }
+  .nbhc .year { font-size: 12px; color: #3a4470; margin-top: 5px; }
+
+  /* BOTTOM */
+  .bottom {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 52px;
+    border-top: 1px solid rgba(28,33,65,0.7);
+    display: flex;
+    align-items: center;
+    padding: 0 54px;
+    z-index: 10;
+  }
+  .bottom-url {
+    font-size: 12px;
+    color: #2a3258;
+    flex: 1;
+    font-weight: 400;
+  }
+  .pills { display: flex; gap: 10px; }
+  .pill {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 20px;
+  }
+  .pill-v { background: rgba(91,91,214,0.12); color: #7878ee; border: 1px solid rgba(91,91,214,0.3); }
+  .pill-t { background: rgba(34,211,165,0.1); color: #3dd9a8; border: 1px solid rgba(34,211,165,0.25); }
+  .pill-b { background: rgba(56,120,240,0.1); color: #5a8ae8; border: 1px solid rgba(56,120,240,0.25); }
+</style>
+</head>
+<body>
+  <div class="orb-purple"></div>
+  <div class="orb-teal"></div>
+  <div class="orb-small"></div>
+
+  <div class="identity">
+    <h1>Haroun Chikh</h1>
+    <div class="sub">Co-fondateur NBHC &middot; SaaS Developer</div>
+    <div class="badge">Founder</div>
+  </div>
+
+  <div class="cards">
+    <div class="card card-devizly">
+      <div class="card-logo"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAACXBIWXMAAAsTAAALEwEAmpwYAAAFi0lEQVR4nO1dW2tdRRTeD17eFbygj95+jVRKFQtqO7NnziFtDCSNLRVJEYovapqHovikLT6IILZKpSg0jRVvrVYotBIv8cFciCZr7XOS5uRyRtY52uaQs+O+zN6zc/Ya+CBP2TPft2bNWmvvM8vzLIwX+uoPSA17hYYxqfG80DgpFC4IDatSo9nJEBpW22vByfbaYMyvwLO0Zs/leO4A3is1vigVfu+aJOlMHPxOaOgnLnIj3vf/elhqOCE0LrkmQBYHdalg9PnK0kOZEa+1uVMoHBAKawVYsCkiWkap8Fh/v7nbKvmiio9LhVddL1DuEAiNP/o+PmaHfLW4m60ekwgR7PeDp9KR7+M+oWDNtUXJHQtYFxqqiciXCiruF4A9AYqU4lm+WtxN6rmeuOypnRDsimb5Eh6RCtH9pLGnQOeo1sET25K/Z4+5i6MdzE4IhT9QOB9u/RqOuLYU2eMQCg91JZ+yuFZGV4BJyp53RfUHu1n/CdeTk2WBgjc6yKdiEtd2ME8R6h0FvFZV07VV6HLB13DgtgAlLilLRxAKv22RTweC1NB0PSFZOkBTytr9dPjudT8ZLCngGe/f14gFmAyWDwpG6QA+n/eDh14KzMSXq2Z2bsMANK2jXm+aC+MN9wT/L+AcHcC/5k3+9HQ2xMMmAQgffHizACSHg170e0Lj33k+lCw/S/JhkwD0d5FFEBrm6RBu5PnQrNwOhAhQZBGEghUv74dmTT50EYDw0ccrzgnvhtIIAAUVoVQCQAFFKJ0AUDARSikAFEiE0goABRGh1AJAAUQovQDgWAQWANzuhJ4VYHn5tiuKiolLqywAWBAgCOKT/x94B4BbsAAQn7RLX3W6jqOv1FiAvM6AubkNMzRc63gGVT95B+QkwHuntpaab/y8zgLkIcC1a2tGVdGa++EzAKITtbDQNCOv1rcInMb9sAAQnaizn3ZPnNK4HxYAopE09ce66esPtpCf1v2wABCNpNGxpa7Wn9b9sAAQP+a36X5YAIgf89t0PywAxI/5bbofFgDixfy23Q8LAPFi/qg4+dYyC5AmEz4bEvNHweCheN+icjUUosX8UeBX0Fy+HO9bVBYAosX8UXD6/fgHMwsA0cn67ff1UMIoLJ2f50M402ro5190/xFGpQ/N9etrHAVlXY5++53lrs8488kKh6F5CDB8eGtWfPy1ullcTP4/+QyA5P7/4EBgpqa4HL2tFWXp/y+MN1L/X94BkMz/x8l2WQDL/n8wZrbLAlj0/36CbJcFsOj/TyfIdlkAS/7/aMJslwWw4P8rKbJdFsCC/z+TIttlAVL6/+Mps10WIAVB7566mTrbZQFSEHT1J/t+fzM4E4bsyGUBcvqNGLAA2RfjgAVI9p7WNcFQvDOg9y5sgoSYmd3I/8KmvK8so49rXRMNIRi/2Mj/yjKh8Zc8H3rk5ZqZmSneLvhzesMMDgc5C4CTzq6tvDjRMLOz7oWgOZDl501+G3COL27Vji9upcaUTiehy4v9Pjzt0QXSfHk3uru8mwZ1BXVtDbJkEBq+vtU/gBqNuZ6QLBmEgr6OFibcwAfdtTBpd9GAUddWIUsCoeF1bmOlnQkQhLZDFxoOu7YO2fsYCu2kR232qN1eASZpehRXtm1l2DoLuJmnyaqDHnUm96IM6gTN7WzRogCwLhQ+6cUZvgZdgC1rdj6oRVjge0kGtzTH1JZPnckTkX9LBB3sotDJvSXhzoJCjO12wsa+Cj7K0RHGEeAKBTOezTEyYu4QCgd4N2Ao8a2OtAqPUWdyL6tBvSeFhje5doSbya9Tj+DQDDeL0SrgKTgoNXxTzvcJ0KSSMrWllRLu8VyOarV2HzWmpIKeUPiZVHCj/bVFvp+8yGyIbrTWQmtqr22U1kprtkHeP2L18Ld2au/oAAAAAElFTkSuQmCC" style="width:100%;height:100%;object-fit:cover;" /></div>
+      <div class="card-name">Devizly</div>
+      <div class="card-desc">Devis &middot; Factures &middot; Paiement</div>
+      <div class="card-badge badge-live">&check; Live</div>
+    </div>
+
+    <div class="card card-worthifast">
+      <div class="card-logo"><div style="width:100%;height:100%;background:linear-gradient(135deg,#0d1428,#132030);border:2px solid #22D3A5;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#22D3A5;border-radius:12px;">W</div></div>
+      <div class="card-name">Worthifast</div>
+      <div class="card-desc">OCR &middot; TVA &middot; Banking</div>
+      <div class="card-badge badge-beta">Beta</div>
+    </div>
+
+    <div class="card card-soon">
+      <div class="soon-icon">?</div>
+      <div class="soon-name">Coming Soon</div>
+      <div class="soon-desc">Next NBHC SaaS</div>
+      <div class="card-badge badge-coming">2026 &rarr;</div>
+    </div>
+  </div>
+
+  <div class="nbhc">
+    <h2>NBHC</h2>
+    <div class="nbhc-line"></div>
+    <div class="studio">SaaS Studio</div>
+    <div class="year">Immatricul&eacute;e &middot; 2026</div>
+  </div>
+
+  <div class="bottom">
+    <div class="bottom-url">devizly.fr &middot; worthifast.vercel.app</div>
+    <div class="pills">
+      <div class="pill pill-v">Devis en 30 sec</div>
+      <div class="pill pill-t">OCR Factures</div>
+      <div class="pill pill-b">TVA &amp; Banking</div>
+    </div>
+  </div>
+</body>
+</html>

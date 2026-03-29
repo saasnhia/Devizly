@@ -69,9 +69,13 @@ export default async function BlogPostPage({
   }
 
   const allPosts = getAllPosts();
-  const related = allPosts
-    .filter((p) => p.category === post.category && p.slug !== post.slug)
-    .slice(0, 3);
+  const sameCategory = allPosts.filter((p) => p.category === post.category && p.slug !== post.slug);
+  const related = sameCategory.length >= 3
+    ? sameCategory.slice(0, 3)
+    : [
+        ...sameCategory,
+        ...allPosts.filter((p) => p.slug !== post.slug && !sameCategory.some((s) => s.slug === p.slug)),
+      ].slice(0, 3);
 
   const headings = extractHeadings(post.content);
 

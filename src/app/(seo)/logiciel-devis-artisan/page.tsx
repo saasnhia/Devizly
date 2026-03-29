@@ -144,6 +144,58 @@ export default function LogicielDevisArtisanPage() {
           après signature, avec une numérotation séquentielle conforme.
         </p>
 
+        {/* Pourquoi un logiciel de devis */}
+        <h2 className="mt-14 text-2xl font-bold">Pourquoi utiliser un logiciel de devis quand on est artisan&nbsp;?</h2>
+
+        <p className="mt-4 text-base leading-relaxed text-slate-400">
+          Le constat est simple&nbsp;: <strong className="text-white">68&nbsp;% des artisans perdent des clients</strong> faute
+          de réactivité sur leurs devis. Un particulier qui demande un devis pour une rénovation de
+          salle de bain s&apos;attend à recevoir une réponse sous 24&nbsp;heures. Si vous répondez en
+          3&nbsp;jours avec un fichier Word mal formaté, le client est déjà parti chez un concurrent.
+        </p>
+
+        <p className="mt-4 text-base leading-relaxed text-slate-400">
+          Un logiciel de devis adapté aux artisans résout ce problème en vous permettant de créer un
+          devis professionnel depuis votre téléphone, entre deux chantiers. Plus besoin de rentrer au
+          bureau le soir pour ouvrir Excel. Avec Devizly, vous décrivez la prestation en langage
+          naturel et l&apos;IA génère un devis complet avec les bonnes lignes, les bons taux de TVA
+          et toutes les mentions légales obligatoires.
+        </p>
+
+        <p className="mt-4 text-base leading-relaxed text-slate-400">
+          Les artisans qui utilisent un logiciel de devis constatent en
+          moyenne une <strong className="text-white">réduction de 80&nbsp;% du temps</strong> passé
+          sur la paperasse, un <strong className="text-white">taux de signature
+          supérieur de 35&nbsp;%</strong> grâce à la signature électronique, et un <strong className="text-white">encaissement plus rapide</strong> grâce aux acomptes par carte bancaire intégrés.
+        </p>
+
+        {/* Mentions obligatoires */}
+        <h2 className="mt-14 text-2xl font-bold">Les mentions obligatoires sur un devis artisan en 2026</h2>
+
+        <p className="mt-4 text-base leading-relaxed text-slate-400">
+          La réglementation française impose des mentions strictes sur tout devis professionnel.
+          Un devis non conforme peut entraîner une amende de
+          3&nbsp;000&nbsp;€ (personne physique) ou 15&nbsp;000&nbsp;€ (personne morale).
+          Devizly remplit automatiquement chaque mention&nbsp;:
+        </p>
+
+        <ul className="mt-4 space-y-2 pl-6 text-base text-slate-400">
+          <li className="list-disc marker:text-violet-500">Identité de l&apos;entreprise&nbsp;: nom, SIRET, adresse, RCS</li>
+          <li className="list-disc marker:text-violet-500">N° TVA intracommunautaire (ou mention exonération art.&nbsp;293&nbsp;B)</li>
+          <li className="list-disc marker:text-violet-500">Date d&apos;émission et durée de validité (30&nbsp;jours par défaut)</li>
+          <li className="list-disc marker:text-violet-500">Description détaillée de chaque prestation avec prix unitaire HT</li>
+          <li className="list-disc marker:text-violet-500">Quantités et unités (forfait, m², heure, pièce)</li>
+          <li className="list-disc marker:text-violet-500">Taux de TVA (5,5&nbsp;%, 10&nbsp;% ou 20&nbsp;% selon les travaux)</li>
+          <li className="list-disc marker:text-violet-500">Total HT, montant TVA, total TTC</li>
+          <li className="list-disc marker:text-violet-500">Conditions de paiement et pénalités de retard</li>
+          <li className="list-disc marker:text-violet-500">Assurance décennale (numéro et assureur, si applicable)</li>
+        </ul>
+
+        <p className="mt-4 text-base leading-relaxed text-slate-400">
+          Devizly pré-remplit toutes ces informations à partir de votre profil. Changez de régime
+          fiscal, mettez à jour votre SIRET — le logiciel s&apos;adapte automatiquement.
+        </p>
+
         {/* 3 avantages */}
         <div className="mt-12 grid gap-6 sm:grid-cols-3">
           <div className="rounded-xl border border-white/10 bg-white/5 p-6">

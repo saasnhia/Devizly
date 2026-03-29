@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { JsonLd } from "@/components/seo/json-ld";
-import { FileText, Shield, Zap, ArrowRight } from "lucide-react";
+import { CTABanner } from "@/components/seo/cta-banner";
+import { HowItWorks } from "@/components/seo/how-it-works";
+import { DevisExample } from "@/components/seo/devis-example";
+import { FileText, Shield, Zap } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Logiciel de Devis Gratuit pour Artisans",
@@ -121,7 +124,7 @@ export default function LogicielDevisArtisanPage() {
         <div className="mt-12 grid gap-6 sm:grid-cols-3">
           <div className="rounded-xl border border-white/10 bg-white/5 p-6">
             <Zap className="mb-3 h-8 w-8 text-violet-400" />
-            <h3 className="text-lg font-semibold">Devis en 2 minutes</h3>
+            <h3 className="text-lg font-semibold">Devis en 30 secondes</h3>
             <p className="mt-2 text-sm text-slate-400">
               Décrivez votre prestation, l&apos;IA structure tout. Mentions légales incluses automatiquement.
             </p>
@@ -140,6 +143,39 @@ export default function LogicielDevisArtisanPage() {
               Votre client signe et paie depuis son téléphone. Acompte Stripe intégré.
             </p>
           </div>
+        </div>
+
+        {/* Comment ça marche */}
+        <div className="mt-16">
+          <h2 className="mb-6 text-2xl font-bold">Comment créer un devis artisan avec Devizly</h2>
+          <HowItWorks />
+        </div>
+
+        {/* Exemple de devis */}
+        <div className="mt-16">
+          <h2 className="mb-6 text-2xl font-bold">Exemple de devis artisan généré par l&apos;IA</h2>
+          <DevisExample
+            metier="Rénovation salle de bain"
+            lines={[
+              { description: "Dépose baignoire + évacuation", qty: 1, unit: "forfait", price: 450 },
+              { description: "Pose douche italienne (receveur + paroi)", qty: 1, unit: "forfait", price: 1800 },
+              { description: "Carrelage sol et murs (fourniture + pose)", qty: 12, unit: "m²", price: 85 },
+              { description: "Plomberie (raccords + robinetterie)", qty: 1, unit: "forfait", price: 650 },
+              { description: "Peinture plafond (2 couches)", qty: 1, unit: "forfait", price: 280 },
+            ]}
+          />
+          <p className="mt-3 text-center text-xs text-slate-500">
+            Devis exemple — les montants sont ajustables à vos tarifs réels.
+          </p>
+        </div>
+
+        {/* CTA mid-page */}
+        <div className="mt-12">
+          <CTABanner
+            title="Créez votre premier devis artisan"
+            subtitle="30 secondes avec l'IA. Gratuit, sans carte bancaire."
+            cta="Essayer maintenant"
+          />
         </div>
 
         {/* FAQ */}
@@ -182,21 +218,12 @@ export default function LogicielDevisArtisanPage() {
           </div>
         </div>
 
-        {/* CTA */}
-        <div className="mt-16 rounded-2xl border border-white/10 bg-gradient-to-br from-violet-600/20 to-indigo-500/20 p-10 text-center">
-          <h2 className="text-2xl font-bold sm:text-3xl">
-            Prêt à gagner du temps sur vos devis ?
-          </h2>
-          <p className="mx-auto mt-3 max-w-md text-slate-400">
-            Créez votre premier devis artisan en 2 minutes. Gratuit, sans CB.
-          </p>
-          <Link
-            href="/signup"
-            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-500 px-8 py-4 text-base font-semibold text-white shadow-xl shadow-violet-500/25 transition-all hover:shadow-violet-500/40 hover:brightness-110"
-          >
-            Essayer gratuitement
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+        {/* CTA bottom */}
+        <div className="mt-16">
+          <CTABanner
+            title="Prêt à gagner du temps sur vos devis ?"
+            subtitle="Créez votre premier devis artisan en 30 secondes. Gratuit, sans CB."
+          />
         </div>
 
         {/* Internal links — metiers */}

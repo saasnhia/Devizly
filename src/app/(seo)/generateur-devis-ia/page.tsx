@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { JsonLd } from "@/components/seo/json-ld";
-import { FileText, Shield, Zap, ArrowRight } from "lucide-react";
+import { FileText, Shield, Zap } from "lucide-react";
+import { CTABanner } from "@/components/seo/cta-banner";
+import { HowItWorks } from "@/components/seo/how-it-works";
+import { DevisExample } from "@/components/seo/devis-example";
 
 export const metadata: Metadata = {
   title: "Générateur de Devis IA Gratuit",
@@ -142,6 +145,24 @@ export default function GenerateurDevisIAPage() {
           </div>
         </div>
 
+        {/* Comment ça marche */}
+        <div className="mt-16">
+          <h2 className="mb-6 text-2xl font-bold">Comment ça marche</h2>
+          <HowItWorks />
+        </div>
+
+        <div className="mt-16">
+          <h2 className="mb-6 text-2xl font-bold">Exemple de devis généré par l&apos;IA</h2>
+          <DevisExample metier="Création graphique" lines={[
+            { description: "Direction artistique et moodboard", qty: 1, unit: "forfait", price: 600 },
+            { description: "Création identité visuelle (logo + charte)", qty: 1, unit: "forfait", price: 1800 },
+            { description: "Déclinaison supports print et web", qty: 1, unit: "forfait", price: 950 },
+          ]} />
+          <p className="mt-3 text-center text-xs text-slate-500">
+            Devis exemple — les montants sont ajustables à vos tarifs réels.
+          </p>
+        </div>
+
         {/* FAQ */}
         <div className="mt-16">
           <h2 className="text-2xl font-bold">Questions fréquentes</h2>
@@ -184,20 +205,11 @@ export default function GenerateurDevisIAPage() {
         </div>
 
         {/* CTA */}
-        <div className="mt-16 rounded-2xl border border-white/10 bg-gradient-to-br from-violet-600/20 to-indigo-500/20 p-10 text-center">
-          <h2 className="text-2xl font-bold sm:text-3xl">
-            Testez le générateur de devis IA
-          </h2>
-          <p className="mx-auto mt-3 max-w-md text-slate-400">
-            Créez votre premier devis avec l&apos;IA en 30 secondes. Gratuit, sans CB.
-          </p>
-          <Link
-            href="/signup"
-            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-500 px-8 py-4 text-base font-semibold text-white shadow-xl shadow-violet-500/25 transition-all hover:shadow-violet-500/40 hover:brightness-110"
-          >
-            Essayer gratuitement
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+        <div className="mt-16">
+          <CTABanner
+            title="Testez le générateur de devis IA"
+            subtitle="Créez votre premier devis avec l'IA en 30 secondes. Gratuit, sans CB."
+          />
         </div>
 
         {/* Internal links */}

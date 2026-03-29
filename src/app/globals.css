@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @plugin "@tailwindcss/typography";
+/* typography v1 — force Vercel rebuild */
 
 @custom-variant dark (&:is(.dark *));
 

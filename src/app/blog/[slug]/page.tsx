@@ -210,11 +210,11 @@ export default async function BlogPostPage({
 
                 prose-h2:mt-10
                 prose-h2:mb-4
-                prose-h2:pt-6
+                prose-h2:pl-4
                 prose-h2:text-xl
-                prose-h2:border-t
-                prose-h2:border-white/10
-                prose-h2:text-[#5B5BD6]
+                prose-h2:border-l-4
+                prose-h2:border-[#5B5BD6]
+                prose-h2:text-white
 
                 prose-h3:mt-8
                 prose-h3:mb-3

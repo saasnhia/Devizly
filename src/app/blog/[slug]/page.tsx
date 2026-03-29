@@ -7,6 +7,7 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { DevizlyLogo } from "@/components/devizly-logo";
 import { TableOfContents } from "@/components/blog/table-of-contents";
 import { mdxComponents } from "@/components/blog/mdx-components";
+import { ReadingProgress } from "@/components/seo/reading-progress";
 import {
   ArrowLeft,
   ArrowRight,
@@ -101,6 +102,7 @@ export default async function BlogPostPage({
 
   return (
     <div className="min-h-screen bg-[#0A0A0F] text-white">
+      <ReadingProgress />
       <JsonLd data={articleSchema} />
 
       {/* ── Navbar ── */}

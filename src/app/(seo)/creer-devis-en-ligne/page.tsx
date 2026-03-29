@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { JsonLd } from "@/components/seo/json-ld";
-import { FileText, Shield, Zap } from "lucide-react";
+import { ArrowRight, FileText, Shield, Zap } from "lucide-react";
 import { CTABanner } from "@/components/seo/cta-banner";
 import { HowItWorks } from "@/components/seo/how-it-works";
 import { DevisExample } from "@/components/seo/devis-example";
+import { ComparisonTable } from "@/components/seo/comparison-table";
+import { SocialProof } from "@/components/seo/social-proof";
 
 export const metadata: Metadata = {
   title: "Créer un Devis en Ligne Gratuit et Professionnel",
@@ -75,6 +77,13 @@ export default function CreerDevisEnLignePage() {
       <JsonLd data={faqSchema} />
 
       <article>
+        {/* Hero badges */}
+        <div className="mb-6 flex flex-wrap items-center gap-2">
+          <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-medium text-emerald-400">Gratuit</span>
+          <span className="rounded-full bg-violet-500/15 px-3 py-1 text-xs font-medium text-violet-400">IA Mistral</span>
+          <span className="rounded-full bg-blue-500/15 px-3 py-1 text-xs font-medium text-blue-400">Sans CB</span>
+        </div>
+
         <h1 className="text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
           Créer un devis en ligne gratuit et professionnel
         </h1>
@@ -85,6 +94,21 @@ export default function CreerDevisEnLignePage() {
           devis professionnels conformes à la réglementation française en quelques minutes, sans
           installation de logiciel et sans connaissances techniques.
         </p>
+
+        {/* Hero stats */}
+        <div className="mt-6 flex flex-wrap gap-6 text-sm">
+          <span className="text-slate-400"><strong className="text-white">30 secondes</strong> — génération IA</span>
+          <span className="text-slate-400"><strong className="text-white">0 €</strong> — plan gratuit</span>
+          <span className="text-slate-400"><strong className="text-white">100% légal</strong> — mentions conformes</span>
+        </div>
+
+        <Link
+          href="/signup"
+          className="mt-6 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition-all hover:shadow-violet-500/40 hover:brightness-110"
+        >
+          Créer mon devis gratuit
+          <ArrowRight className="h-4 w-4" />
+        </Link>
 
         <p className="mt-4 text-base leading-relaxed text-slate-400">
           Créer un devis avec Devizly se fait en trois étapes simples. Première étape : décrivez
@@ -145,6 +169,14 @@ export default function CreerDevisEnLignePage() {
           </div>
         </div>
 
+        {/* Comparaison */}
+        <div className="mt-16">
+          <h2 className="mb-6 text-2xl font-bold">Devizly vs Excel vs les autres</h2>
+          <div className="rounded-xl border border-white/10 bg-white/[0.02] p-6">
+            <ComparisonTable />
+          </div>
+        </div>
+
         {/* Comment ça marche */}
         <div className="mt-16">
           <h2 className="mb-6 text-2xl font-bold">Comment ça marche</h2>
@@ -201,6 +233,11 @@ export default function CreerDevisEnLignePage() {
               </p>
             </div>
           </div>
+        </div>
+
+        {/* Social proof */}
+        <div className="mt-16">
+          <SocialProof />
         </div>
 
         {/* CTA */}

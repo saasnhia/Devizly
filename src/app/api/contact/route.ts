@@ -43,7 +43,7 @@ export async function POST(request: Request) {
   try {
     await resend.emails.send({
       from: "Devizly Contact <noreply@devizly.fr>",
-      to: "contact@nbhc.fr",
+      to: "harounchikh71@gmail.com",
       replyTo: email,
       subject: `[Devizly] Question tarifs — ${safeEmail}`,
       html: `<p><strong>De :</strong> ${safeEmail}</p><p><strong>Message :</strong></p><p>${safeMessage}</p>`,

@@ -46,7 +46,7 @@ Paiements : Stripe Connect
 - Tarifs : https://devizly.fr/#tarifs
 - Blog : https://devizly.fr/blog
 - Légal : https://devizly.fr/mentions-legales
-- Contact : contact@nbhc.fr
+- Contact : harou@nbhc.fr
 
 ## FAQ
 

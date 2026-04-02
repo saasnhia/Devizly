@@ -1,3 +1,17 @@
+/**
+ * Twilio SMS integration for quote reminders (J+7).
+ *
+ * Setup:
+ * 1. Create an account at https://twilio.com
+ * 2. Buy a French phone number (+33…) in Console > Phone Numbers
+ * 3. Copy Account SID & Auth Token from Console > Account Info
+ * 4. Set environment variables:
+ *    - TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ *    - TWILIO_AUTH_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ *    - TWILIO_PHONE_NUMBER=+33xxxxxxxxx
+ *
+ * If these variables are absent, SMS sending is silently skipped (no crash).
+ */
 import twilio from "twilio";
 
 let _client: ReturnType<typeof twilio> | null = null;

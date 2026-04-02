@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 import { checkSignupAbuse, recordSignupIp } from "@/lib/antiabuse";
+import { getResend } from "@/lib/resend";
+import { welcomeEmail } from "@/lib/emails/welcome";
 
 function createServiceClient() {
   return createServerClient(
@@ -68,6 +70,19 @@ export async function POST(request: Request) {
   // Record IP for rate limiting
   if (data.user) {
     await recordSignupIp(ip, data.user.id);
+
+    // Send welcome email (non-blocking)
+    try {
+      const { subject, html } = welcomeEmail({ userName: fullName });
+      await getResend().emails.send({
+        from: "Devizly <noreply@devizly.fr>",
+        to: email,
+        subject,
+        html,
+      });
+    } catch (emailErr) {
+      console.error("[signup] Welcome email failed:", emailErr);
+    }
   }
 
   return NextResponse.json({ success: true, userId: data.user?.id });

@@ -63,7 +63,7 @@ export async function GET(
   // Fetch owner profile for calendly link + subscription status + Stripe Connect
   const { data: ownerProfile } = await supabase
     .from("profiles")
-    .select("calendly_url, subscription_status, stripe_connect_status")
+    .select("calendly_url, subscription_status, stripe_connect_status, company_name, full_name")
     .eq("id", quote.user_id)
     .single();
 
@@ -76,6 +76,7 @@ export async function GET(
     success: true,
     data: quote,
     calendly_url: ownerPlan !== "free" ? (ownerProfile?.calendly_url || null) : null,
+    owner_name: ownerProfile?.company_name || ownerProfile?.full_name || null,
     owner_plan: ownerPlan,
     stripe_enabled: stripeEnabled,
   });

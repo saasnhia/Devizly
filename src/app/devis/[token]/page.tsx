@@ -35,6 +35,7 @@ import {
   getStatusLabel,
 } from "@/lib/utils/quote";
 import { SignatureCanvas } from "@/components/signature-canvas";
+import { CalendlyEmbed } from "@/components/calendly/CalendlyEmbed";
 import { QRCodeSVG } from "qrcode.react";
 import type { QuoteWithItems } from "@/types";
 import { toast } from "sonner";
@@ -58,6 +59,7 @@ export default function PublicQuotePage({
   const [signerName, setSignerName] = useState("");
   const [payLoading, setPayLoading] = useState(false);
   const [calendlyUrl, setCalendlyUrl] = useState<string | null>(null);
+  const [ownerName, setOwnerName] = useState<string | null>(null);
   const [ownerPlan, setOwnerPlan] = useState<string>("free");
   const [stripeEnabled, setStripeEnabled] = useState(false);
 
@@ -72,6 +74,9 @@ export default function PublicQuotePage({
     setQuote(result.data);
     if (result.calendly_url) {
       setCalendlyUrl(result.calendly_url);
+    }
+    if (result.owner_name) {
+      setOwnerName(result.owner_name);
     }
     if (result.owner_plan) {
       setOwnerPlan(result.owner_plan);
@@ -397,7 +402,7 @@ export default function PublicQuotePage({
                   <Download className="mr-2 h-4 w-4" />
                   Télécharger PDF
                 </Button>
-                {calendlyUrl && (
+                {calendlyUrl && !(quote.status === "signé" || quote.status === "accepté") && (
                   <Button
                     variant="outline"
                     className="flex-1"
@@ -573,6 +578,15 @@ export default function PublicQuotePage({
             </div>
           </CardContent>
         </Card>
+
+        {/* Calendly inline embed — shown after signature */}
+        {calendlyUrl && (quote.status === "signé" || quote.status === "accepté") && (
+          <Card className="mt-6">
+            <CardContent className="pt-6">
+              <CalendlyEmbed url={calendlyUrl} userName={ownerName || undefined} />
+            </CardContent>
+          </Card>
+        )}
 
         {/* QR Code */}
         <div className="mt-6 flex flex-col items-center gap-2">

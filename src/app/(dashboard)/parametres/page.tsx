@@ -617,14 +617,41 @@ export default function ParametresPage() {
                   </a>
                 </div>
               ) : (
-                <Input
-                  value={calendlyUrl}
-                  onChange={(e) => setCalendlyUrl(e.target.value)}
-                  placeholder="https://calendly.com/votre-nom/30min"
-                />
+                <div className="space-y-2">
+                  <Input
+                    value={calendlyUrl}
+                    onChange={(e) => setCalendlyUrl(e.target.value)}
+                    placeholder="https://calendly.com/votre-nom/intervention"
+                  />
+                  {calendlyUrl ? (
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="text-xs text-green-700 border-green-300 bg-green-50">
+                        <CheckCircle2 className="mr-1 h-3 w-3" />
+                        Calendly connecté
+                      </Badge>
+                      <a
+                        href={calendlyUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs font-medium text-indigo-600 hover:underline"
+                      >
+                        Tester →
+                      </a>
+                    </div>
+                  ) : (
+                    <a
+                      href="https://calendly.com/signup"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs font-medium text-indigo-600 hover:underline"
+                    >
+                      Créer un compte Calendly gratuit →
+                    </a>
+                  )}
+                </div>
               )}
               <p className="text-xs text-muted-foreground">
-                Affiché sur vos devis publics pour permettre la prise de RDV.
+                Intégré directement sur vos devis signés pour permettre la prise de RDV.
               </p>
             </div>
 

@@ -362,14 +362,20 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
         .aurora-word-wrap {
           display: inline-block;
           position: relative;
+          min-width: 220px;
           height: 1.15em;
-          min-width: 340px;
           overflow: hidden;
           vertical-align: bottom;
           text-align: left;
         }
+        @media (min-width: 640px) {
+          .aurora-word-wrap { min-width: 300px; }
+        }
         .aurora-word {
-          display: inline-block;
+          position: absolute;
+          left: 0;
+          top: 0;
+          white-space: nowrap;
           transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
                       opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
           color: #5B5BD6;
@@ -391,25 +397,30 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
 
         /* ---------- Page base ---------- */
         .aurora-page {
-          background: #08090a;
           color: #eeeef0;
           min-height: 100vh;
           font-feature-settings: "ss01", "cv01", "cv02";
+          position: relative;
         }
 
         /* ---------- Bento card base ---------- */
         .bento-card {
-          background: rgba(255,255,255,0.03);
-          border: 1px solid rgba(255,255,255,0.08);
-          border-radius: 20px;
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
+          background: rgba(255,255,255,0.02);
+          border: 1px solid rgba(255,255,255,0.06);
+          border-radius: 16px;
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
           padding: 32px;
+          display: flex;
+          flex-direction: column;
           transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
                       border-color 0.25s ease;
           overflow: hidden;
           position: relative;
-          min-height: 160px;
+          min-height: 380px;
+        }
+        .bento-card-compact {
+          min-height: auto;
         }
         .bento-card:hover {
           transform: scale(1.02);
@@ -647,10 +658,11 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
           {/* Rotating word line */}
           <Reveal delay={150}>
             <p
-              className="mx-auto mt-4 text-center font-bold tracking-[-0.02em] text-[#8b8d9e]"
+              className="mx-auto mt-4 flex items-center justify-center gap-[0.35em] whitespace-nowrap text-center font-bold tracking-[-0.02em] text-[#8b8d9e]"
               style={{ fontSize: "clamp(1.2rem, 2.5vw, 1.8rem)" }}
             >
-              Le logiciel de devis pour les <RotatingWord />
+              <span>Le logiciel de devis pour les</span>
+              <RotatingWord />
             </p>
           </Reveal>
 
@@ -737,7 +749,7 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
       {/* ══════════════════════════════════════════════
           SECTION 3 — BENTO GRID FEATURES
           ══════════════════════════════════════════════ */}
-      <section id="fonctionnalites" className="border-t border-white/[0.04] py-24 sm:py-32">
+      <section id="fonctionnalites" className="aurora-features-bg border-t border-white/[0.04] py-24 sm:py-32">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <Reveal>
             <p className="text-[11px] font-semibold uppercase tracking-widest text-[#5B5BD6]">
@@ -751,21 +763,19 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
             </h2>
           </Reveal>
 
-          {/* Bento grid — 6 cards, airy spacing */}
-          <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {/* Card 1 — Devis IA — Large (col-span-2) */}
-            <Reveal delay={0} className="md:col-span-2">
-              <div className="bento-card">
-                <div className="mb-3 flex items-center gap-2">
-                  <Bot className="h-5 w-5 text-[#5B5BD6]" />
-                  <span className="text-[11px] font-bold uppercase tracking-widest text-[#5B5BD6]">Génération IA</span>
-                  <span className="rounded bg-[#5B5BD6]/15 px-1.5 py-0.5 text-[10px] font-bold text-[#5B5BD6]">30s</span>
+          {/* Top row — 3 main feature cards */}
+          <div className="mt-14 grid grid-cols-1 items-stretch gap-6 md:grid-cols-3">
+            {/* Card 1 — Génération IA */}
+            <Reveal delay={0}>
+              <div className="bento-card justify-between">
+                <div>
+                  <span className="text-xs font-medium uppercase tracking-widest text-[#5B5BD6]">Génération IA</span>
+                  <h3 className="mt-3 mb-2 text-xl font-bold tracking-tight">Devis IA en 30 secondes</h3>
+                  <p className="text-sm leading-relaxed text-slate-400">
+                    Décrivez votre prestation, l&apos;IA structure le devis avec des prix marché.
+                  </p>
                 </div>
-                <h3 className="text-xl font-bold tracking-tight sm:text-2xl">Devis IA en 30 secondes</h3>
-                <p className="mt-2 line-clamp-2 max-w-md text-sm leading-[1.5] text-[#8b8d9e]">
-                  Décrivez votre prestation, l&apos;IA structure le devis avec des prix marché. Vous ajustez tout.
-                </p>
-                <div className="mt-5 overflow-hidden rounded-xl">
+                <div className="mt-6 flex-1 overflow-hidden rounded-xl">
                   <DevisGeneratorMockup />
                 </div>
               </div>
@@ -773,17 +783,15 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
 
             {/* Card 2 — Signature eIDAS */}
             <Reveal delay={100}>
-              <div className="bento-card">
-                <div className="mb-3 flex items-center gap-2">
-                  <PenTool className="h-5 w-5 text-[#5B5BD6]" />
-                  <span className="text-[11px] font-bold uppercase tracking-widest text-[#5B5BD6]">Signature</span>
-                  <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-bold text-emerald-400">eIDAS</span>
+              <div className="bento-card justify-between">
+                <div>
+                  <span className="text-xs font-medium uppercase tracking-widest text-[#5B5BD6]">Signature</span>
+                  <h3 className="mt-3 mb-2 text-xl font-bold tracking-tight">Signature électronique eIDAS</h3>
+                  <p className="text-sm leading-relaxed text-slate-400">
+                    Votre client signe depuis son téléphone. Valeur juridique eIDAS, horodatage certifié.
+                  </p>
                 </div>
-                <h3 className="text-lg font-bold tracking-tight">Signature électronique légale</h3>
-                <p className="mt-2 line-clamp-2 text-sm leading-[1.5] text-[#8b8d9e]">
-                  Votre client signe depuis son téléphone. Valeur juridique eIDAS.
-                </p>
-                <div className="mt-5">
+                <div className="mt-6 flex-1 overflow-hidden">
                   <SignatureMockup />
                 </div>
               </div>
@@ -791,72 +799,75 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
 
             {/* Card 3 — Paiement Stripe */}
             <Reveal delay={200}>
-              <div className="bento-card">
-                <div className="mb-3 flex items-center gap-2">
-                  <CreditCard className="h-5 w-5 text-[#5B5BD6]" />
-                  <span className="text-[11px] font-bold uppercase tracking-widest text-[#5B5BD6]">Paiement</span>
-                  <span className="rounded bg-[#5B5BD6]/15 px-1.5 py-0.5 text-[10px] font-bold text-[#5B5BD6]">48h</span>
+              <div className="bento-card justify-between">
+                <div>
+                  <span className="text-xs font-medium uppercase tracking-widest text-[#5B5BD6]">Paiement</span>
+                  <h3 className="mt-3 mb-2 text-xl font-bold tracking-tight">Acompte Stripe direct</h3>
+                  <p className="text-sm leading-relaxed text-slate-400">
+                    Acompte 30/50% par carte. Fonds sur votre compte en 48h via Stripe Connect.
+                  </p>
                 </div>
-                <h3 className="text-lg font-bold tracking-tight">Acompte Stripe direct</h3>
-                <p className="mt-2 line-clamp-2 text-sm leading-[1.5] text-[#8b8d9e]">
-                  Acompte 30/50% par carte. Fonds sur votre compte en 48h.
-                </p>
-                <div className="mt-5">
+                <div className="mt-6 flex-1 overflow-hidden">
                   <PaymentMockup />
                 </div>
               </div>
             </Reveal>
+          </div>
 
-            {/* Card 4 — Relances auto */}
-            <Reveal delay={100} className="md:col-span-2">
-              <div className="bento-card">
-                <div className="mb-3 flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-[#5B5BD6]" />
-                  <span className="text-[11px] font-bold uppercase tracking-widest text-[#5B5BD6]">Relances</span>
-                  <span className="rounded bg-[#5B5BD6]/15 px-1.5 py-0.5 text-[10px] font-bold text-[#5B5BD6]">Auto</span>
+          {/* Bottom row — secondary features */}
+          <div className="mt-6 grid grid-cols-1 items-stretch gap-6 md:grid-cols-3">
+            {/* Card 4 — Relances */}
+            <Reveal delay={100}>
+              <div className="bento-card justify-between">
+                <div>
+                  <span className="text-xs font-medium uppercase tracking-widest text-[#5B5BD6]">Relances</span>
+                  <h3 className="mt-3 mb-2 text-xl font-bold tracking-tight">Relances J+2, J+5, J+7</h3>
+                  <p className="text-sm leading-relaxed text-slate-400">
+                    Vos clients sont relancés automatiquement. Vous ne levez pas le petit doigt.
+                  </p>
                 </div>
-                <h3 className="text-xl font-bold tracking-tight sm:text-2xl">Relances J+2, J+5, J+7</h3>
-                <p className="mt-2 line-clamp-2 max-w-md text-sm leading-[1.5] text-[#8b8d9e]">
-                  Vos clients sont relancés automatiquement. Vous ne levez pas le petit doigt.
-                </p>
-                <div className="mt-5">
+                <div className="mt-6 flex-1 overflow-hidden">
                   <RelancesMockup />
                 </div>
               </div>
             </Reveal>
 
-            {/* Card 5 — Pipeline CRM — Large (col-span-2) */}
-            <Reveal delay={200} className="md:col-span-2">
-              <div className="bento-card">
-                <div className="mb-3 flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-[#5B5BD6]" />
-                  <span className="text-[11px] font-bold uppercase tracking-widest text-[#5B5BD6]">Pipeline</span>
+            {/* Card 5 — Pipeline */}
+            <Reveal delay={200}>
+              <div className="bento-card justify-between">
+                <div>
+                  <span className="text-xs font-medium uppercase tracking-widest text-[#5B5BD6]">Pipeline</span>
+                  <h3 className="mt-3 mb-2 text-xl font-bold tracking-tight">Pipeline Kanban visuel</h3>
+                  <p className="text-sm leading-relaxed text-slate-400">
+                    Prospect → envoyé → signé → payé. Votre CA en temps réel.
+                  </p>
                 </div>
-                <h3 className="text-xl font-bold tracking-tight sm:text-2xl">Pipeline Kanban visuel</h3>
-                <p className="mt-2 line-clamp-2 max-w-md text-sm leading-[1.5] text-[#8b8d9e]">
-                  Prospect → envoyé → signé → payé. Votre CA en temps réel.
-                </p>
-                <div className="mt-5">
+                <div className="mt-6 flex-1 overflow-hidden">
                   <KanbanMockup />
                 </div>
               </div>
             </Reveal>
 
-            {/* Card 6 — Facturation auto (horizontal compact) */}
-            <Reveal delay={300} className="md:col-span-2 lg:col-span-4">
-              <div className="bento-card flex items-center gap-6">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#5B5BD6]/10">
-                  <Receipt className="h-7 w-7 text-[#5B5BD6]" />
-                </div>
+            {/* Card 6 — Facturation + Calendly */}
+            <Reveal delay={300}>
+              <div className="bento-card justify-between">
                 <div>
-                  <div className="mb-1 flex items-center gap-2">
-                    <span className="text-[11px] font-bold uppercase tracking-widest text-[#5B5BD6]">Facturation</span>
-                    <span className="rounded bg-[#5B5BD6]/15 px-1.5 py-0.5 text-[10px] font-bold text-[#5B5BD6]">Auto</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-medium uppercase tracking-widest text-[#5B5BD6]">Facturation</span>
+                    <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-bold text-amber-400">Nouveau</span>
                   </div>
-                  <h3 className="text-lg font-bold tracking-tight">Facturation automatique + Calendly intégré</h3>
-                  <p className="mt-1 line-clamp-2 max-w-2xl text-sm leading-[1.5] text-[#8b8d9e]">
-                    Facture générée à la signature, export CSV comptable. Calendly intégré pour planifier le kick-off sans friction.
+                  <h3 className="mt-3 mb-2 text-xl font-bold tracking-tight">Facturation auto + Calendly</h3>
+                  <p className="text-sm leading-relaxed text-slate-400">
+                    Facture générée à la signature, export CSV. Calendly intégré pour planifier le kick-off.
                   </p>
+                </div>
+                <div className="mt-6 flex items-center gap-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#5B5BD6]/10">
+                    <Receipt className="h-6 w-6 text-[#5B5BD6]" />
+                  </div>
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#5B5BD6]/10">
+                    <CalendarCheck className="h-6 w-6 text-[#5B5BD6]" />
+                  </div>
                 </div>
               </div>
             </Reveal>

@@ -212,25 +212,29 @@ function Reveal({
    ══════════════════════════════════════════════════ */
 
 function RotatingWord() {
-  const [index, setIndex] = useState(0);
-  const [show, setShow] = useState(true);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setShow(false);
-      setTimeout(() => {
-        setIndex((i) => (i + 1) % heroWords.length);
-        setShow(true);
-      }, 400);
+      setActiveIndex((i) => (i + 1) % heroWords.length);
     }, 2800);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <span className="aurora-word-wrap">
-      <span className={`aurora-word ${show ? "aurora-word-in" : "aurora-word-out"}`}>
-        {heroWords[index]}
-      </span>
+    <span className="relative inline-block" style={{ minWidth: "220px", height: "1.2em" }}>
+      {heroWords.map((word, i) => (
+        <span
+          key={word}
+          className="absolute left-0 top-0 font-bold text-[#5B5BD6] transition-all duration-500"
+          style={{
+            opacity: activeIndex === i ? 1 : 0,
+            transform: activeIndex === i ? "translateY(0)" : "translateY(8px)",
+          }}
+        >
+          {word}
+        </span>
+      ))}
     </span>
   );
 }
@@ -657,13 +661,15 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
 
           {/* Rotating word line */}
           <Reveal delay={150}>
-            <p
-              className="mx-auto mt-4 flex items-center justify-center gap-[0.35em] whitespace-nowrap text-center font-bold tracking-[-0.02em] text-[#8b8d9e]"
-              style={{ fontSize: "clamp(1.2rem, 2.5vw, 1.8rem)" }}
-            >
-              <span>Le logiciel de devis pour les</span>
-              <RotatingWord />
-            </p>
+            <div className="mx-auto mt-4 flex w-full items-center justify-center">
+              <div
+                className="flex items-center justify-center gap-[0.35em] font-semibold text-slate-300"
+                style={{ fontSize: "clamp(1.2rem, 2.5vw, 1.8rem)" }}
+              >
+                <span className="whitespace-nowrap">Le logiciel de devis pour les</span>
+                <RotatingWord />
+              </div>
+            </div>
           </Reveal>
 
           {/* Subtitle */}
@@ -775,8 +781,22 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
                     Décrivez votre prestation, l&apos;IA structure le devis avec des prix marché.
                   </p>
                 </div>
-                <div className="mt-6 flex-1 overflow-hidden rounded-xl">
-                  <DevisGeneratorMockup />
+                <div className="mt-6 flex flex-1 flex-col gap-3 rounded-xl border border-white/[0.08] bg-white/[0.05] p-5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">✨</span>
+                    <span className="text-sm text-slate-400">Décrivez votre prestation...</span>
+                  </div>
+                  <div className="h-px bg-white/10" />
+                  <div className="space-y-2">
+                    <div className="h-2 w-3/4 rounded bg-[#5B5BD6]/40" />
+                    <div className="h-2 w-full rounded bg-white/10" />
+                    <div className="h-2 w-5/6 rounded bg-white/10" />
+                  </div>
+                  <div className="mt-auto pt-3">
+                    <div className="w-fit rounded-lg bg-[#5B5BD6] px-4 py-2 text-xs font-medium text-white">
+                      Générer avec l&apos;IA
+                    </div>
+                  </div>
                 </div>
               </div>
             </Reveal>

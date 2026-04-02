@@ -105,7 +105,7 @@ export function SignatureMockup() {
         <button
           className={`flex w-full items-center justify-center gap-2 rounded-lg py-2.5 text-xs font-semibold transition-all duration-300 ${
             phase === 1
-              ? "bg-[#5e6ad2] text-white"
+              ? "bg-[#5B5BD6] text-white"
               : "border border-white/[0.06] bg-white/[0.03] text-[#8b8fa8]"
           }`}
         >
@@ -115,14 +115,14 @@ export function SignatureMockup() {
       )}
 
       {phase >= 2 && phase < 3 && (
-        <div className="rounded-lg border border-[#5e6ad2]/30 bg-[#08090a] p-3">
+        <div className="rounded-lg border border-[#5B5BD6]/30 bg-[#08090a] p-3">
           <p className="mb-2 text-[10px] text-[#8b8fa8]">Votre signature :</p>
           <svg viewBox="0 0 170 50" className="h-12 w-full">
             <path
               ref={pathRef}
               d={SIGNATURE_PATH}
               fill="none"
-              stroke="#5e6ad2"
+              stroke="#5B5BD6"
               strokeWidth="2"
               strokeLinecap="round"
               strokeDasharray={pathLength || 400}
@@ -149,7 +149,7 @@ export function SignatureMockup() {
 
       {/* Client info */}
       <div className="mt-3 flex items-center gap-2 text-[10px] text-[#8b8fa8]">
-        <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#5e6ad2]/20 text-[8px] font-bold text-[#5e6ad2]">
+        <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#5B5BD6]/20 text-[8px] font-bold text-[#5B5BD6]">
           SP
         </div>
         Sophie Petit · sophie@email.com

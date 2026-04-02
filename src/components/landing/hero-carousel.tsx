@@ -113,7 +113,7 @@ export function HeroCarousel() {
               onClick={() => setCurrent(i)}
               className={`h-2 rounded-full transition-all ${
                 i === current
-                  ? "w-6 bg-[#5e6ad2]"
+                  ? "w-6 bg-[#5B5BD6]"
                   : "w-2 bg-white/[0.12] hover:bg-white/[0.24]"
               }`}
               aria-label={`Slide ${i + 1}`}

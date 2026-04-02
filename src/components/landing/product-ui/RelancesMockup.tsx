@@ -62,7 +62,7 @@ export function RelancesMockup() {
       {/* Client context */}
       <div className="mb-4 flex items-center justify-between rounded-lg border border-white/[0.06] bg-[#08090a] px-3 py-2">
         <div className="flex items-center gap-2">
-          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#5e6ad2]/20 text-[9px] font-bold text-[#5e6ad2]">
+          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#5B5BD6]/20 text-[9px] font-bold text-[#5B5BD6]">
             SP
           </div>
           <div>
@@ -70,7 +70,7 @@ export function RelancesMockup() {
             <p className="text-[9px] text-[#8b8fa8]">Site e-commerce · 6 100 €</p>
           </div>
         </div>
-        <span className="rounded bg-[#5e6ad2]/15 px-1.5 py-0.5 text-[9px] font-medium text-[#5e6ad2]">
+        <span className="rounded bg-[#5B5BD6]/15 px-1.5 py-0.5 text-[9px] font-medium text-[#5B5BD6]">
           Envoyé
         </span>
       </div>
@@ -90,10 +90,10 @@ export function RelancesMockup() {
                   className={`flex h-6 w-6 items-center justify-center rounded-full border-2 transition-all duration-500 ${
                     isActive
                       ? isCurrent && !isLast
-                        ? "border-[#5e6ad2] bg-[#5e6ad2]"
+                        ? "border-[#5B5BD6] bg-[#5B5BD6]"
                         : isLast && isActive
                           ? "border-[#3dd68c] bg-[#3dd68c]"
-                          : "border-[#5e6ad2] bg-[#5e6ad2]"
+                          : "border-[#5B5BD6] bg-[#5B5BD6]"
                       : "border-white/20 bg-transparent"
                   }`}
                 >
@@ -111,7 +111,7 @@ export function RelancesMockup() {
                 {i < STEPS.length - 1 && (
                   <div
                     className={`w-[2px] flex-1 transition-colors duration-500 ${
-                      i < activeStep ? "bg-[#5e6ad2]" : "bg-white/[0.06]"
+                      i < activeStep ? "bg-[#5B5BD6]" : "bg-white/[0.06]"
                     }`}
                     style={{ minHeight: 24 }}
                   />
@@ -123,7 +123,7 @@ export function RelancesMockup() {
                 <div className="flex items-center gap-2">
                   <span
                     className={`text-[10px] font-bold transition-colors duration-500 ${
-                      isActive ? "text-[#5e6ad2]" : "text-[#8b8fa8]/50"
+                      isActive ? "text-[#5B5BD6]" : "text-[#8b8fa8]/50"
                     }`}
                   >
                     {step.day}

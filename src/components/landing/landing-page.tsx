@@ -18,7 +18,6 @@ import {
   Shield,
   FileText,
   Receipt,
-  LayoutDashboard,
   PenTool,
   ChevronDown,
   Menu,
@@ -28,7 +27,24 @@ import {
   Send,
   MessageCircle,
   BookOpen,
+  Zap,
+  Clock,
+  CalendarCheck,
 } from "lucide-react";
+
+/* ══════════════════════════════════════════════════
+   DESIGN TOKENS
+   ══════════════════════════════════════════════════ */
+
+const ACCENT = "#5B5BD6";
+const ACCENT_LIGHT = "rgba(91,91,214,0.12)";
+const BG = "#06060b";
+const SURFACE = "#0c0c14";
+const SURFACE_2 = "#12121e";
+const BORDER = "rgba(255,255,255,0.06)";
+const TEXT = "#eeeef0";
+const TEXT_MUTED = "#8b8d9e";
+const GREEN = "#3dd68c";
 
 /* ══════════════════════════════════════════════════
    DATA
@@ -47,56 +63,97 @@ const professions = [
   "Community Managers",
   "Rédacteurs",
   "Vidéastes",
+  "Électriciens",
+  "Plombiers",
+  "Menuisiers",
+];
+
+const heroWords = [
+  "freelances",
+  "artisans",
+  "consultants",
+  "créatifs",
+  "indépendants",
+];
+
+const steps = [
+  {
+    num: "01",
+    icon: Bot,
+    title: "Décrivez votre prestation",
+    description:
+      "En quelques mots, l'IA structure votre devis avec des prix marché. Vous ajustez tout librement.",
+  },
+  {
+    num: "02",
+    icon: Send,
+    title: "Envoyez et faites signer",
+    description:
+      "Votre client reçoit un lien, consulte le devis et signe électroniquement depuis son navigateur.",
+  },
+  {
+    num: "03",
+    icon: CreditCard,
+    title: "Encaissez immédiatement",
+    description:
+      "Acompte Stripe intégré. Votre client paie en ligne, les fonds arrivent sous 48h.",
+  },
 ];
 
 const featureSections = [
   {
     label: "Génération IA",
     icon: Bot,
-    title: "IA Mistral française",
+    title: "Devis IA en 30 secondes",
     description:
-      "Décrivez votre prestation en langage naturel. L'IA structure votre devis et propose des prix marché comme point de départ — vous ajustez librement chaque ligne, chaque tarif. 100% hébergé en France.",
+      "Décrivez votre prestation en langage naturel. L'IA structure votre devis et propose des prix marché — vous ajustez chaque ligne, chaque tarif. Hébergé en France, conforme RGPD.",
     mockup: "devis" as const,
+    highlight: "30s",
   },
   {
-    label: "Signature",
+    label: "Signature légale",
     icon: PenTool,
-    title: "Signature électronique",
+    title: "Signature électronique eIDAS",
     description:
-      "Votre client signe depuis son téléphone. Valeur juridique, zéro friction.",
+      "Votre client signe depuis son téléphone ou ordinateur. Valeur juridique conforme eIDAS, horodatage certifié, zéro friction.",
     mockup: "signature" as const,
+    highlight: "eIDAS",
   },
   {
-    label: "Pipeline",
-    icon: LayoutDashboard,
-    title: "Pipeline Kanban",
-    description:
-      "Visualisez chaque opportunité : prospect → envoyé → signé → payé. Drag & drop intuitif.",
-    mockup: "kanban" as const,
-  },
-  {
-    label: "Paiement",
+    label: "Paiement intégré",
     icon: CreditCard,
-    title: "Acompte Stripe intégré",
+    title: "Acompte Stripe direct",
     description:
-      "Acompte 30/50%, paiement par carte. Fonds sur votre compte en 48h via Stripe Connect.",
+      "Acompte 30% ou 50%, paiement par carte bancaire. Fonds sur votre compte en 48h via Stripe Connect.",
     mockup: "payment" as const,
+    highlight: "48h",
   },
   {
-    label: "Relances",
-    icon: Send,
-    title: "Relances automatiques",
+    label: "Relances auto",
+    icon: Clock,
+    title: "Relances J+2, J+5, J+7",
     description:
-      "J+2, J+5, J+7 — vos clients sont relancés automatiquement. Vous ne levez pas le petit doigt.",
+      "Vos clients sont relancés automatiquement selon un calendrier optimisé. Vous ne levez pas le petit doigt.",
     mockup: "relances" as const,
+    highlight: "Auto",
+  },
+  {
+    label: "Calendly",
+    icon: CalendarCheck,
+    title: "Calendly après signature",
+    description:
+      "Dès que votre client signe, il peut réserver un créneau directement. L'onboarding démarre sans friction.",
+    mockup: "kanban" as const,
+    highlight: "Nouveau",
   },
   {
     label: "Facturation",
     icon: Receipt,
     title: "Facturation automatique",
     description:
-      "À la signature, la facture est générée, numérotée et envoyée. Export CSV compatible comptable.",
+      "À la signature, la facture est générée, numérotée et envoyée automatiquement. Export CSV compatible comptable.",
     mockup: null,
+    highlight: "Auto",
   },
 ];
 
@@ -108,7 +165,7 @@ const plans = [
     description: "Pour tester sans engagement",
     features: [
       "3 devis par mois",
-      "Génération IA Mistral",
+      "Génération IA",
       "Templates professionnels",
       "QR Code + liens publics",
       "Versioning devis",
@@ -125,10 +182,10 @@ const plans = [
     features: [
       "Devis illimités",
       "Tout le plan Gratuit",
-      "Signature électronique",
+      "Signature électronique eIDAS",
       "Acompte Stripe (30/50%)",
       "Tracking ouvertures",
-      "Analytics + relances auto",
+      "Relances automatiques",
       "Facturation PDF",
     ],
     cta: "Choisir Pro",
@@ -158,15 +215,15 @@ const plans = [
 const faqs = [
   {
     q: "Est-ce conforme aux exigences légales françaises ?",
-    a: "Oui. Devizly génère des devis avec toutes les mentions obligatoires : SIRET, TVA, conditions de paiement, date de validité. L'IA Mistral est hébergée en France — vos données ne quittent jamais l'UE.",
+    a: "Oui. Devizly génère des devis avec toutes les mentions obligatoires : SIRET, TVA, conditions de paiement, date de validité. L'IA est hébergée en France — vos données ne quittent jamais l'UE.",
   },
   {
     q: "L'IA décide-t-elle de mes prix ?",
-    a: "Non. L'IA propose une structure de devis avec des prix marché comme suggestion de départ. Vous gardez le contrôle total : modifiez chaque ligne, chaque tarif, chaque description avant d'envoyer. C'est vous le professionnel, l'IA est juste là pour vous faire gagner du temps.",
+    a: "Non. L'IA propose une structure de devis avec des prix marché comme suggestion de départ. Vous gardez le contrôle total : modifiez chaque ligne, chaque tarif, chaque description avant d'envoyer.",
   },
   {
     q: "Combien de devis gratuits par mois ?",
-    a: "Le plan Gratuit offre 3 devis par mois, pour toujours, sans carte bancaire. Passez Pro (19€/mois) pour un nombre illimité.",
+    a: "Le plan Gratuit offre 3 devis par mois, pour toujours, sans carte bancaire. Passez Pro (19\u00A0€/mois) pour un nombre illimité.",
   },
   {
     q: "Le client a-t-il besoin de créer un compte ?",
@@ -177,16 +234,16 @@ const faqs = [
     a: "Devizly utilise Stripe Connect. Votre client paie par carte bancaire. Les fonds arrivent sur votre compte sous 48h. Vous n'avez rien à configurer côté facturation.",
   },
   {
-    q: "Puis-je importer mes clients existants ?",
-    a: "Vous pouvez ajouter vos clients manuellement ou les recevoir via le formulaire de capture intégré. L'import CSV est prévu prochainement.",
-  },
-  {
     q: "Mes données sont-elles sécurisées ?",
-    a: "Hébergement européen (Supabase EU), chiffrement en transit et au repos, conforme RGPD. L'IA Mistral est 100% hébergée en France.",
+    a: "Hébergement européen (Supabase EU), chiffrement en transit et au repos, conforme RGPD. L'IA est 100% hébergée en France.",
   },
   {
     q: "Devizly fonctionne-t-il avec mon logiciel comptable ?",
-    a: "Vous pouvez exporter vos factures en CSV compatible avec la plupart des logiciels comptables (Pennylane, Indy, etc.). L'intégration directe arrive bientôt.",
+    a: "Vous pouvez exporter vos factures en CSV compatible avec la plupart des logiciels comptables (Pennylane, Indy, etc.).",
+  },
+  {
+    q: "La signature électronique a-t-elle une valeur juridique ?",
+    a: "Oui. La signature Devizly est conforme au règlement européen eIDAS. Elle est horodatée, traçable et juridiquement opposable.",
   },
 ];
 
@@ -216,28 +273,27 @@ function FeatureMockup({ type }: { type: string | null }) {
     case "relances":
       return <RelancesMockup />;
     default:
-      // Facturation — simple static mockup
       return (
-        <div className="rounded-xl border border-white/[0.06] bg-[#0f0f10] p-4">
-          <div className="mb-3 text-xs font-medium uppercase tracking-widest text-[#8b8fa8]">
+        <div className="rounded-xl border border-white/[0.06] bg-[#0c0c14] p-4">
+          <div className="mb-3 text-xs font-medium uppercase tracking-widest text-[#8b8d9e]">
             Facture auto-générée
           </div>
-          <div className="space-y-2 rounded-lg border border-white/[0.06] bg-[#08090a] p-3">
+          <div className="space-y-2 rounded-lg border border-white/[0.06] bg-[#06060b] p-3">
             <div className="flex justify-between text-[11px]">
-              <span className="font-medium text-[#e8e9f0]">FACT-2026-018</span>
-              <span className="text-[#8b8fa8]">25/03/2026</span>
+              <span className="font-medium text-[#eeeef0]">FACT-2026-018</span>
+              <span className="text-[#8b8d9e]">25/03/2026</span>
             </div>
             <div className="h-px bg-white/[0.06]" />
             {["Design UX/UI", "Développement Next.js", "Hébergement"].map((l) => (
               <div key={l} className="flex justify-between text-[10px]">
-                <span className="text-[#8b8fa8]">{l}</span>
+                <span className="text-[#8b8d9e]">{l}</span>
                 <span className="h-2 w-10 rounded bg-white/[0.06]" />
               </div>
             ))}
             <div className="h-px bg-white/[0.06]" />
             <div className="flex justify-between text-xs font-bold">
-              <span className="text-[#e8e9f0]">Total TTC</span>
-              <span className="text-[#e8e9f0]">6 100 €</span>
+              <span className="text-[#eeeef0]">Total TTC</span>
+              <span className="text-[#eeeef0]">6 100 €</span>
             </div>
           </div>
           <div className="mt-3 flex items-center gap-1.5 text-[10px] text-[#3dd68c]">
@@ -245,16 +301,45 @@ function FeatureMockup({ type }: { type: string | null }) {
             Envoyée automatiquement à la signature
           </div>
           <div className="mt-2 flex gap-2">
-            <div className="rounded bg-white/[0.06] px-2 py-1 text-[9px] text-[#8b8fa8]">
-              📄 PDF
+            <div className="rounded bg-white/[0.06] px-2 py-1 text-[9px] text-[#8b8d9e]">
+              PDF
             </div>
-            <div className="rounded bg-white/[0.06] px-2 py-1 text-[9px] text-[#8b8fa8]">
-              📊 Export CSV
+            <div className="rounded bg-white/[0.06] px-2 py-1 text-[9px] text-[#8b8d9e]">
+              Export CSV
             </div>
           </div>
         </div>
       );
   }
+}
+
+function RotatingWord() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((i) => (i + 1) % heroWords.length);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <span className="relative inline-block h-[1.15em] w-auto overflow-hidden align-bottom">
+      <AnimatePresence mode="wait">
+        <motion.span
+          key={heroWords[index]}
+          initial={{ y: 40, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -40, opacity: 0 }}
+          transition={{ duration: 0.4, ease: "easeInOut" }}
+          className="inline-block"
+          style={{ color: ACCENT }}
+        >
+          {heroWords[index]}
+        </motion.span>
+      </AnimatePresence>
+    </span>
+  );
 }
 
 function FAQItem({ question, answer }: { question: string; answer: string }) {
@@ -264,11 +349,11 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
     <div className="border-b border-white/[0.06]">
       <button
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between py-5 text-left text-base font-semibold text-[#e8e9f0] transition-opacity duration-200 hover:opacity-80 sm:text-lg"
+        className="flex w-full items-center justify-between py-5 text-left text-base font-semibold text-[#eeeef0] transition-colors duration-200 hover:text-[#5B5BD6] sm:text-lg"
       >
         {question}
         <ChevronDown
-          className={`ml-4 h-5 w-5 shrink-0 text-[#8b8fa8] transition-transform duration-300 ${
+          className={`ml-4 h-5 w-5 shrink-0 text-[#8b8d9e] transition-transform duration-300 ${
             open ? "rotate-180" : ""
           }`}
         />
@@ -282,7 +367,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="overflow-hidden"
           >
-            <p className="pb-5 text-sm leading-relaxed text-[#8b8fa8] sm:text-base">
+            <p className="pb-5 text-sm leading-relaxed text-[#8b8d9e] sm:text-base">
               {answer}
             </p>
           </motion.div>
@@ -307,7 +392,7 @@ interface RecentPost {
 
 export function LandingPage({ recentPosts = [] }: { recentPosts?: RecentPost[] }) {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#08090a]" />}>
+    <Suspense fallback={<div className="min-h-screen" style={{ background: BG }} />}>
       <LandingPageInner recentPosts={recentPosts} />
     </Suspense>
   );
@@ -342,50 +427,58 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
 
   return (
     <div
-      className="min-h-screen bg-[#08090a] text-[#e8e9f0]"
-      style={{ fontFeatureSettings: '"ss01", "cv01", "cv02"' }}
+      className="min-h-screen text-[#eeeef0]"
+      style={{
+        background: BG,
+        fontFeatureSettings: '"ss01", "cv01", "cv02"',
+      }}
     >
       <BetaBanner />
 
       {/* ══════════════════════════════════════════════
-          NAVBAR
+          NAVBAR — Glassy, minimal
           ══════════════════════════════════════════════ */}
       <nav
-        className={`fixed top-0 z-50 w-full transition-all duration-300 ${
+        className={`fixed top-0 z-50 w-full transition-all duration-500 ${
           scrolled
-            ? "border-b border-white/[0.06] bg-[#08090a]/80 backdrop-blur-xl"
+            ? "border-b bg-[#06060b]/70 backdrop-blur-2xl"
             : "bg-transparent"
         }`}
+        style={{ borderColor: scrolled ? BORDER : "transparent" }}
       >
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           <Link href="/" className="flex items-center gap-2 transition-opacity duration-200 hover:opacity-80">
             <DevizlyLogo width={130} height={34} className="text-white" />
             {isBeta && (
-              <span className="rounded bg-[#5e6ad2] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
-                bêta
+              <span
+                className="rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white"
+                style={{ background: ACCENT }}
+              >
+                beta
               </span>
             )}
           </Link>
 
           <div className="hidden items-center gap-8 text-sm md:flex">
-            <a href="#fonctionnalites" className="text-[#8b8fa8] transition-opacity duration-150 hover:text-[#e8e9f0]">
-              Fonctionnalités
+            <a href="#fonctionnalites" className="text-[#8b8d9e] transition-colors duration-150 hover:text-white">
+              Fonctionnalites
             </a>
-            <a href="#tarifs" className="text-[#8b8fa8] transition-opacity duration-150 hover:text-[#e8e9f0]">
+            <a href="#tarifs" className="text-[#8b8d9e] transition-colors duration-150 hover:text-white">
               Tarifs
             </a>
-            <a href="#faq" className="text-[#8b8fa8] transition-opacity duration-150 hover:text-[#e8e9f0]">
+            <a href="#faq" className="text-[#8b8d9e] transition-colors duration-150 hover:text-white">
               FAQ
             </a>
           </div>
 
           <div className="hidden items-center gap-3 md:flex">
-            <Link href="/login" className="rounded-lg px-4 py-2 text-sm text-[#8b8fa8] transition-opacity duration-150 hover:text-[#e8e9f0]">
+            <Link href="/login" className="rounded-lg px-4 py-2 text-sm text-[#8b8d9e] transition-colors duration-150 hover:text-white">
               Connexion
             </Link>
             <Link
               href="/signup"
-              className="rounded-lg bg-[#5e6ad2] px-5 py-2 text-sm font-medium text-white transition-opacity duration-200 hover:opacity-90"
+              className="rounded-lg px-5 py-2 text-sm font-medium text-white transition-all duration-200 hover:brightness-110"
+              style={{ background: ACCENT, boxShadow: `0 0 24px ${ACCENT}33` }}
             >
               Essayer gratuitement
             </Link>
@@ -402,14 +495,18 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="overflow-hidden border-b border-white/[0.06] bg-[#08090a]/95 backdrop-blur-xl md:hidden"
+              className="overflow-hidden border-b border-white/[0.06] bg-[#06060b]/95 backdrop-blur-xl md:hidden"
             >
               <div className="flex flex-col gap-4 px-6 py-6">
-                <a href="#fonctionnalites" className="text-[#8b8fa8] hover:text-[#e8e9f0]" onClick={() => setMobileMenuOpen(false)}>Fonctionnalités</a>
-                <a href="#tarifs" className="text-[#8b8fa8] hover:text-[#e8e9f0]" onClick={() => setMobileMenuOpen(false)}>Tarifs</a>
-                <a href="#faq" className="text-[#8b8fa8] hover:text-[#e8e9f0]" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
-                <Link href="/login" className="text-[#8b8fa8] hover:text-[#e8e9f0]">Connexion</Link>
-                <Link href="/signup" className="rounded-lg bg-[#5e6ad2] px-5 py-2.5 text-center text-sm font-medium text-white">
+                <a href="#fonctionnalites" className="text-[#8b8d9e] hover:text-white" onClick={() => setMobileMenuOpen(false)}>Fonctionnalites</a>
+                <a href="#tarifs" className="text-[#8b8d9e] hover:text-white" onClick={() => setMobileMenuOpen(false)}>Tarifs</a>
+                <a href="#faq" className="text-[#8b8d9e] hover:text-white" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
+                <Link href="/login" className="text-[#8b8d9e] hover:text-white">Connexion</Link>
+                <Link
+                  href="/signup"
+                  className="rounded-lg px-5 py-2.5 text-center text-sm font-medium text-white"
+                  style={{ background: ACCENT }}
+                >
                   Essayer gratuitement
                 </Link>
               </div>
@@ -419,68 +516,147 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
       </nav>
 
       {/* ══════════════════════════════════════════════
-          HERO IMMERSIF — "Le produit EST la landing"
-          H1 massif gauche + sous-titre droite
-          DevisGeneratorMockup pleine largeur dessous
+          HERO — Immersive, product-led
           ══════════════════════════════════════════════ */}
-      <section className="pb-0 pt-28 sm:pt-36">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          {/* Top: H1 left + subtitle right */}
-          <div className="grid gap-8 lg:grid-cols-[1.3fr_1fr] lg:items-start">
-            <div>
-              <p className="text-[11px] font-medium uppercase tracking-widest text-[#8b8fa8]">
-                {copy ? copy.badge : "Propulsé par l\u2019IA Mistral — hébergée en France"}
-              </p>
-              <h1
-                className="mt-5 font-extrabold leading-[1.0] tracking-[-0.04em] text-[#e8e9f0]"
-                style={{ fontSize: "clamp(2.2rem, 3.8vw, 4.2rem)" }}
-              >
-                {copy
-                  ? `${copy.hero}, signez et encaissez vos devis en 2 minutes.`
-                  : "Créez, signez et encaissez vos devis en 2 minutes."}
-              </h1>
-            </div>
+      <section className="relative overflow-hidden pb-0 pt-28 sm:pt-36">
+        {/* Radial glow behind hero */}
+        <div
+          className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2"
+          style={{
+            width: "120%",
+            height: "600px",
+            background: `radial-gradient(ellipse 50% 60% at 50% 0%, ${ACCENT}15 0%, transparent 70%)`,
+          }}
+        />
 
-            <div className="lg:pt-8">
-              <p className="max-w-sm text-base leading-relaxed text-[#8b8fa8]">
-                L&apos;IA structure vos devis et propose des prix marché — vous
-                ajustez tout à vos tarifs. Vos clients signent et paient en ligne.
-                Relances auto, facturation PDF, pipeline Kanban — tout est inclus.
-              </p>
-              <button
-                onClick={() => {
-                  const el = document.getElementById("demo");
-                  el?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="group mt-6 inline-flex items-center gap-2 text-sm font-medium text-[#5e6ad2] transition-opacity duration-150 hover:opacity-80"
-              >
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#5e6ad2] opacity-75" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-[#5e6ad2]" />
-                </span>
-                Démo en direct
-                <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-              </button>
-            </div>
-          </div>
+        <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+          {/* Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex justify-center"
+          >
+            <span
+              className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-[13px] font-medium"
+              style={{
+                borderColor: `${ACCENT}30`,
+                background: ACCENT_LIGHT,
+                color: ACCENT,
+              }}
+            >
+              <Zap className="h-3.5 w-3.5" />
+              {copy ? copy.badge : "Propulse par l\u2019IA — heberge en France"}
+            </span>
+          </motion.div>
 
-          {/* Product mockup — full width, overflows below fold */}
-          <div className="mt-16 overflow-visible sm:mt-20">
+          {/* H1 */}
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="mx-auto mt-8 max-w-4xl text-center font-extrabold leading-[1.05] tracking-[-0.04em]"
+            style={{ fontSize: "clamp(2.4rem, 5vw, 4.5rem)" }}
+          >
+            {copy ? (
+              <>
+                {copy.hero}, signez et encaissez
+                <br className="hidden sm:block" /> vos devis en 2 minutes.
+              </>
+            ) : (
+              <>
+                Le logiciel de devis
+                <br className="hidden sm:block" />
+                pour les <RotatingWord />
+              </>
+            )}
+          </motion.h1>
+
+          {/* Subtitle */}
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="mx-auto mt-6 max-w-2xl text-center text-lg leading-relaxed text-[#8b8d9e] sm:text-xl"
+          >
+            Creez vos devis avec l&apos;IA, faites signer electroniquement,
+            encaissez par carte — le tout en 2 minutes. Relances auto, facturation,
+            pipeline Kanban.
+          </motion.p>
+
+          {/* CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row"
+          >
+            <Link
+              href="/signup"
+              className="group inline-flex items-center gap-2 rounded-xl px-8 py-4 text-base font-semibold text-white transition-all duration-200 hover:brightness-110"
+              style={{ background: ACCENT, boxShadow: `0 0 40px ${ACCENT}40` }}
+            >
+              Creer mon premier devis
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Link>
+            <button
+              onClick={() => {
+                const el = document.getElementById("demo");
+                el?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="inline-flex items-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.03] px-8 py-4 text-base font-medium text-[#eeeef0] transition-colors duration-200 hover:bg-white/[0.06]"
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" style={{ background: GREEN }} />
+                <span className="relative inline-flex h-2 w-2 rounded-full" style={{ background: GREEN }} />
+              </span>
+              Demo en direct
+            </button>
+          </motion.div>
+
+          {/* Trust badges */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="mt-8 flex flex-wrap items-center justify-center gap-6 text-[13px] text-[#8b8d9e]"
+          >
+            <span className="flex items-center gap-1.5">
+              <Check className="h-3.5 w-3.5" style={{ color: GREEN }} />
+              Gratuit, sans CB
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Shield className="h-3.5 w-3.5" style={{ color: GREEN }} />
+              Conforme RGPD
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Check className="h-3.5 w-3.5" style={{ color: GREEN }} />
+              IA hebergee en France
+            </span>
+          </motion.div>
+
+          {/* Product mockup — hero centerpiece */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="mt-16 sm:mt-20"
+          >
             <DevisGeneratorMockup />
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ══════════════════════════════════════════════
-          TICKER MÉTIERS
+          TICKER METIERS
           ══════════════════════════════════════════════ */}
       <section className="mt-20 py-5 sm:mt-28">
         <div className="relative overflow-hidden">
-          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-[#08090a] to-transparent" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-[#08090a] to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-[#06060b] to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-[#06060b] to-transparent" />
           <div className="animate-ticker flex gap-8 whitespace-nowrap">
             {[...professions, ...professions].map((p, i) => (
-              <span key={i} className="text-[12px] tracking-[0.05em] text-white/30">
+              <span key={i} className="text-[12px] tracking-[0.05em] text-white/20">
                 {i > 0 && <span className="mr-8">·</span>}
                 {p}
               </span>
@@ -500,14 +676,59 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
       </section>
 
       {/* ══════════════════════════════════════════════
-          FEATURES — "inline product" avec mockups animés
-          Chaque feature = grande section alternée
+          HOW IT WORKS — 3 steps
+          ══════════════════════════════════════════════ */}
+      <section className="border-t border-white/[0.04] py-24 sm:py-32">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="text-center">
+            <p className="text-[11px] font-medium uppercase tracking-widest" style={{ color: ACCENT }}>
+              Comment ca marche
+            </p>
+            <h2
+              className="mt-4 font-bold tracking-[-0.02em]"
+              style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.5rem)" }}
+            >
+              3 etapes. 2 minutes. C&apos;est tout.
+            </h2>
+          </div>
+
+          <div className="mt-16 grid gap-8 md:grid-cols-3">
+            {steps.map((step, i) => (
+              <div key={step.num} className="relative text-center">
+                {/* Connector line */}
+                {i < steps.length - 1 && (
+                  <div className="absolute left-[calc(50%+40px)] top-10 hidden h-px w-[calc(100%-80px)] bg-gradient-to-r from-white/10 via-white/6 to-transparent md:block" />
+                )}
+
+                <div
+                  className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl"
+                  style={{ background: ACCENT_LIGHT }}
+                >
+                  <step.icon className="h-7 w-7" style={{ color: ACCENT }} />
+                </div>
+                <p className="mb-2 text-[11px] font-bold uppercase tracking-widest" style={{ color: ACCENT }}>
+                  Etape {step.num}
+                </p>
+                <h3 className="mb-3 text-lg font-bold text-[#eeeef0]">
+                  {step.title}
+                </h3>
+                <p className="mx-auto max-w-xs text-sm leading-relaxed text-[#8b8d9e]">
+                  {step.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════
+          FEATURES — Alternating sections with mockups
           ══════════════════════════════════════════════ */}
       <section id="fonctionnalites">
         {featureSections.map((feat, i) => (
           <div
             key={feat.title}
-            className="border-t border-white/[0.06] py-24 sm:py-32"
+            className="border-t border-white/[0.04] py-24 sm:py-28"
           >
             <div className="mx-auto max-w-6xl px-4 sm:px-6">
               <div
@@ -517,16 +738,26 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
               >
                 {/* Text */}
                 <div className={i % 2 === 1 ? "lg:[direction:ltr]" : ""}>
-                  <p className="text-[11px] font-medium uppercase tracking-widest text-[#5e6ad2]">
-                    {feat.label}
-                  </p>
+                  <div className="mb-4 flex items-center gap-2">
+                    <p className="text-[11px] font-medium uppercase tracking-widest" style={{ color: ACCENT }}>
+                      {feat.label}
+                    </p>
+                    {feat.highlight && (
+                      <span
+                        className="rounded px-1.5 py-0.5 text-[10px] font-bold uppercase"
+                        style={{ background: ACCENT_LIGHT, color: ACCENT }}
+                      >
+                        {feat.highlight}
+                      </span>
+                    )}
+                  </div>
                   <h2
-                    className="mt-4 font-bold tracking-[-0.02em]"
+                    className="font-bold tracking-[-0.02em]"
                     style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.5rem)" }}
                   >
                     {feat.title}
                   </h2>
-                  <p className="mt-3 max-w-md text-base leading-relaxed text-[#8b8fa8]">
+                  <p className="mt-4 max-w-md text-base leading-relaxed text-[#8b8d9e]">
                     {feat.description}
                   </p>
                 </div>
@@ -542,71 +773,74 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
       </section>
 
       {/* ══════════════════════════════════════════════
-          DÉMO LIVE INTERACTIVE
-          Fond avec subtle radial gradient (seule exception)
+          DEMO LIVE INTERACTIVE
           ══════════════════════════════════════════════ */}
       <section
         id="demo"
-        className="border-t border-white/[0.06] py-24 sm:py-32"
+        className="border-t border-white/[0.04] py-24 sm:py-32"
         style={{
-          background:
-            "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(94,106,210,0.08) 0%, transparent 100%)",
+          background: `radial-gradient(ellipse 80% 50% at 50% 0%, ${ACCENT}0a 0%, transparent 100%)`,
         }}
       >
         <DemoSection />
       </section>
 
       {/* ══════════════════════════════════════════════
-          PRICING — Linear style
+          PRICING
           ══════════════════════════════════════════════ */}
-      <section id="tarifs" className="border-t border-white/[0.06] py-24 sm:py-32">
+      <section id="tarifs" className="border-t border-white/[0.04] py-24 sm:py-32">
         <div className="mx-auto max-w-5xl px-4 sm:px-6">
-          <p className="text-[11px] font-medium uppercase tracking-widest text-[#8b8fa8]">
-            Tarifs
-          </p>
-          <h2
-            className="mt-4 font-bold tracking-[-0.02em]"
-            style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.5rem)" }}
-          >
-            Commencez gratuitement, évoluez à votre rythme
-          </h2>
-          <p className="mt-4 max-w-lg text-[#8b8fa8]">
-            Pas de surprise. Pas d&apos;engagement. Changez de plan à tout moment.
-          </p>
+          <div className="text-center">
+            <p className="text-[11px] font-medium uppercase tracking-widest" style={{ color: ACCENT }}>
+              Tarifs
+            </p>
+            <h2
+              className="mt-4 font-bold tracking-[-0.02em]"
+              style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.5rem)" }}
+            >
+              Commencez gratuitement, evoluez a votre rythme
+            </h2>
+            <p className="mx-auto mt-4 max-w-lg text-[#8b8d9e]">
+              Pas de surprise. Pas d&apos;engagement. Changez de plan a tout moment.
+            </p>
+          </div>
 
           <div className="mt-14 grid gap-6 md:grid-cols-3">
             {plans.map((plan) => (
               <div
                 key={plan.name}
-                className={`relative flex flex-col rounded-xl border p-6 sm:p-8 ${
-                  plan.popular
-                    ? "border-[#5e6ad2]/40 bg-[#5e6ad2]/[0.04]"
-                    : "border-white/[0.06] bg-[#0f0f10]"
-                }`}
+                className="relative flex flex-col rounded-2xl border p-6 transition-colors duration-200 sm:p-8"
+                style={{
+                  borderColor: plan.popular ? `${ACCENT}50` : BORDER,
+                  background: plan.popular ? `${ACCENT}08` : SURFACE,
+                }}
               >
                 {plan.popular && (
-                  <p className="mb-2 text-[11px] font-medium uppercase tracking-widest text-[#5e6ad2]">
+                  <div
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-4 py-1 text-[11px] font-bold uppercase tracking-wider text-white"
+                    style={{ background: ACCENT }}
+                  >
                     Populaire
-                  </p>
+                  </div>
                 )}
 
-                <h3 className="text-xl font-bold text-[#e8e9f0]">{plan.name}</h3>
-                <p className="mt-1 text-sm text-[#8b8fa8]">{plan.description}</p>
+                <h3 className="text-xl font-bold text-[#eeeef0]">{plan.name}</h3>
+                <p className="mt-1 text-sm text-[#8b8d9e]">{plan.description}</p>
 
                 <div className="mt-6">
-                  <span className="text-4xl font-bold tracking-[-0.03em] text-[#e8e9f0]">
+                  <span className="text-4xl font-bold tracking-[-0.03em] text-[#eeeef0]">
                     {plan.price}€
                   </span>
-                  {plan.period && <span className="text-[#8b8fa8]">{plan.period}</span>}
+                  {plan.period && <span className="text-[#8b8d9e]">{plan.period}</span>}
                   {plan.price === 0 && (
-                    <p className="mt-1 text-xs text-[#8b8fa8]">Gratuit pour toujours</p>
+                    <p className="mt-1 text-xs text-[#8b8d9e]">Gratuit pour toujours</p>
                   )}
                 </div>
 
                 <ul className="mt-6 flex-1 space-y-3">
                   {plan.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2.5 text-sm text-[#8b8fa8]">
-                      <span className="mt-0.5 text-[#5e6ad2]">—</span>
+                    <li key={f} className="flex items-start gap-2.5 text-sm text-[#8b8d9e]">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0" style={{ color: ACCENT }} />
                       {f}
                     </li>
                   ))}
@@ -614,16 +848,17 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
 
                 <Link
                   href={plan.href}
-                  className={`mt-8 block rounded-lg py-3 text-center text-sm font-semibold transition-opacity duration-200 hover:opacity-90 ${
+                  className="mt-8 block rounded-xl py-3.5 text-center text-sm font-semibold transition-all duration-200 hover:brightness-110"
+                  style={
                     plan.popular
-                      ? "bg-[#5e6ad2] text-white"
-                      : "border border-white/[0.06] bg-white/[0.03] text-[#e8e9f0] hover:bg-white/[0.06]"
-                  }`}
+                      ? { background: ACCENT, color: "white", boxShadow: `0 0 24px ${ACCENT}33` }
+                      : { border: `1px solid ${BORDER}`, background: "rgba(255,255,255,0.03)", color: TEXT }
+                  }
                 >
                   {plan.cta}
                 </Link>
-                <p className="mt-2 text-center text-xs text-[#8b8fa8]">
-                  {plan.price === 0 ? "Sans carte bancaire" : "Résiliable à tout moment"}
+                <p className="mt-2 text-center text-xs text-[#8b8d9e]">
+                  {plan.price === 0 ? "Sans carte bancaire" : "Resiliable a tout moment"}
                 </p>
               </div>
             ))}
@@ -632,19 +867,21 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
       </section>
 
       {/* ══════════════════════════════════════════════
-          FAQ — lignes minimalistes
+          FAQ
           ══════════════════════════════════════════════ */}
-      <section id="faq" className="border-t border-white/[0.06] py-24 sm:py-32">
+      <section id="faq" className="border-t border-white/[0.04] py-24 sm:py-32">
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
-          <p className="text-[11px] font-medium uppercase tracking-widest text-[#8b8fa8]">
-            FAQ
-          </p>
-          <h2
-            className="mt-4 font-bold tracking-[-0.02em]"
-            style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.5rem)" }}
-          >
-            Questions fréquentes
-          </h2>
+          <div className="text-center">
+            <p className="text-[11px] font-medium uppercase tracking-widest" style={{ color: ACCENT }}>
+              FAQ
+            </p>
+            <h2
+              className="mt-4 font-bold tracking-[-0.02em]"
+              style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.5rem)" }}
+            >
+              Questions frequentes
+            </h2>
+          </div>
 
           <div className="mt-12">
             {faqs.map((faq, i) => (
@@ -655,12 +892,12 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
       </section>
 
       {/* ══════════════════════════════════════════════
-          DERNIERS ARTICLES
+          BLOG
           ══════════════════════════════════════════════ */}
       {recentPosts.length > 0 && (
-        <section className="border-t border-white/[0.06] py-24 sm:py-32">
+        <section className="border-t border-white/[0.04] py-24 sm:py-32">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-widest text-[#8b8fa8]">
+            <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-widest" style={{ color: ACCENT }}>
               <BookOpen className="h-3.5 w-3.5" />
               Blog
             </div>
@@ -670,8 +907,8 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
             >
               Derniers articles
             </h2>
-            <p className="mt-4 max-w-lg text-[#8b8fa8]">
-              Guides pratiques pour freelances, artisans et indépendants.
+            <p className="mt-4 max-w-lg text-[#8b8d9e]">
+              Guides pratiques pour freelances, artisans et independants.
             </p>
 
             <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -679,18 +916,22 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
                 <Link
                   key={post.slug}
                   href={`/blog/${post.slug}`}
-                  className="group block rounded-xl border border-white/[0.06] bg-[#0f0f10] p-6 transition-opacity duration-200 hover:opacity-80"
+                  className="group block rounded-2xl border border-white/[0.06] p-6 transition-all duration-200 hover:border-white/[0.12] hover:bg-white/[0.02]"
+                  style={{ background: SURFACE }}
                 >
-                  <span className="inline-block rounded bg-[#5e6ad2]/10 px-3 py-1 text-xs font-medium text-[#5e6ad2]">
+                  <span
+                    className="inline-block rounded-full px-3 py-1 text-xs font-medium"
+                    style={{ background: ACCENT_LIGHT, color: ACCENT }}
+                  >
                     {post.category}
                   </span>
-                  <h3 className="mt-3 text-lg font-semibold leading-snug text-[#e8e9f0]">
+                  <h3 className="mt-3 text-lg font-semibold leading-snug text-[#eeeef0]">
                     {post.title}
                   </h3>
-                  <p className="mt-2 line-clamp-2 text-sm text-[#8b8fa8]">
+                  <p className="mt-2 line-clamp-2 text-sm text-[#8b8d9e]">
                     {post.description}
                   </p>
-                  <div className="mt-4 flex items-center gap-3 text-xs text-[#8b8fa8]/60">
+                  <div className="mt-4 flex items-center gap-3 text-xs text-[#8b8d9e]/60">
                     <span>{new Date(post.date).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}</span>
                     <span>·</span>
                     <span>{post.readingTime}</span>
@@ -702,7 +943,8 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
             <div className="mt-10">
               <Link
                 href="/blog"
-                className="inline-flex items-center gap-2 text-sm font-medium text-[#5e6ad2] transition-opacity duration-200 hover:opacity-80"
+                className="inline-flex items-center gap-2 text-sm font-medium transition-opacity duration-200 hover:opacity-80"
+                style={{ color: ACCENT }}
               >
                 Voir tous les articles
                 <ArrowRight className="h-4 w-4" />
@@ -717,38 +959,51 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
           ══════════════════════════════════════════════ */}
       <section className="py-24 sm:py-32">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
-          <div className="rounded-xl border border-white/[0.06] bg-[#0f0f10] p-10 sm:p-16">
-            <FileText className="mb-4 h-10 w-10 text-[#5e6ad2]" />
+          <div
+            className="relative overflow-hidden rounded-3xl border p-10 sm:p-16"
+            style={{
+              borderColor: BORDER,
+              background: `linear-gradient(135deg, ${SURFACE_2} 0%, ${SURFACE} 100%)`,
+            }}
+          >
+            {/* Accent glow */}
+            <div
+              className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full opacity-20 blur-3xl"
+              style={{ background: ACCENT }}
+            />
+
+            <FileText className="mb-6 h-12 w-12" style={{ color: ACCENT }} />
             <h2
               className="font-bold tracking-[-0.02em]"
               style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.5rem)" }}
             >
-              Prêt à arrêter de perdre du temps
+              Pret a arreter de perdre du temps
               <br className="hidden sm:block" /> sur vos devis ?
             </h2>
-            <p className="mt-4 max-w-lg text-base text-[#8b8fa8]">
-              Créez votre premier devis en 30 secondes avec l&apos;IA.
+            <p className="mt-4 max-w-lg text-base text-[#8b8d9e]">
+              Creez votre premier devis en 30 secondes avec l&apos;IA.
               Gratuit, sans engagement, sans carte bancaire.
             </p>
 
             <div className="mt-10 flex flex-col gap-4 sm:flex-row">
               <Link
                 href="/signup"
-                className="group inline-flex items-center gap-2 rounded-lg bg-[#5e6ad2] px-8 py-4 text-base font-semibold text-white transition-opacity duration-200 hover:opacity-90"
+                className="group inline-flex items-center gap-2 rounded-xl px-8 py-4 text-base font-semibold text-white transition-all duration-200 hover:brightness-110"
+                style={{ background: ACCENT, boxShadow: `0 0 40px ${ACCENT}40` }}
               >
                 Commencer gratuitement
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
               <button
                 onClick={() => setVideoOpen(true)}
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/[0.06] bg-transparent px-8 py-4 text-base font-medium text-[#e8e9f0] transition-opacity duration-200 hover:bg-white/[0.04]"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/[0.08] bg-transparent px-8 py-4 text-base font-medium text-[#eeeef0] transition-colors duration-200 hover:bg-white/[0.04]"
               >
-                Voir la démo
+                Voir la demo
               </button>
             </div>
 
-            <p className="mt-6 text-sm text-[#8b8fa8]">
-              Sans carte bancaire · Accès immédiat · Support français
+            <p className="mt-6 text-sm text-[#8b8d9e]">
+              Sans carte bancaire · Acces immediat · Support francais
             </p>
           </div>
         </div>
@@ -757,52 +1012,52 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
       {/* ══════════════════════════════════════════════
           FOOTER
           ══════════════════════════════════════════════ */}
-      <footer className="border-t border-white/[0.06] py-12">
+      <footer className="border-t border-white/[0.04] py-12">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="flex flex-col items-center justify-between gap-8 md:flex-row">
             <Link href="/" className="transition-opacity duration-200 hover:opacity-80">
               <DevizlyLogo width={120} height={32} className="text-white" />
             </Link>
 
-            <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-[#8b8fa8]">
-              <a href="#fonctionnalites" className="transition-opacity duration-150 hover:text-[#e8e9f0]">Fonctionnalités</a>
-              <a href="#tarifs" className="transition-opacity duration-150 hover:text-[#e8e9f0]">Tarifs</a>
-              <a href="#faq" className="transition-opacity duration-150 hover:text-[#e8e9f0]">FAQ</a>
-              <Link href="/blog" className="transition-opacity duration-150 hover:text-[#e8e9f0]">Blog</Link>
-              <Link href="/login" className="transition-opacity duration-150 hover:text-[#e8e9f0]">Connexion</Link>
+            <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-[#8b8d9e]">
+              <a href="#fonctionnalites" className="transition-colors duration-150 hover:text-white">Fonctionnalites</a>
+              <a href="#tarifs" className="transition-colors duration-150 hover:text-white">Tarifs</a>
+              <a href="#faq" className="transition-colors duration-150 hover:text-white">FAQ</a>
+              <Link href="/blog" className="transition-colors duration-150 hover:text-white">Blog</Link>
+              <Link href="/login" className="transition-colors duration-150 hover:text-white">Connexion</Link>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-[#8b8fa8]/50">
-              <span className="font-medium text-[#8b8fa8]/70">Solutions :</span>
-              <Link href="/logiciel-devis-artisan" className="hover:text-[#8b8fa8]">Logiciel devis artisan</Link>
-              <Link href="/devis-auto-entrepreneur" className="hover:text-[#8b8fa8]">Devis auto-entrepreneur</Link>
-              <Link href="/logiciel-facturation-freelance" className="hover:text-[#8b8fa8]">Facturation freelance</Link>
-              <Link href="/devis-batiment-gratuit" className="hover:text-[#8b8fa8]">Devis bâtiment</Link>
-              <Link href="/creer-devis-en-ligne" className="hover:text-[#8b8fa8]">Créer devis en ligne</Link>
-              <Link href="/generateur-devis-ia" className="hover:text-[#8b8fa8]">Générateur devis IA</Link>
+            <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-[#8b8d9e]/50">
+              <span className="font-medium text-[#8b8d9e]/70">Solutions :</span>
+              <Link href="/logiciel-devis-artisan" className="hover:text-[#8b8d9e]">Logiciel devis artisan</Link>
+              <Link href="/devis-auto-entrepreneur" className="hover:text-[#8b8d9e]">Devis auto-entrepreneur</Link>
+              <Link href="/logiciel-facturation-freelance" className="hover:text-[#8b8d9e]">Facturation freelance</Link>
+              <Link href="/devis-batiment-gratuit" className="hover:text-[#8b8d9e]">Devis batiment</Link>
+              <Link href="/creer-devis-en-ligne" className="hover:text-[#8b8d9e]">Creer devis en ligne</Link>
+              <Link href="/generateur-devis-ia" className="hover:text-[#8b8d9e]">Generateur devis IA</Link>
             </div>
 
-            <div className="flex items-center gap-2 text-xs text-[#8b8fa8]">
+            <div className="flex items-center gap-2 text-xs text-[#8b8d9e]">
               <Shield className="h-3.5 w-3.5" />
               <span>Conforme RGPD</span>
               <span className="mx-1">·</span>
-              <span>Hébergé en France</span>
+              <span>Heberge en France</span>
             </div>
           </div>
 
-          <div className="my-8 h-px bg-white/[0.06]" />
+          <div className="my-8 h-px bg-white/[0.04]" />
 
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-[#8b8fa8]/50">
-              <Link href="/mentions-legales" className="hover:text-[#8b8fa8]">Mentions légales</Link>
-              <Link href="/cgv" className="hover:text-[#8b8fa8]">CGV</Link>
-              <Link href="/cgu" className="hover:text-[#8b8fa8]">CGU</Link>
-              <Link href="/confidentialite" className="hover:text-[#8b8fa8]">Confidentialité</Link>
-              <Link href="/cookies" className="hover:text-[#8b8fa8]">Cookies</Link>
-              <Link href="/securite" className="hover:text-[#8b8fa8]">Sécurité</Link>
+            <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-[#8b8d9e]/50">
+              <Link href="/mentions-legales" className="hover:text-[#8b8d9e]">Mentions legales</Link>
+              <Link href="/cgv" className="hover:text-[#8b8d9e]">CGV</Link>
+              <Link href="/cgu" className="hover:text-[#8b8d9e]">CGU</Link>
+              <Link href="/confidentialite" className="hover:text-[#8b8d9e]">Confidentialite</Link>
+              <Link href="/cookies" className="hover:text-[#8b8d9e]">Cookies</Link>
+              <Link href="/securite" className="hover:text-[#8b8d9e]">Securite</Link>
             </div>
-            <p className="text-xs text-[#8b8fa8]/50">
-              &copy; {new Date().getFullYear()} NBHC SAS — SIREN 102 637 899 — 55 Rue Henri Clément, 71100 Saint-Rémy
+            <p className="text-xs text-[#8b8d9e]/50">
+              &copy; {new Date().getFullYear()} NBHC SAS — SIREN 102 637 899 — 55 Rue Henri Clement, 71100 Saint-Remy
             </p>
           </div>
         </div>
@@ -825,7 +1080,8 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="relative mx-4 w-full max-w-4xl overflow-hidden rounded-xl border border-white/[0.06] bg-[#08090a]"
+              className="relative mx-4 w-full max-w-4xl overflow-hidden rounded-2xl border border-white/[0.06]"
+              style={{ background: BG }}
               onClick={(e) => e.stopPropagation()}
             >
               <button
@@ -853,18 +1109,19 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             onClick={() => setChatOpen(true)}
-            className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-xl border border-white/[0.06] bg-[#0f0f10] px-5 py-3 transition-opacity duration-200 hover:opacity-90"
+            className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-2xl border border-white/[0.06] px-5 py-3 transition-opacity duration-200 hover:opacity-90"
+            style={{ background: SURFACE }}
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#5e6ad2]/20">
-              <MessageCircle className="h-5 w-5 text-[#5e6ad2]" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: ACCENT_LIGHT }}>
+              <MessageCircle className="h-5 w-5" style={{ color: ACCENT }} />
             </div>
             <div className="text-left">
-              <p className="text-sm font-medium text-[#e8e9f0]">Une question sur les tarifs ?</p>
-              <p className="text-xs text-[#8b8fa8]">Je réponds en 2min</p>
+              <p className="text-sm font-medium text-[#eeeef0]">Une question sur les tarifs ?</p>
+              <p className="text-xs text-[#8b8d9e]">Je reponds en 2min</p>
             </div>
             <button
               onClick={(e) => { e.stopPropagation(); setChatShown(false); }}
-              className="ml-1 rounded-full p-1 text-[#8b8fa8] hover:text-[#e8e9f0]"
+              className="ml-1 rounded-full p-1 text-[#8b8d9e] hover:text-[#eeeef0]"
               aria-label="Fermer"
             >
               <X className="h-3.5 w-3.5" />
@@ -879,30 +1136,31 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="fixed bottom-6 right-6 z-50 w-[360px] overflow-hidden rounded-xl border border-white/[0.06] bg-[#0f0f10]"
+            className="fixed bottom-6 right-6 z-50 w-[360px] overflow-hidden rounded-2xl border border-white/[0.06]"
+            style={{ background: SURFACE }}
           >
-            <div className="flex items-center justify-between border-b border-white/[0.06] bg-[#5e6ad2]/10 px-5 py-4">
+            <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4" style={{ background: ACCENT_LIGHT }}>
               <div className="flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#5e6ad2]/20">
-                  <MessageCircle className="h-4 w-4 text-[#5e6ad2]" />
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg" style={{ background: ACCENT_LIGHT }}>
+                  <MessageCircle className="h-4 w-4" style={{ color: ACCENT }} />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-[#e8e9f0]">Devizly</p>
-                  <p className="text-xs text-[#8b8fa8]">Support en ligne</p>
+                  <p className="text-sm font-semibold text-[#eeeef0]">Devizly</p>
+                  <p className="text-xs text-[#8b8d9e]">Support en ligne</p>
                 </div>
               </div>
               <button
                 onClick={() => { setChatOpen(false); setChatShown(false); }}
-                className="rounded-full p-1.5 text-[#8b8fa8] hover:bg-white/[0.06] hover:text-[#e8e9f0]"
+                className="rounded-full p-1.5 text-[#8b8d9e] hover:bg-white/[0.06] hover:text-[#eeeef0]"
                 aria-label="Fermer"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
             <div className="p-5">
-              <div className="mb-4 rounded-lg bg-white/[0.03] px-4 py-3">
-                <p className="text-sm text-[#8b8fa8]">
-                  Bonjour ! Une question sur les tarifs ou les fonctionnalités ? Envoyez-nous un message, on répond en moins de 2 minutes.
+              <div className="mb-4 rounded-xl bg-white/[0.03] px-4 py-3">
+                <p className="text-sm text-[#8b8d9e]">
+                  Bonjour ! Une question sur les tarifs ou les fonctionnalites ? Envoyez-nous un message, on repond en moins de 2 minutes.
                 </p>
               </div>
               <form
@@ -929,18 +1187,19 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
                   type="email"
                   required
                   placeholder="Votre email"
-                  className="w-full rounded-lg border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-[#e8e9f0] placeholder-[#8b8fa8] outline-none focus:border-[#5e6ad2]/50"
+                  className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-[#eeeef0] placeholder-[#8b8d9e] outline-none focus:border-[#5B5BD6]/50"
                 />
                 <textarea
                   name="message"
                   required
                   rows={3}
                   placeholder="Votre question..."
-                  className="w-full resize-none rounded-lg border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-[#e8e9f0] placeholder-[#8b8fa8] outline-none focus:border-[#5e6ad2]/50"
+                  className="w-full resize-none rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-[#eeeef0] placeholder-[#8b8d9e] outline-none focus:border-[#5B5BD6]/50"
                 />
                 <button
                   type="submit"
-                  className="w-full rounded-lg bg-[#5e6ad2] py-2.5 text-sm font-semibold text-white transition-opacity duration-200 hover:opacity-90"
+                  className="w-full rounded-xl py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:brightness-110"
+                  style={{ background: ACCENT }}
                 >
                   Envoyer
                 </button>

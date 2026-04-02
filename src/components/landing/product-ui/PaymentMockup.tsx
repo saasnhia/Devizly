@@ -74,7 +74,7 @@ export function PaymentMockup() {
             key={opt.label}
             className={`flex items-center justify-between rounded-lg border px-3 py-2 text-xs transition-all duration-300 ${
               opt.selected
-                ? "border-[#5e6ad2] bg-[#5e6ad2]/10 text-[#e8e9f0]"
+                ? "border-[#5B5BD6] bg-[#5B5BD6]/10 text-[#e8e9f0]"
                 : "border-white/[0.06] text-[#8b8fa8]"
             }`}
           >
@@ -82,7 +82,7 @@ export function PaymentMockup() {
               <div
                 className={`h-3.5 w-3.5 rounded-full border-2 transition-all duration-300 ${
                   opt.selected
-                    ? "border-[#5e6ad2] bg-[#5e6ad2]"
+                    ? "border-[#5B5BD6] bg-[#5B5BD6]"
                     : "border-white/20"
                 }`}
               >
@@ -104,7 +104,7 @@ export function PaymentMockup() {
         <div
           className={`flex items-center justify-center gap-2 rounded-lg py-2.5 text-xs font-semibold transition-all duration-300 ${
             phase >= 1
-              ? "bg-[#5e6ad2] text-white"
+              ? "bg-[#5B5BD6] text-white"
               : "bg-white/[0.06] text-[#8b8fa8]"
           }`}
         >
@@ -114,7 +114,7 @@ export function PaymentMockup() {
       )}
 
       {phase === 2 && (
-        <div className="flex items-center justify-center gap-2 rounded-lg bg-[#5e6ad2] py-2.5 text-xs font-semibold text-white">
+        <div className="flex items-center justify-center gap-2 rounded-lg bg-[#5B5BD6] py-2.5 text-xs font-semibold text-white">
           <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
           Traitement en cours...
         </div>

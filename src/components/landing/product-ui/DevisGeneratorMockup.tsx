@@ -162,7 +162,7 @@ export function DevisGeneratorMockup() {
                 key={item.label}
                 className={`flex items-center gap-2.5 rounded-md px-3 py-2 text-[13px] ${
                   item.active
-                    ? "border-l-[3px] border-[#5e6ad2] bg-[#5e6ad2]/10 font-medium text-[#e8e9f0]"
+                    ? "border-l-[3px] border-[#5B5BD6] bg-[#5B5BD6]/10 font-medium text-[#e8e9f0]"
                     : "border-l-[3px] border-transparent text-[#8b8fa8]"
                 }`}
               >
@@ -206,7 +206,7 @@ export function DevisGeneratorMockup() {
                 <span className="text-[#e8e9f0]">
                   {displayText}
                   {phase === 1 && (
-                    <span className="ml-0.5 inline-block h-4 w-[2px] animate-pulse bg-[#5e6ad2]" />
+                    <span className="ml-0.5 inline-block h-4 w-[2px] animate-pulse bg-[#5B5BD6]" />
                   )}
                 </span>
               )}
@@ -217,7 +217,7 @@ export function DevisGeneratorMockup() {
               <div
                 className={`rounded-md border border-white/[0.06] bg-white/[0.03] py-2 text-center text-xs font-medium text-[#8b8fa8] ${
                   phase === 1 && typedChars === TYPING_TEXT.length
-                    ? "border-[#5e6ad2]/40 text-[#5e6ad2]"
+                    ? "border-[#5B5BD6]/40 text-[#5B5BD6]"
                     : ""
                 }`}
               >
@@ -227,13 +227,13 @@ export function DevisGeneratorMockup() {
 
             {phase === 2 && (
               <div>
-                <div className="mb-1 flex items-center gap-2 text-xs text-[#5e6ad2]">
-                  <div className="h-3 w-3 animate-spin rounded-full border-2 border-[#5e6ad2] border-t-transparent" />
+                <div className="mb-1 flex items-center gap-2 text-xs text-[#5B5BD6]">
+                  <div className="h-3 w-3 animate-spin rounded-full border-2 border-[#5B5BD6] border-t-transparent" />
                   Génération IA en cours...
                 </div>
                 <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
                   <div
-                    className="h-full rounded-full bg-[#5e6ad2] transition-all duration-75"
+                    className="h-full rounded-full bg-[#5B5BD6] transition-all duration-75"
                     style={{ width: `${progress}%` }}
                   />
                 </div>

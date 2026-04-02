@@ -3,9 +3,9 @@ import { DevizlyLogo } from "@/components/devizly-logo";
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-[#0A0A0F] text-white">
+    <div className="min-h-screen bg-[#06060b] text-white">
       {/* Navbar */}
-      <nav className="border-b border-white/10 bg-[#0A0A0F]/80 backdrop-blur-xl">
+      <nav className="border-b border-white/[0.06] bg-[#06060b]/80 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4 sm:px-6">
           <Link href="/" className="transition-transform hover:scale-105">
             <DevizlyLogo width={130} height={34} className="text-white" />
@@ -19,7 +19,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
             </Link>
             <Link
               href="/signup"
-              className="rounded-lg bg-gradient-to-r from-violet-600 to-indigo-500 px-5 py-2 text-sm font-medium text-white shadow-lg shadow-violet-500/25 transition-all hover:shadow-violet-500/40 hover:brightness-110"
+              className="rounded-lg bg-[#5B5BD6] px-5 py-2 text-sm font-medium text-white shadow-lg shadow-[#5B5BD6]/25 transition-all hover:shadow-[#5B5BD6]/40 hover:brightness-110"
             >
               Essayer gratuitement
             </Link>
@@ -33,7 +33,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-white/5 py-8">
+      <footer className="border-t border-white/[0.04] py-8">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-6 px-4 text-xs text-slate-500 sm:px-6">
           <Link href="/" className="transition-colors hover:text-white">Accueil</Link>
           <Link href="/pricing" className="transition-colors hover:text-white">Tarifs</Link>
@@ -42,11 +42,11 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
           <Link href="/logiciel-facturation-freelance" className="transition-colors hover:text-white">Facturation freelance</Link>
         </div>
         <div className="mx-auto mt-4 flex max-w-5xl flex-wrap items-center justify-center gap-6 px-4 text-xs text-slate-600 sm:px-6">
-          <Link href="/mentions-legales" className="transition-colors hover:text-slate-400">Mentions légales</Link>
-          <Link href="/confidentialite" className="transition-colors hover:text-slate-400">Confidentialité</Link>
+          <Link href="/mentions-legales" className="transition-colors hover:text-slate-400">Mentions legales</Link>
+          <Link href="/confidentialite" className="transition-colors hover:text-slate-400">Confidentialite</Link>
         </div>
         <p className="mt-4 text-center text-xs text-slate-600">
-          &copy; {new Date().getFullYear()} Devizly. Tous droits réservés.
+          &copy; {new Date().getFullYear()} Devizly. Tous droits reserves.
         </p>
       </footer>
     </div>

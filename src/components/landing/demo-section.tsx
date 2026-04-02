@@ -139,7 +139,7 @@ export function DemoSection() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         {/* Header */}
         <div className="mb-12 text-center">
-          <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-violet-500/10 px-4 py-1.5 text-sm font-medium text-violet-400">
+          <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#5B5BD6]/10 px-4 py-1.5 text-sm font-medium text-[#7C7CE0]">
             <Sparkles className="h-4 w-4" />
             Démo en direct — sans inscription
           </span>
@@ -172,8 +172,8 @@ export function DemoSection() {
                     onClick={() => setMetier(m.value)}
                     className={`rounded-lg border px-3 py-2 text-left text-sm transition-all ${
                       metier === m.value
-                        ? "border-violet-500 bg-violet-500/15 font-medium text-violet-300"
-                        : "border-white/10 text-slate-400 hover:border-violet-500/40 hover:bg-white/[0.03]"
+                        ? "border-[#5B5BD6] bg-[#5B5BD6]/15 font-medium text-[#9B9BE8]"
+                        : "border-white/10 text-slate-400 hover:border-[#5B5BD6]/40 hover:bg-white/[0.03]"
                     }`}
                   >
                     {m.icon} {m.label}
@@ -231,7 +231,7 @@ export function DemoSection() {
             <Button
               onClick={handleGenerate}
               disabled={!canGenerate}
-              className="h-12 w-full bg-violet-600 text-base font-medium text-white hover:bg-violet-700"
+              className="h-12 w-full bg-[#5B5BD6] text-base font-medium text-white hover:bg-[#4B4BC0]"
             >
               {isGenerating ? (
                 <>
@@ -256,8 +256,8 @@ export function DemoSection() {
 
             {/* Upgrade upsell */}
             {showUpgrade && (
-              <div className="mt-4 rounded-lg border border-violet-500/20 bg-violet-500/10 p-4 text-center">
-                <p className="mb-2 text-sm font-medium text-violet-300">
+              <div className="mt-4 rounded-lg border border-[#5B5BD6]/20 bg-[#5B5BD6]/10 p-4 text-center">
+                <p className="mb-2 text-sm font-medium text-[#9B9BE8]">
                   Vous avez utilisé vos 3 démos gratuites
                 </p>
                 <p className="mb-3 text-xs text-slate-400">
@@ -267,7 +267,7 @@ export function DemoSection() {
                 <Button
                   asChild
                   size="sm"
-                  className="w-full bg-violet-600 text-white hover:bg-violet-700"
+                  className="w-full bg-[#5B5BD6] text-white hover:bg-[#4B4BC0]"
                 >
                   <a href="/signup">Créer mon compte gratuit →</a>
                 </Button>
@@ -288,8 +288,8 @@ export function DemoSection() {
           <div className="min-h-[520px] overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
             {!quote && !isGenerating && (
               <div className="flex min-h-[520px] flex-col items-center justify-center p-8 text-center">
-                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-500/10">
-                  <Sparkles className="h-8 w-8 text-violet-400" />
+                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#5B5BD6]/10">
+                  <Sparkles className="h-8 w-8 text-[#7C7CE0]" />
                 </div>
                 <p className="mb-2 font-medium text-white">
                   Votre devis apparaîtra ici
@@ -316,8 +316,8 @@ export function DemoSection() {
 
             {isGenerating && (
               <div className="flex min-h-[520px] flex-col items-center justify-center p-8 text-center">
-                <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-500/10">
-                  <Sparkles className="h-8 w-8 animate-pulse text-violet-400" />
+                <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#5B5BD6]/10">
+                  <Sparkles className="h-8 w-8 animate-pulse text-[#7C7CE0]" />
                 </div>
                 <p className="mb-2 font-medium text-white">
                   L&apos;IA analyse votre prestation...
@@ -362,7 +362,7 @@ export function DemoSection() {
                   </div>
                 </div>
 
-                <p className="mt-2 rounded-lg border border-violet-500/20 bg-violet-500/10 px-3 py-2 text-xs text-violet-300">
+                <p className="mt-2 rounded-lg border border-[#5B5BD6]/20 bg-[#5B5BD6]/10 px-3 py-2 text-xs text-[#9B9BE8]">
                   ✏️ Tout est modifiable — montants, lignes, conditions — une
                   fois votre compte créé.
                 </p>
@@ -414,7 +414,7 @@ export function DemoSection() {
                   </div>
                   <div className="mt-2 flex justify-between border-t border-white/10 pt-2 text-base font-bold">
                     <span className="text-white">Total TTC</span>
-                    <span className="text-violet-400">
+                    <span className="text-[#7C7CE0]">
                       {fmt(quote.total)}€
                     </span>
                   </div>
@@ -439,7 +439,7 @@ export function DemoSection() {
                   </p>
                   <Button
                     asChild
-                    className="w-full bg-violet-600 text-white hover:bg-violet-700"
+                    className="w-full bg-[#5B5BD6] text-white hover:bg-[#4B4BC0]"
                   >
                     <a href="/signup">
                       Créer mon compte gratuit

@@ -32,7 +32,7 @@ const INITIAL: Record<string, KanbanCard[]> = {
 
 const COLUMNS = [
   { key: "prospects", label: "Prospects", color: "#8b8fa8" },
-  { key: "envoyes", label: "Envoyés", color: "#5e6ad2" },
+  { key: "envoyes", label: "Envoyés", color: "#5B5BD6" },
   { key: "signes", label: "Signés", color: "#e8b44a" },
   { key: "payes", label: "Payés", color: "#3dd68c" },
 ];
@@ -127,7 +127,7 @@ export function KanbanMockup() {
                   style={{
                     boxShadow:
                       movingId === card.id
-                        ? "0 0 0 1px #5e6ad2, 0 4px 12px rgba(94,106,210,0.2)"
+                        ? "0 0 0 1px #5B5BD6, 0 4px 12px rgba(94,106,210,0.2)"
                         : "none",
                     transform: movingId === card.id ? "scale(1.03)" : "scale(1)",
                   }}

@@ -363,8 +363,10 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
           display: inline-block;
           position: relative;
           height: 1.15em;
+          min-width: 340px;
           overflow: hidden;
           vertical-align: bottom;
+          text-align: left;
         }
         .aurora-word {
           display: inline-block;
@@ -402,11 +404,12 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
           border-radius: 20px;
           backdrop-filter: blur(20px);
           -webkit-backdrop-filter: blur(20px);
-          padding: 24px;
+          padding: 32px;
           transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
                       border-color 0.25s ease;
           overflow: hidden;
           position: relative;
+          min-height: 160px;
         }
         .bento-card:hover {
           transform: scale(1.02);
@@ -453,6 +456,41 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
           background-repeat: repeat;
           pointer-events: none;
           z-index: 1;
+        }
+
+        /* ---------- COUCHE 1: Dot grid ---------- */
+        .hero-dotgrid {
+          position: absolute;
+          inset: 0;
+          background-image: radial-gradient(rgba(255,255,255,0.12) 1px, transparent 1px);
+          background-size: 32px 32px;
+          pointer-events: none;
+          z-index: 1;
+        }
+        /* Vignette fade on dot grid edges */
+        .hero-dotgrid::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(ellipse 70% 60% at 50% 40%, transparent 40%, #08090a 80%);
+          pointer-events: none;
+        }
+
+        /* ---------- COUCHE 2: Scan line ---------- */
+        @keyframes scanLine {
+          0%   { transform: translateY(-100%); }
+          100% { transform: translateY(100vh); }
+        }
+        .hero-scanline {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(91,91,214,0.6), transparent);
+          animation: scanLine 8s linear infinite;
+          pointer-events: none;
+          z-index: 2;
         }
 
         /* ---------- Reduced motion ---------- */
@@ -529,6 +567,24 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
           SECTION 2 — HERO IMMERSIF
           ══════════════════════════════════════════════ */}
       <section className="hero-grain relative overflow-hidden pb-0 pt-28 sm:pt-36">
+        {/* COUCHE 1 — Dot grid with vignette */}
+        <div className="hero-dotgrid" />
+
+        {/* COUCHE 2 — Scan line */}
+        <div className="hero-scanline" />
+
+        {/* COUCHE 3 — Central glow under title */}
+        <div
+          className="pointer-events-none absolute left-1/2 top-[280px] -translate-x-1/2"
+          style={{
+            width: "600px",
+            height: "300px",
+            background: "radial-gradient(ellipse, rgba(91,91,214,0.15) 0%, transparent 70%)",
+            filter: "blur(40px)",
+            zIndex: 0,
+          }}
+        />
+
         {/* Aurora blobs */}
         <div
           className="pointer-events-none absolute right-[-10%] top-[-15%] h-[500px] w-[500px] rounded-full opacity-[0.25]"
@@ -695,27 +751,21 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
             </h2>
           </Reveal>
 
-          {/* Bento grid */}
-          <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Bento grid — 6 cards, airy spacing */}
+          <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
             {/* Card 1 — Devis IA — Large (col-span-2) */}
-            <Reveal delay={0} className="sm:col-span-2">
-              <div className="bento-card min-h-[340px]">
-                <div className="mb-2 flex items-center gap-2">
+            <Reveal delay={0} className="md:col-span-2">
+              <div className="bento-card">
+                <div className="mb-3 flex items-center gap-2">
                   <Bot className="h-5 w-5 text-[#5B5BD6]" />
-                  <span className="text-[11px] font-bold uppercase tracking-widest text-[#5B5BD6]">
-                    Génération IA
-                  </span>
-                  <span className="rounded bg-[#5B5BD6]/15 px-1.5 py-0.5 text-[10px] font-bold text-[#5B5BD6]">
-                    30s
-                  </span>
+                  <span className="text-[11px] font-bold uppercase tracking-widest text-[#5B5BD6]">Génération IA</span>
+                  <span className="rounded bg-[#5B5BD6]/15 px-1.5 py-0.5 text-[10px] font-bold text-[#5B5BD6]">30s</span>
                 </div>
-                <h3 className="text-xl font-bold tracking-tight sm:text-2xl">
-                  Devis IA en 30 secondes
-                </h3>
-                <p className="mt-2 max-w-md text-sm leading-relaxed text-[#8b8d9e]">
-                  Décrivez votre prestation en langage naturel. L&apos;IA structure votre devis et propose des prix marché — vous ajustez chaque ligne.
+                <h3 className="text-xl font-bold tracking-tight sm:text-2xl">Devis IA en 30 secondes</h3>
+                <p className="mt-2 line-clamp-2 max-w-md text-sm leading-[1.5] text-[#8b8d9e]">
+                  Décrivez votre prestation, l&apos;IA structure le devis avec des prix marché. Vous ajustez tout.
                 </p>
-                <div className="mt-4 overflow-hidden rounded-xl">
+                <div className="mt-5 overflow-hidden rounded-xl">
                   <DevisGeneratorMockup />
                 </div>
               </div>
@@ -723,131 +773,89 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
 
             {/* Card 2 — Signature eIDAS */}
             <Reveal delay={100}>
-              <div className="bento-card min-h-[340px]">
-                <div className="mb-2 flex items-center gap-2">
+              <div className="bento-card">
+                <div className="mb-3 flex items-center gap-2">
                   <PenTool className="h-5 w-5 text-[#5B5BD6]" />
-                  <span className="text-[11px] font-bold uppercase tracking-widest text-[#5B5BD6]">
-                    Signature
-                  </span>
-                  <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-bold text-emerald-400">
-                    eIDAS
-                  </span>
+                  <span className="text-[11px] font-bold uppercase tracking-widest text-[#5B5BD6]">Signature</span>
+                  <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-bold text-emerald-400">eIDAS</span>
                 </div>
-                <h3 className="text-lg font-bold tracking-tight">
-                  Signature électronique légale
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-[#8b8d9e]">
-                  Votre client signe depuis son téléphone. Valeur juridique eIDAS, horodatage certifié.
+                <h3 className="text-lg font-bold tracking-tight">Signature électronique légale</h3>
+                <p className="mt-2 line-clamp-2 text-sm leading-[1.5] text-[#8b8d9e]">
+                  Votre client signe depuis son téléphone. Valeur juridique eIDAS.
                 </p>
-                <div className="mt-4">
+                <div className="mt-5">
                   <SignatureMockup />
                 </div>
               </div>
             </Reveal>
 
-            {/* Card 3 — Relances auto */}
+            {/* Card 3 — Paiement Stripe */}
             <Reveal delay={200}>
-              <div className="bento-card min-h-[340px]">
-                <div className="mb-2 flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-[#5B5BD6]" />
-                  <span className="text-[11px] font-bold uppercase tracking-widest text-[#5B5BD6]">
-                    Relances
-                  </span>
-                  <span className="rounded bg-[#5B5BD6]/15 px-1.5 py-0.5 text-[10px] font-bold text-[#5B5BD6]">
-                    Auto
-                  </span>
-                </div>
-                <h3 className="text-lg font-bold tracking-tight">
-                  Relances J+2, J+5, J+7
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-[#8b8d9e]">
-                  Vos clients sont relancés automatiquement. Vous ne levez pas le petit doigt.
-                </p>
-                <div className="mt-4">
-                  <RelancesMockup />
-                </div>
-              </div>
-            </Reveal>
-
-            {/* Card 4 — Pipeline CRM — Large (col-span-2, row-span-2 on lg) */}
-            <Reveal delay={100} className="sm:col-span-2 lg:row-span-2">
-              <div className="bento-card flex h-full min-h-[400px] flex-col">
-                <div className="mb-2 flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-[#5B5BD6]" />
-                  <span className="text-[11px] font-bold uppercase tracking-widest text-[#5B5BD6]">
-                    Pipeline
-                  </span>
-                </div>
-                <h3 className="text-xl font-bold tracking-tight sm:text-2xl">
-                  Pipeline Kanban visuel
-                </h3>
-                <p className="mt-2 max-w-md text-sm leading-relaxed text-[#8b8d9e]">
-                  Prospect → envoyé → signé → payé. Visualisez chaque opportunité et votre CA en temps réel.
-                </p>
-                <div className="mt-4 flex-1">
-                  <KanbanMockup />
-                </div>
-              </div>
-            </Reveal>
-
-            {/* Card 5 — Paiement Stripe */}
-            <Reveal delay={200}>
-              <div className="bento-card min-h-[340px]">
-                <div className="mb-2 flex items-center gap-2">
+              <div className="bento-card">
+                <div className="mb-3 flex items-center gap-2">
                   <CreditCard className="h-5 w-5 text-[#5B5BD6]" />
-                  <span className="text-[11px] font-bold uppercase tracking-widest text-[#5B5BD6]">
-                    Paiement
-                  </span>
-                  <span className="rounded bg-[#5B5BD6]/15 px-1.5 py-0.5 text-[10px] font-bold text-[#5B5BD6]">
-                    48h
-                  </span>
+                  <span className="text-[11px] font-bold uppercase tracking-widest text-[#5B5BD6]">Paiement</span>
+                  <span className="rounded bg-[#5B5BD6]/15 px-1.5 py-0.5 text-[10px] font-bold text-[#5B5BD6]">48h</span>
                 </div>
-                <h3 className="text-lg font-bold tracking-tight">
-                  Acompte Stripe direct
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-[#8b8d9e]">
-                  Acompte 30/50%, paiement par carte. Fonds sur votre compte en 48h via Stripe Connect.
+                <h3 className="text-lg font-bold tracking-tight">Acompte Stripe direct</h3>
+                <p className="mt-2 line-clamp-2 text-sm leading-[1.5] text-[#8b8d9e]">
+                  Acompte 30/50% par carte. Fonds sur votre compte en 48h.
                 </p>
-                <div className="mt-4">
+                <div className="mt-5">
                   <PaymentMockup />
                 </div>
               </div>
             </Reveal>
 
-            {/* Card 6 — Calendly */}
-            <Reveal delay={300}>
-              <div className="bento-card flex min-h-[180px] flex-col items-start justify-center">
-                <div className="mb-2 flex items-center gap-2">
-                  <CalendarCheck className="h-5 w-5 text-[#5B5BD6]" />
-                  <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-bold text-amber-400">
-                    Nouveau
-                  </span>
+            {/* Card 4 — Relances auto */}
+            <Reveal delay={100} className="md:col-span-2">
+              <div className="bento-card">
+                <div className="mb-3 flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-[#5B5BD6]" />
+                  <span className="text-[11px] font-bold uppercase tracking-widest text-[#5B5BD6]">Relances</span>
+                  <span className="rounded bg-[#5B5BD6]/15 px-1.5 py-0.5 text-[10px] font-bold text-[#5B5BD6]">Auto</span>
                 </div>
-                <h3 className="text-lg font-bold tracking-tight">
-                  Calendly intégré
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-[#8b8d9e]">
-                  Après signature, votre client réserve un créneau directement. L&apos;onboarding démarre sans friction.
+                <h3 className="text-xl font-bold tracking-tight sm:text-2xl">Relances J+2, J+5, J+7</h3>
+                <p className="mt-2 line-clamp-2 max-w-md text-sm leading-[1.5] text-[#8b8d9e]">
+                  Vos clients sont relancés automatiquement. Vous ne levez pas le petit doigt.
                 </p>
+                <div className="mt-5">
+                  <RelancesMockup />
+                </div>
               </div>
             </Reveal>
 
-            {/* Card 7 — Facturation */}
-            <Reveal delay={350} className="sm:col-span-2 lg:col-span-2">
-              <div className="bento-card flex min-h-[180px] items-center gap-6">
-                <div className="shrink-0">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#5B5BD6]/10">
-                    <Receipt className="h-7 w-7 text-[#5B5BD6]" />
-                  </div>
+            {/* Card 5 — Pipeline CRM — Large (col-span-2) */}
+            <Reveal delay={200} className="md:col-span-2">
+              <div className="bento-card">
+                <div className="mb-3 flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-[#5B5BD6]" />
+                  <span className="text-[11px] font-bold uppercase tracking-widest text-[#5B5BD6]">Pipeline</span>
+                </div>
+                <h3 className="text-xl font-bold tracking-tight sm:text-2xl">Pipeline Kanban visuel</h3>
+                <p className="mt-2 line-clamp-2 max-w-md text-sm leading-[1.5] text-[#8b8d9e]">
+                  Prospect → envoyé → signé → payé. Votre CA en temps réel.
+                </p>
+                <div className="mt-5">
+                  <KanbanMockup />
+                </div>
+              </div>
+            </Reveal>
+
+            {/* Card 6 — Facturation auto (horizontal compact) */}
+            <Reveal delay={300} className="md:col-span-2 lg:col-span-4">
+              <div className="bento-card flex items-center gap-6">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#5B5BD6]/10">
+                  <Receipt className="h-7 w-7 text-[#5B5BD6]" />
                 </div>
                 <div>
                   <div className="mb-1 flex items-center gap-2">
                     <span className="text-[11px] font-bold uppercase tracking-widest text-[#5B5BD6]">Facturation</span>
                     <span className="rounded bg-[#5B5BD6]/15 px-1.5 py-0.5 text-[10px] font-bold text-[#5B5BD6]">Auto</span>
                   </div>
-                  <h3 className="text-lg font-bold tracking-tight">Facturation automatique</h3>
-                  <p className="mt-1 max-w-lg text-sm leading-relaxed text-[#8b8d9e]">
-                    À la signature, la facture est générée, numérotée et envoyée. Export CSV compatible comptable (Pennylane, Indy...).
+                  <h3 className="text-lg font-bold tracking-tight">Facturation automatique + Calendly intégré</h3>
+                  <p className="mt-1 line-clamp-2 max-w-2xl text-sm leading-[1.5] text-[#8b8d9e]">
+                    Facture générée à la signature, export CSV comptable. Calendly intégré pour planifier le kick-off sans friction.
                   </p>
                 </div>
               </div>

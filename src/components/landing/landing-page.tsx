@@ -212,29 +212,26 @@ function Reveal({
    ══════════════════════════════════════════════════ */
 
 function RotatingWord() {
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [index, setIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setActiveIndex((i) => (i + 1) % heroWords.length);
-    }, 2800);
+      setVisible(false);
+      setTimeout(() => {
+        setIndex((i) => (i + 1) % heroWords.length);
+        setVisible(true);
+      }, 300);
+    }, 2500);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <span className="relative inline-block" style={{ minWidth: "220px", height: "1.2em" }}>
-      {heroWords.map((word, i) => (
-        <span
-          key={word}
-          className="absolute left-0 top-0 font-bold text-[#5B5BD6] transition-all duration-500"
-          style={{
-            opacity: activeIndex === i ? 1 : 0,
-            transform: activeIndex === i ? "translateY(0)" : "translateY(8px)",
-          }}
-        >
-          {word}
-        </span>
-      ))}
+    <span
+      className="font-bold text-[#5B5BD6] transition-all duration-300"
+      style={{ opacity: visible ? 1 : 0, display: "inline" }}
+    >
+      {heroWords[index]}
     </span>
   );
 }
@@ -362,30 +359,6 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
           100% { transform: translateX(-50%); }
         }
 
-        /* ---------- Word rotation ---------- */
-        .aurora-word-wrap {
-          display: inline-block;
-          position: relative;
-          min-width: 220px;
-          height: 1.15em;
-          overflow: hidden;
-          vertical-align: bottom;
-          text-align: left;
-        }
-        @media (min-width: 640px) {
-          .aurora-word-wrap { min-width: 300px; }
-        }
-        .aurora-word {
-          position: absolute;
-          left: 0;
-          top: 0;
-          white-space: nowrap;
-          transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                      opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-          color: #5B5BD6;
-        }
-        .aurora-word-in  { transform: translateY(0); opacity: 1; }
-        .aurora-word-out { transform: translateY(-100%); opacity: 0; }
 
         /* ---------- Scroll reveal ---------- */
         .aurora-reveal {
@@ -511,7 +484,6 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
         /* ---------- Reduced motion ---------- */
         @media (prefers-reduced-motion: reduce) {
           .aurora-reveal { transition: none; opacity: 1; transform: none; }
-          .aurora-word { transition: none; }
           .btn-shimmer::before { animation: none !important; }
         }
       `}</style>
@@ -661,15 +633,10 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
 
           {/* Rotating word line */}
           <Reveal delay={150}>
-            <div className="mx-auto mt-4 flex w-full items-center justify-center">
-              <div
-                className="flex items-center justify-center gap-[0.35em] font-semibold text-slate-300"
-                style={{ fontSize: "clamp(1.2rem, 2.5vw, 1.8rem)" }}
-              >
-                <span className="whitespace-nowrap">Le logiciel de devis pour les</span>
-                <RotatingWord />
-              </div>
-            </div>
+            <p className="mt-4 text-center text-xl font-semibold text-slate-300 md:text-2xl">
+              Le logiciel de devis pour les{' '}
+              <RotatingWord />
+            </p>
           </Reveal>
 
           {/* Subtitle */}

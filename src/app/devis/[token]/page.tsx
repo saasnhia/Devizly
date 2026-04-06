@@ -64,6 +64,8 @@ export default function PublicQuotePage({
   const [stripeEnabled, setStripeEnabled] = useState(false);
   const [requireDepositBeforeSign, setRequireDepositBeforeSign] = useState(false);
   const [requiredDepositPercentage, setRequiredDepositPercentage] = useState(30);
+  const [depositMode, setDepositMode] = useState<"percent" | "fixed">("percent");
+  const [depositFixedAmount, setDepositFixedAmount] = useState(0);
 
   const fetchQuote = useCallback(async () => {
     const response = await fetch(`/api/quotes/share/${token}`);
@@ -91,6 +93,12 @@ export default function PublicQuotePage({
     }
     if (result.required_deposit_percentage) {
       setRequiredDepositPercentage(result.required_deposit_percentage);
+    }
+    if (result.deposit_mode) {
+      setDepositMode(result.deposit_mode);
+    }
+    if (result.deposit_fixed_amount) {
+      setDepositFixedAmount(result.deposit_fixed_amount);
     }
     setLoading(false);
   }, [token]);
@@ -175,12 +183,14 @@ export default function PublicQuotePage({
     setResponding(false);
   }
 
-  async function handlePayment(depositPercent?: number) {
+  async function handlePayment(depositPercent?: number, fixedAmount?: number) {
     if (!quote) return;
     setPayLoading(true);
     try {
       const bodyPayload: Record<string, unknown> = { share_token: token };
-      if (depositPercent) {
+      if (fixedAmount) {
+        bodyPayload.deposit_fixed_amount = fixedAmount;
+      } else if (depositPercent) {
         bodyPayload.deposit_percent = depositPercent;
       }
       const res = await fetch(`/api/quotes/${quote.id}/checkout`, {
@@ -520,7 +530,9 @@ export default function PublicQuotePage({
                     ) : (
                       <div className="rounded-xl border border-amber-500/30 bg-amber-50 p-4">
                         <p className="text-sm font-medium text-amber-800">
-                          Un acompte de {requiredDepositPercentage}% est requis pour valider votre réservation
+                          {depositMode === "fixed"
+                            ? `Un acompte de ${depositFixedAmount}€ est requis avant de signer`
+                            : `Un acompte de ${requiredDepositPercentage}% (${formatCurrency(Number(quote.total_ttc) * requiredDepositPercentage / 100, quote.currency || "EUR")}) est requis pour valider votre réservation`}
                         </p>
                         <p className="text-xs text-amber-600 mt-1">
                           Réglez l&apos;acompte ci-dessous, puis signez le devis et prenez votre rendez-vous.
@@ -550,7 +562,11 @@ export default function PublicQuotePage({
                         {depositRequired ? (
                           <Button
                             className="flex-1 border-2 border-amber-400 bg-amber-50 text-amber-900 hover:bg-amber-100"
-                            onClick={() => handlePayment(requiredDepositPercentage)}
+                            onClick={() =>
+                              depositMode === "fixed"
+                                ? handlePayment(undefined, depositFixedAmount)
+                                : handlePayment(requiredDepositPercentage)
+                            }
                             disabled={payLoading}
                           >
                             {payLoading ? (
@@ -558,7 +574,9 @@ export default function PublicQuotePage({
                             ) : (
                               <CreditCard className="mr-2 h-4 w-4" />
                             )}
-                            Étape 1 — Régler l&apos;acompte {requiredDepositPercentage}% ({formatCurrency(Number(quote.total_ttc) * requiredDepositPercentage / 100, quote.currency || "EUR")})
+                            {depositMode === "fixed"
+                              ? `Étape 1 — Régler l'acompte ${depositFixedAmount}€`
+                              : `Étape 1 — Régler l'acompte ${requiredDepositPercentage}% (${formatCurrency(Number(quote.total_ttc) * requiredDepositPercentage / 100, quote.currency || "EUR")})`}
                           </Button>
                         ) : (
                           <>

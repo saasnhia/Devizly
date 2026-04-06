@@ -49,6 +49,8 @@ export default function ParametresPage() {
   const [calendlyUrl, setCalendlyUrl] = useState("");
   const [requireDepositBeforeSign, setRequireDepositBeforeSign] = useState(false);
   const [requiredDepositPercentage, setRequiredDepositPercentage] = useState("30");
+  const [depositMode, setDepositMode] = useState<"percent" | "fixed">("percent");
+  const [depositFixedAmount, setDepositFixedAmount] = useState("");
   const [slug, setSlug] = useState("");
   const [brandColor, setBrandColor] = useState("#8B5CF6");
   const [profile, setProfile] = useState({
@@ -90,7 +92,7 @@ export default function ParametresPage() {
 
       const { data } = await supabase
         .from("profiles")
-        .select("subscription_status, logo_url, stripe_connect_status, calendly_url, slug, brand_color, require_deposit_before_sign, required_deposit_percentage")
+        .select("subscription_status, logo_url, stripe_connect_status, calendly_url, slug, brand_color, require_deposit_before_sign, required_deposit_percentage, deposit_mode, deposit_fixed_amount")
         .eq("id", user.id)
         .single();
       if (data?.subscription_status) {
@@ -116,6 +118,12 @@ export default function ParametresPage() {
       }
       if (data?.required_deposit_percentage) {
         setRequiredDepositPercentage(String(data.required_deposit_percentage));
+      }
+      if (data?.deposit_mode) {
+        setDepositMode(data.deposit_mode as "percent" | "fixed");
+      }
+      if (data?.deposit_fixed_amount) {
+        setDepositFixedAmount(String(data.deposit_fixed_amount));
       }
     }
     loadProfile();
@@ -232,6 +240,8 @@ export default function ParametresPage() {
           brand_color: brandColor || "#8B5CF6",
           require_deposit_before_sign: requireDepositBeforeSign,
           required_deposit_percentage: parseInt(requiredDepositPercentage, 10) || 30,
+          deposit_mode: depositMode,
+          deposit_fixed_amount: parseInt(depositFixedAmount, 10) || 0,
         })
         .eq("id", user.id);
     }
@@ -678,20 +688,58 @@ export default function ParametresPage() {
                 </button>
               </div>
               {requireDepositBeforeSign && (
-                <div className="space-y-2 pl-4 border-l-2 border-primary/20">
+                <div className="space-y-3 pl-4 border-l-2 border-primary/20">
                   <Label>Montant de l&apos;acompte requis</Label>
-                  <Select
-                    value={requiredDepositPercentage}
-                    onValueChange={setRequiredDepositPercentage}
-                  >
-                    <SelectTrigger className="w-40">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="30">30%</SelectItem>
-                      <SelectItem value="50">50%</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setDepositMode("percent")}
+                      className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                        depositMode === "percent"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted text-muted-foreground hover:bg-muted/80"
+                      }`}
+                    >
+                      Pourcentage
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDepositMode("fixed")}
+                      className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                        depositMode === "fixed"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted text-muted-foreground hover:bg-muted/80"
+                      }`}
+                    >
+                      Montant fixe
+                    </button>
+                  </div>
+                  {depositMode === "percent" ? (
+                    <Select
+                      value={requiredDepositPercentage}
+                      onValueChange={setRequiredDepositPercentage}
+                    >
+                      <SelectTrigger className="w-40">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="30">30%</SelectItem>
+                        <SelectItem value="50">50%</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        min="1"
+                        placeholder="ex: 150"
+                        value={depositFixedAmount}
+                        onChange={(e) => setDepositFixedAmount(e.target.value)}
+                        className="w-32"
+                      />
+                      <span className="text-sm text-muted-foreground">€</span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

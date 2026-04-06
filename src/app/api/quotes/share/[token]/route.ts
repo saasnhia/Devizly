@@ -63,7 +63,7 @@ export async function GET(
   // Fetch owner profile for calendly link + subscription status + Stripe Connect
   const { data: ownerProfile } = await supabase
     .from("profiles")
-    .select("calendly_url, subscription_status, stripe_connect_status, company_name, full_name, require_deposit_before_sign, required_deposit_percentage")
+    .select("calendly_url, subscription_status, stripe_connect_status, company_name, full_name, require_deposit_before_sign, required_deposit_percentage, deposit_mode, deposit_fixed_amount")
     .eq("id", quote.user_id)
     .single();
 
@@ -81,6 +81,8 @@ export async function GET(
     stripe_enabled: stripeEnabled,
     require_deposit_before_sign: ownerProfile?.require_deposit_before_sign ?? false,
     required_deposit_percentage: ownerProfile?.required_deposit_percentage ?? 30,
+    deposit_mode: ownerProfile?.deposit_mode ?? "percent",
+    deposit_fixed_amount: ownerProfile?.deposit_fixed_amount ?? 0,
   });
 }
 

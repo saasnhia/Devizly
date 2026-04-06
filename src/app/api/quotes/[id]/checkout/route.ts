@@ -23,9 +23,10 @@ export async function POST(
 
   const { id } = await params;
   const body = await request.json();
-  const { share_token, deposit_percent } = body as {
+  const { share_token, deposit_percent, deposit_fixed_amount } = body as {
     share_token: string;
     deposit_percent?: number;
+    deposit_fixed_amount?: number;
   };
 
   if (!share_token) {
@@ -54,11 +55,15 @@ export async function POST(
     );
   }
 
-  // Validate deposit_percent if provided
+  // Validate deposit: percent or fixed amount
   const validDepositPercents = [30, 50];
-  const isDeposit =
+  const isPercentDeposit =
     deposit_percent !== undefined &&
     validDepositPercents.includes(deposit_percent);
+  const isFixedDeposit =
+    deposit_fixed_amount !== undefined &&
+    deposit_fixed_amount > 0;
+  const isDeposit = isPercentDeposit || isFixedDeposit;
 
   const stripe = getStripe();
   const appUrl = getSiteUrl();
@@ -66,16 +71,25 @@ export async function POST(
 
   if (isDeposit) {
     // Deposit: single line item for the acompte amount
-    const depositAmount = Math.round(
-      Number(quote.total_ttc) * (deposit_percent / 100) * 100
-    );
+    let depositAmount: number;
+    let depositLabel: string;
+
+    if (isFixedDeposit) {
+      depositAmount = Math.round(deposit_fixed_amount * 100);
+      depositLabel = `Acompte ${deposit_fixed_amount}€ — ${quote.title || "Devis"}`;
+    } else {
+      depositAmount = Math.round(
+        Number(quote.total_ttc) * (deposit_percent! / 100) * 100
+      );
+      depositLabel = `Acompte ${deposit_percent}% — ${quote.title || "Devis"}`;
+    }
 
     const lineItems = [
       {
         price_data: {
           currency: stripeCurrency,
           product_data: {
-            name: `Acompte ${deposit_percent}% — ${quote.title || "Devis"}`,
+            name: depositLabel,
           },
           unit_amount: depositAmount,
         },
@@ -103,12 +117,14 @@ export async function POST(
       metadata: {
         quote_id: quote.id,
         devizly_payment: "true",
-        deposit_percent: String(deposit_percent),
+        ...(isPercentDeposit ? { deposit_percent: String(deposit_percent) } : {}),
+        ...(isFixedDeposit ? { deposit_fixed_amount: String(deposit_fixed_amount) } : {}),
       },
       payment_intent_data: {
         metadata: {
           quote_id: quote.id,
-          deposit_percent: String(deposit_percent),
+          ...(isPercentDeposit ? { deposit_percent: String(deposit_percent) } : {}),
+          ...(isFixedDeposit ? { deposit_fixed_amount: String(deposit_fixed_amount) } : {}),
         },
       },
     };
@@ -128,7 +144,7 @@ export async function POST(
       .from("quotes")
       .update({
         stripe_checkout_session: session.id,
-        deposit_percent: deposit_percent,
+        ...(isPercentDeposit ? { deposit_percent: deposit_percent } : {}),
       })
       .eq("id", quote.id);
 

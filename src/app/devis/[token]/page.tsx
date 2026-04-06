@@ -514,27 +514,25 @@ export default function PublicQuotePage({
                         Payer {formatCurrency(Number(quote.total_ttc), quote.currency || "EUR")} maintenant
                       </Button>
 
-                      {/* Deposit options — Pro/Business only */}
-                      {ownerPlan !== "free" && (
-                        <div className="flex gap-2">
-                          <Button
-                            variant="outline"
-                            className="flex-1"
-                            onClick={() => handlePayment(30)}
-                            disabled={payLoading}
-                          >
-                            Acompte 30% — {formatCurrency(Number(quote.total_ttc) * 0.3, quote.currency || "EUR")}
-                          </Button>
-                          <Button
-                            variant="outline"
-                            className="flex-1"
-                            onClick={() => handlePayment(50)}
-                            disabled={payLoading}
-                          >
-                            Acompte 50% — {formatCurrency(Number(quote.total_ttc) * 0.5, quote.currency || "EUR")}
-                          </Button>
-                        </div>
-                      )}
+                      {/* Deposit options */}
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => handlePayment(30)}
+                          disabled={payLoading}
+                        >
+                          Acompte 30% — {formatCurrency(Number(quote.total_ttc) * 0.3, quote.currency || "EUR")}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => handlePayment(50)}
+                          disabled={payLoading}
+                        >
+                          Acompte 50% — {formatCurrency(Number(quote.total_ttc) * 0.5, quote.currency || "EUR")}
+                        </Button>
+                      </div>
                     </>
                   )}
 

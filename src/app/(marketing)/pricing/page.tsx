@@ -36,7 +36,7 @@ const comparisonFeatures: PlanFeature[] = [
   { text: "Partage par lien + QR Code", free: true, pro: true, business: true },
   { text: "Versioning devis", free: true, pro: true, business: true },
   { text: "Signature électronique", free: false, pro: true, business: true },
-  { text: "Acompte Stripe (30/50%)", free: false, pro: true, business: true },
+  { text: "Acompte Stripe (30/50%)", free: true, pro: true, business: true },
   { text: "Tracking ouvertures email", free: false, pro: true, business: true },
   { text: "Calendly intégré", free: true, pro: true, business: true },
   { text: "Export PDF personnalisé", free: false, pro: true, business: true },

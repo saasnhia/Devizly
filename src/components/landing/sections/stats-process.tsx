@@ -29,7 +29,7 @@ export function StatsProcess() {
         <div className="mx-auto flex max-w-4xl flex-col items-center justify-center gap-8 px-6 sm:flex-row sm:gap-0 sm:divide-x sm:divide-white/10">
           <Stat value={30} suffix="s" label="Pour créer un devis" />
           <Stat value={0} suffix="€" label="Pour démarrer" />
-          <Stat value={2400} suffix="+" label="Devis créés" />
+          <Stat value={100} suffix="%" label="Légalement conforme" />
         </div>
       </div>
 

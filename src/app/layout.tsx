@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import { Toaster } from "sonner";
 import { CookieBanner } from "@/components/cookie-banner";
 import { ServiceWorkerRegister } from "@/components/sw-register";
@@ -16,6 +16,13 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
   display: "swap",
+});
+
+const plusJakarta = Plus_Jakarta_Sans({
+  variable: "--font-plus-jakarta",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://devizly.fr";
@@ -132,7 +139,7 @@ export default function RootLayout({
         <JsonLd data={websiteSchema} />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${plusJakarta.variable} antialiased`}
       >
         {children}
         <Toaster richColors position="top-right" />

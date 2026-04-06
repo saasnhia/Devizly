@@ -75,7 +75,7 @@ export async function GET(
   return NextResponse.json({
     success: true,
     data: quote,
-    calendly_url: ownerPlan !== "free" ? (ownerProfile?.calendly_url || null) : null,
+    calendly_url: ownerProfile?.calendly_url || null,
     owner_name: ownerProfile?.company_name || ownerProfile?.full_name || null,
     owner_plan: ownerPlan,
     stripe_enabled: stripeEnabled,

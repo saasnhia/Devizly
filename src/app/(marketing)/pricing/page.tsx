@@ -38,7 +38,7 @@ const comparisonFeatures: PlanFeature[] = [
   { text: "Signature électronique", free: false, pro: true, business: true },
   { text: "Acompte Stripe (30/50%)", free: false, pro: true, business: true },
   { text: "Tracking ouvertures email", free: false, pro: true, business: true },
-  { text: "Calendly intégré", free: false, pro: true, business: true },
+  { text: "Calendly intégré", free: true, pro: true, business: true },
   { text: "Export PDF personnalisé", free: false, pro: true, business: true },
   { text: "Analytics devis", free: false, pro: true, business: true },
   { text: "Relances automatiques", free: false, pro: true, business: true },

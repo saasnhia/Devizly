@@ -47,6 +47,8 @@ export default function ParametresPage() {
   const [snippetCopied, setSnippetCopied] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [calendlyUrl, setCalendlyUrl] = useState("");
+  const [requireDepositBeforeSign, setRequireDepositBeforeSign] = useState(false);
+  const [requiredDepositPercentage, setRequiredDepositPercentage] = useState("30");
   const [slug, setSlug] = useState("");
   const [brandColor, setBrandColor] = useState("#8B5CF6");
   const [profile, setProfile] = useState({
@@ -88,7 +90,7 @@ export default function ParametresPage() {
 
       const { data } = await supabase
         .from("profiles")
-        .select("subscription_status, logo_url, stripe_connect_status, calendly_url, slug, brand_color")
+        .select("subscription_status, logo_url, stripe_connect_status, calendly_url, slug, brand_color, require_deposit_before_sign, required_deposit_percentage")
         .eq("id", user.id)
         .single();
       if (data?.subscription_status) {
@@ -108,6 +110,12 @@ export default function ParametresPage() {
       }
       if (data?.brand_color) {
         setBrandColor(data.brand_color);
+      }
+      if (data?.require_deposit_before_sign) {
+        setRequireDepositBeforeSign(true);
+      }
+      if (data?.required_deposit_percentage) {
+        setRequiredDepositPercentage(String(data.required_deposit_percentage));
       }
     }
     loadProfile();
@@ -222,6 +230,8 @@ export default function ParametresPage() {
           rcs_number: profile.rcs_number || null,
           slug: slug.toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 50) || null,
           brand_color: brandColor || "#8B5CF6",
+          require_deposit_before_sign: requireDepositBeforeSign,
+          required_deposit_percentage: parseInt(requiredDepositPercentage, 10) || 30,
         })
         .eq("id", user.id);
     }
@@ -634,6 +644,56 @@ export default function ParametresPage() {
               <p className="text-xs text-muted-foreground">
                 Intégré directement sur vos devis signés pour permettre la prise de RDV.
               </p>
+            </div>
+
+            <Separator />
+
+            {/* Signature & Acompte */}
+            <div className="space-y-4">
+              <Label className="flex items-center gap-2 text-base font-semibold">
+                <CreditCard className="h-4 w-4" />
+                Signature &amp; Acompte
+              </Label>
+              <div className="flex items-center justify-between rounded-lg border p-4">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">Exiger un acompte avant la signature du devis</p>
+                  <p className="text-xs text-muted-foreground">
+                    Vos clients devront régler l&apos;acompte avant de pouvoir signer et prendre rendez-vous via Calendly.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={requireDepositBeforeSign}
+                  onClick={() => setRequireDepositBeforeSign(!requireDepositBeforeSign)}
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors ${
+                    requireDepositBeforeSign ? "bg-primary" : "bg-muted"
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      requireDepositBeforeSign ? "translate-x-6" : "translate-x-1"
+                    }`}
+                  />
+                </button>
+              </div>
+              {requireDepositBeforeSign && (
+                <div className="space-y-2 pl-4 border-l-2 border-primary/20">
+                  <Label>Montant de l&apos;acompte requis</Label>
+                  <Select
+                    value={requiredDepositPercentage}
+                    onValueChange={setRequiredDepositPercentage}
+                  >
+                    <SelectTrigger className="w-40">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="30">30%</SelectItem>
+                      <SelectItem value="50">50%</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
 
             <Separator />

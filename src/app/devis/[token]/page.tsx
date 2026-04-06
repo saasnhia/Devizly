@@ -62,6 +62,8 @@ export default function PublicQuotePage({
   const [ownerName, setOwnerName] = useState<string | null>(null);
   const [ownerPlan, setOwnerPlan] = useState<string>("free");
   const [stripeEnabled, setStripeEnabled] = useState(false);
+  const [requireDepositBeforeSign, setRequireDepositBeforeSign] = useState(false);
+  const [requiredDepositPercentage, setRequiredDepositPercentage] = useState(30);
 
   const fetchQuote = useCallback(async () => {
     const response = await fetch(`/api/quotes/share/${token}`);
@@ -83,6 +85,12 @@ export default function PublicQuotePage({
     }
     if (result.stripe_enabled) {
       setStripeEnabled(true);
+    }
+    if (result.require_deposit_before_sign) {
+      setRequireDepositBeforeSign(true);
+    }
+    if (result.required_deposit_percentage) {
+      setRequiredDepositPercentage(result.required_deposit_percentage);
     }
     setLoading(false);
   }, [token]);
@@ -221,6 +229,8 @@ export default function PublicQuotePage({
     (a, b) => a.position - b.position
   );
   const tvaAmount = Number(quote.total_ttc) - Number(quote.total_ht);
+  const depositPaid = !!quote.deposit_paid_at;
+  const depositRequired = requireDepositBeforeSign && !depositPaid;
 
   return (
     <div className="min-h-screen bg-slate-50 py-8">
@@ -498,6 +508,27 @@ export default function PublicQuotePage({
               ) : (
                 /* Main actions: Pay + Sign + Refuse */
                 <div className="flex flex-col gap-3">
+                  {/* Deposit required banner */}
+                  {requireDepositBeforeSign && quote.status === "envoyé" && (
+                    depositPaid ? (
+                      <div className="rounded-xl border border-green-500/30 bg-green-500/10 p-4">
+                        <p className="text-sm font-medium text-green-700">
+                          <CheckCircle className="mr-1.5 inline h-4 w-4" />
+                          Acompte réglé — vous pouvez maintenant signer le devis
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="rounded-xl border border-amber-500/30 bg-amber-50 p-4">
+                        <p className="text-sm font-medium text-amber-800">
+                          Un acompte de {requiredDepositPercentage}% est requis pour valider votre réservation
+                        </p>
+                        <p className="text-xs text-amber-600 mt-1">
+                          Réglez l&apos;acompte ci-dessous, puis signez le devis et prenez votre rendez-vous.
+                        </p>
+                      </div>
+                    )
+                  )}
+
                   {/* Full payment — only if Stripe is configured */}
                   {stripeEnabled && (
                     <>
@@ -516,22 +547,39 @@ export default function PublicQuotePage({
 
                       {/* Deposit options */}
                       <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          className="flex-1"
-                          onClick={() => handlePayment(30)}
-                          disabled={payLoading}
-                        >
-                          Acompte 30% — {formatCurrency(Number(quote.total_ttc) * 0.3, quote.currency || "EUR")}
-                        </Button>
-                        <Button
-                          variant="outline"
-                          className="flex-1"
-                          onClick={() => handlePayment(50)}
-                          disabled={payLoading}
-                        >
-                          Acompte 50% — {formatCurrency(Number(quote.total_ttc) * 0.5, quote.currency || "EUR")}
-                        </Button>
+                        {depositRequired ? (
+                          <Button
+                            className="flex-1 border-2 border-amber-400 bg-amber-50 text-amber-900 hover:bg-amber-100"
+                            onClick={() => handlePayment(requiredDepositPercentage)}
+                            disabled={payLoading}
+                          >
+                            {payLoading ? (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                              <CreditCard className="mr-2 h-4 w-4" />
+                            )}
+                            Étape 1 — Régler l&apos;acompte {requiredDepositPercentage}% ({formatCurrency(Number(quote.total_ttc) * requiredDepositPercentage / 100, quote.currency || "EUR")})
+                          </Button>
+                        ) : (
+                          <>
+                            <Button
+                              variant="outline"
+                              className="flex-1"
+                              onClick={() => handlePayment(30)}
+                              disabled={payLoading}
+                            >
+                              Acompte 30% — {formatCurrency(Number(quote.total_ttc) * 0.3, quote.currency || "EUR")}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              className="flex-1"
+                              onClick={() => handlePayment(50)}
+                              disabled={payLoading}
+                            >
+                              Acompte 50% — {formatCurrency(Number(quote.total_ttc) * 0.5, quote.currency || "EUR")}
+                            </Button>
+                          </>
+                        )}
                       </div>
                     </>
                   )}
@@ -541,9 +589,10 @@ export default function PublicQuotePage({
                     <div className="flex flex-col gap-3 sm:flex-row">
                       <Button
                         variant="outline"
-                        className="flex-1"
-                        onClick={() => setShowSignature(true)}
-                        disabled={responding}
+                        className={`flex-1 ${depositRequired ? "opacity-50 cursor-not-allowed" : ""}`}
+                        onClick={() => !depositRequired && setShowSignature(true)}
+                        disabled={responding || depositRequired}
+                        title={depositRequired ? "Veuillez d'abord régler l'acompte" : undefined}
                       >
                         <PenLine className="mr-2 h-4 w-4" />
                         Accepter et signer

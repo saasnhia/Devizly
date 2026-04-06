@@ -3,6 +3,8 @@
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { SmoothScroll } from "./smooth-scroll";
+import { CustomCursor } from "./custom-cursor";
+import { SectionDivider } from "./section-divider";
 import { EditorialNav } from "./sections/editorial-nav";
 import { EditorialHero } from "./sections/editorial-hero";
 import { ValueProposition } from "./sections/value-proposition";
@@ -33,14 +35,21 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
   return (
     <SmoothScroll>
       <div className="aurora-page grain">
+        <CustomCursor />
         <EditorialNav />
         <EditorialHero segment={segment} />
+        <SectionDivider />
         <ValueProposition />
+        <SectionDivider />
         <DemoWrapper />
+        <SectionDivider />
         <StatsProcess />
+        <SectionDivider />
         <EditorialPricing />
+        <SectionDivider />
         <FaqSection />
         <BlogSection recentPosts={recentPosts} />
+        <SectionDivider />
         <CtaFinal onVideoOpen={() => setVideoOpen(true)} />
         <MinimalFooter />
         <ChatWidget />

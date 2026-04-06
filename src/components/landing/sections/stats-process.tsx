@@ -1,21 +1,94 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import CountUp from "react-countup";
 import { useInView } from "react-intersection-observer";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { steps } from "../data/landing-data";
+
+gsap.registerPlugin(ScrollTrigger);
 
 function Stat({ value, suffix, label }: { value: number; suffix?: string; label: string }) {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.3 });
+  const numRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    if (!inView || !numRef.current || value === 0) return;
+    // Flash effect after count finishes
+    const duration = value === 30 ? 1.5 : 2;
+    const timeout = setTimeout(() => {
+      if (!numRef.current) return;
+      gsap.to(numRef.current, {
+        scale: 1.05,
+        textShadow: "0 0 40px rgba(91,91,214,0.4)",
+        duration: 0.15,
+        yoyo: true,
+        repeat: 1,
+        ease: "power2.out",
+        onComplete: () => {
+          if (numRef.current) {
+            numRef.current.style.textShadow = "none";
+          }
+        },
+      });
+    }, duration * 1000);
+    return () => clearTimeout(timeout);
+  }, [inView, value]);
 
   return (
-    <div ref={ref} className="reveal-up flex-1 px-6 py-4 text-center">
-      <p className="text-5xl font-bold text-white lg:text-7xl">
-        {inView ? <CountUp end={value} duration={2} /> : "0"}
+    <div ref={ref} className="flex-1 px-6 py-4 text-center">
+      <p ref={numRef} className="text-5xl font-bold text-white lg:text-7xl will-change-transform">
+        {inView ? (
+          <CountUp
+            end={value}
+            duration={value === 30 ? 1.5 : 2}
+            easingFn={(t, b, c, d) => {
+              // power2.out easing
+              const x = t / d;
+              return b + c * (1 - (1 - x) * (1 - x));
+            }}
+          />
+        ) : (
+          "0"
+        )}
         {suffix}
       </p>
       <p className="mt-2 text-sm text-slate-400">{label}</p>
     </div>
+  );
+}
+
+function StatDivider() {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        ref.current,
+        { scaleY: 0 },
+        {
+          scaleY: 1,
+          duration: 0.8,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: ref.current,
+            start: "top 85%",
+            toggleActions: "play none none none",
+          },
+        }
+      );
+    });
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      className="hidden sm:block w-px h-16 bg-white/10 origin-top"
+      style={{ transform: "scaleY(0)" }}
+    />
   );
 }
 
@@ -26,9 +99,11 @@ export function StatsProcess() {
     <section id="fonctionnalites">
       {/* Stats strip */}
       <div className="border-y border-white/[0.05] py-16 lg:py-20">
-        <div className="mx-auto flex max-w-4xl flex-col items-center justify-center gap-8 px-6 sm:flex-row sm:gap-0 sm:divide-x sm:divide-white/10">
+        <div className="mx-auto flex max-w-4xl flex-col items-center justify-center gap-8 px-6 sm:flex-row sm:gap-0">
           <Stat value={30} suffix="s" label="Pour créer un devis" />
+          <StatDivider />
           <Stat value={0} suffix="€" label="Pour démarrer" />
+          <StatDivider />
           <Stat value={100} suffix="%" label="Légalement conforme" />
         </div>
       </div>

@@ -77,6 +77,8 @@ const plans = [
       "Templates professionnels",
       "QR Code + liens publics",
       "Versioning devis",
+      "Acompte Stripe (30/50%)",
+      "Calendly sur devis signé",
     ],
     cta: "Commencer gratuitement",
     popular: false,

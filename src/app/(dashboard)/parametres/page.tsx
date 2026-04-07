@@ -53,6 +53,11 @@ export default function ParametresPage() {
   const [depositFixedAmount, setDepositFixedAmount] = useState("");
   const [slug, setSlug] = useState("");
   const [brandColor, setBrandColor] = useState("#8B5CF6");
+  const [referralCode, setReferralCode] = useState("");
+  const [referralCount, setReferralCount] = useState(0);
+  const [isFounder, setIsFounder] = useState(false);
+  const [founderNumber, setFounderNumber] = useState<number | null>(null);
+  const [refCopied, setRefCopied] = useState(false);
   const [profile, setProfile] = useState({
     full_name: "",
     company_name: "",
@@ -92,7 +97,7 @@ export default function ParametresPage() {
 
       const { data } = await supabase
         .from("profiles")
-        .select("subscription_status, logo_url, stripe_connect_status, calendly_url, slug, brand_color, require_deposit_before_sign, required_deposit_percentage, deposit_mode, deposit_fixed_amount")
+        .select("subscription_status, logo_url, stripe_connect_status, calendly_url, slug, brand_color, require_deposit_before_sign, required_deposit_percentage, deposit_mode, deposit_fixed_amount, referral_code, is_founder, founder_number")
         .eq("id", user.id)
         .single();
       if (data?.subscription_status) {
@@ -124,6 +129,23 @@ export default function ParametresPage() {
       }
       if (data?.deposit_fixed_amount) {
         setDepositFixedAmount(String(data.deposit_fixed_amount));
+      }
+      if (data?.referral_code) {
+        setReferralCode(data.referral_code);
+      }
+      if (data?.is_founder) {
+        setIsFounder(true);
+        setFounderNumber(data.founder_number ?? null);
+      }
+
+      // Load referral count
+      if (data?.referral_code) {
+        const { count } = await supabase
+          .from("referrals")
+          .select("*", { count: "exact", head: true })
+          .eq("referrer_id", user.id)
+          .eq("status", "completed");
+        setReferralCount(count ?? 0);
       }
     }
     loadProfile();
@@ -798,6 +820,57 @@ export default function ParametresPage() {
             </Button>
           </CardContent>
         </Card>
+
+        {/* Founder badge */}
+        {isFounder && (
+          <div className="flex items-center gap-3 rounded-xl border border-amber-300/30 bg-amber-500/10 px-5 py-3">
+            <span className="text-lg">&#11088;</span>
+            <p className="text-sm font-semibold text-amber-200">
+              Fondateur #{founderNumber} — Plan Pro à vie
+            </p>
+          </div>
+        )}
+
+        {/* Referral section */}
+        {referralCode && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Zap className="h-5 w-5" />
+                Parrainez vos contacts
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Offrez 1 mois Pro à -50% à vos filleuls. Vous recevez 1 mois gratuit dès qu&apos;ils s&apos;abonnent.
+              </p>
+              <div className="space-y-2">
+                <Label>Votre lien de parrainage</Label>
+                <div className="flex gap-2">
+                  <Input
+                    readOnly
+                    value={`https://devizly.fr/r/${referralCode}`}
+                    className="flex-1"
+                  />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => {
+                      navigator.clipboard.writeText(`https://devizly.fr/r/${referralCode}`);
+                      setRefCopied(true);
+                      setTimeout(() => setRefCopied(false), 2000);
+                    }}
+                  >
+                    {refCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                  </Button>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {referralCount} filleul{referralCount !== 1 ? "s" : ""} actif{referralCount !== 1 ? "s" : ""}
+              </p>
+            </CardContent>
+          </Card>
+        )}
 
         <Card>
           <CardHeader>

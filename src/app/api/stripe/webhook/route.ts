@@ -194,6 +194,75 @@ export async function POST(request: Request) {
         })
         .eq("id", userId);
       if (subErr) console.error("[Webhook] Subscription activation failed:", { userId, plan, error: subErr.message });
+
+      // Founder badge (first 100 paying subscribers)
+      if (plan !== "free") {
+        try {
+          const { count } = await supabase
+            .from("profiles")
+            .select("*", { count: "exact", head: true })
+            .eq("is_founder", true);
+
+          if ((count ?? 0) < 100) {
+            const founderNumber = (count ?? 0) + 1;
+            await supabase
+              .from("profiles")
+              .update({
+                is_founder: true,
+                founder_number: founderNumber,
+              })
+              .eq("id", userId);
+            console.log(`[FOUNDER] User ${userId} est le fondateur #${founderNumber}`);
+          }
+        } catch (founderErr) {
+          console.error("[Webhook] Founder badge failed:", founderErr);
+        }
+      }
+
+      // Referral reward (1 month credit to referrer)
+      if (plan !== "free") {
+        try {
+          const { data: referral } = await supabase
+            .from("referrals")
+            .select("referrer_id, status")
+            .eq("referred_id", userId)
+            .eq("status", "pending")
+            .single();
+
+          if (referral) {
+            const { data: referrer } = await supabase
+              .from("profiles")
+              .select("stripe_customer_id, email")
+              .eq("id", referral.referrer_id)
+              .single();
+
+            if (referrer?.stripe_customer_id) {
+              const stripe = getStripe();
+              await stripe.customers.createBalanceTransaction(
+                referrer.stripe_customer_id,
+                {
+                  amount: -1900, // -19€ = 1 mois Pro offert
+                  currency: "eur",
+                  description: "Parrainage Devizly — 1 mois offert",
+                }
+              );
+            }
+
+            await supabase
+              .from("referrals")
+              .update({
+                status: "completed",
+                rewarded_at: new Date().toISOString(),
+              })
+              .eq("referred_id", userId);
+
+            console.log(`[REFERRAL] Parrain ${referrer?.email} récompensé pour avoir parrainé ${userId}`);
+          }
+        } catch (refErr) {
+          console.error("[Webhook] Referral reward failed:", refErr);
+        }
+      }
+
       break;
     }
 

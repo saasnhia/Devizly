@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { createServerClient } from "@supabase/ssr";
 import { getResend } from "@/lib/resend";
 import { welcomeEmail } from "@/lib/emails/welcome";
+import { assignReferralCode, linkReferral } from "@/lib/referral";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -21,6 +24,24 @@ export async function GET(request: Request) {
           const isNewUser = now - createdAt < 60_000; // created less than 60s ago
           if (isNewUser) {
             const userName = user.user_metadata?.full_name || user.email?.split("@")[0] || "";
+
+            // Assign referral code + link referral (service role needed)
+            try {
+              const serviceClient = createServerClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.SUPABASE_SERVICE_ROLE_KEY!,
+                { cookies: { getAll: () => [], setAll: () => {} } }
+              );
+              await assignReferralCode(serviceClient, user.id, userName);
+              const cookieStore = await cookies();
+              const refCode = cookieStore.get("ref_code")?.value;
+              if (refCode) {
+                await linkReferral(serviceClient, user.id, refCode);
+              }
+            } catch (refErr) {
+              console.error("[auth/callback] Referral setup failed:", refErr);
+            }
+
             const { subject, html } = welcomeEmail({ userName });
             await getResend().emails.send({
               from: "Devizly <noreply@devizly.fr>",

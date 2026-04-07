@@ -6,6 +6,7 @@ import {
   View,
   StyleSheet,
   Image,
+  Link,
 } from "@react-pdf/renderer";
 
 /* ── Types ─────────────────────────────────────── */
@@ -63,6 +64,7 @@ export interface DevisPdfProps {
   document_hash_algorithm?: string | null;
   signer_ip?: string | null;
   signed_user_agent?: string | null;
+  ownerPlan?: string;
 }
 
 /* ── Colors ────────────────────────────────────── */
@@ -570,9 +572,15 @@ export function DevisPdf(props: DevisPdfProps) {
           <Text style={s.footerText}>
             Édité par NBHC SAS — SIREN 102 637 899 — RCS Chalon-sur-Saône
           </Text>
-          <Text style={s.footerText}>
-            Document généré par Devizly — devizly.fr
-          </Text>
+          {props.ownerPlan === "free" ? (
+            <Link src="https://devizly.fr" style={{ fontSize: 7, color: "#94a3b8", textDecoration: "none" }}>
+              Créé avec Devizly — Essai gratuit sur devizly.fr
+            </Link>
+          ) : (
+            <Text style={s.footerText}>
+              Document généré par Devizly — devizly.fr
+            </Text>
+          )}
         </View>
       </Page>
 

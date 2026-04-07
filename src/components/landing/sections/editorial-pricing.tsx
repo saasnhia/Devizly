@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { gsap } from "gsap";
@@ -128,6 +128,28 @@ function PricingLine({ plan, index }: { plan: (typeof plans)[number]; index: num
   );
 }
 
+function FounderBanner() {
+  const [remaining, setRemaining] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch("/api/founder-count")
+      .then((r) => r.json())
+      .then((d) => setRemaining(d.remaining ?? null))
+      .catch(() => {});
+  }, []);
+
+  if (remaining === null || remaining <= 0) return null;
+
+  return (
+    <p className="reveal-up mt-8 text-center text-sm text-slate-500">
+      &#11088;{" "}
+      <strong className="text-white">Offre Fondateur</strong> — Les 100
+      premiers abonnés Pro obtiennent 9&euro;/mois à vie.{" "}
+      <span className="text-[#5B5BD6]">{remaining}/100 places restantes</span>
+    </p>
+  );
+}
+
 export function EditorialPricing() {
   return (
     <section id="tarifs" className="py-24 lg:py-32">
@@ -144,6 +166,8 @@ export function EditorialPricing() {
             <PricingLine key={plan.name} plan={plan} index={i} />
           ))}
         </div>
+
+        <FounderBanner />
       </div>
     </section>
   );

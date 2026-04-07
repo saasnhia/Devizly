@@ -305,7 +305,7 @@ export default async function DashboardPage() {
         .order("created_at", { ascending: false }),
       supabase
         .from("profiles")
-        .select("subscription_status, devis_used, onboarding_completed, company_name, company_siret, stripe_account_id, stripe_connect_status")
+        .select("subscription_status, devis_used, onboarding_completed, company_name, company_siret, stripe_account_id, stripe_connect_status, is_founder, founder_number")
         .eq("id", user.id)
         .single(),
       supabase
@@ -425,6 +425,12 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* ── Header ── */}
+      {profile?.is_founder && (
+        <div className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/30 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-600">
+          &#11088; Fondateur #{profile.founder_number}
+        </div>
+      )}
+
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">

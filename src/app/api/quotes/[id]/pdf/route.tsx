@@ -33,7 +33,7 @@ export async function GET(
   // Fetch logo from profiles
   const { data: profile } = await supabase
     .from("profiles")
-    .select("logo_url, tva_number, is_micro_entrepreneur, legal_form, rcs_number")
+    .select("logo_url, tva_number, is_micro_entrepreneur, legal_form, rcs_number, subscription_status")
     .eq("id", user.id)
     .single();
 
@@ -75,6 +75,7 @@ export async function GET(
     document_hash_algorithm: quote.document_hash_algorithm || null,
     signer_ip: quote.signer_ip || null,
     signed_user_agent: quote.signed_user_agent || null,
+    ownerPlan: profile?.subscription_status || "free",
   };
 
   const buffer = await renderToBuffer(<DevisPdf {...props} />);

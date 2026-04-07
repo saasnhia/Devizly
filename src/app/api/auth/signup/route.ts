@@ -4,6 +4,7 @@ import { createServerClient } from "@supabase/ssr";
 import { checkSignupAbuse, recordSignupIp } from "@/lib/antiabuse";
 import { getResend } from "@/lib/resend";
 import { welcomeEmail } from "@/lib/emails/welcome";
+import { assignReferralCode, linkReferral } from "@/lib/referral";
 
 function createServiceClient() {
   return createServerClient(
@@ -15,7 +16,12 @@ function createServiceClient() {
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { email, password, fullName } = body;
+  const { email, password, fullName, ref_code } = body as {
+    email: string;
+    password: string;
+    fullName: string;
+    ref_code?: string;
+  };
 
   if (!email || !password || !fullName) {
     return NextResponse.json(
@@ -70,6 +76,22 @@ export async function POST(request: Request) {
   // Record IP for rate limiting
   if (data.user) {
     await recordSignupIp(ip, data.user.id);
+
+    // Assign referral code (non-blocking)
+    try {
+      await assignReferralCode(supabase, data.user.id, fullName);
+    } catch (refErr) {
+      console.error("[signup] Referral code assignment failed:", refErr);
+    }
+
+    // Link referral if ref_code provided
+    if (ref_code) {
+      try {
+        await linkReferral(supabase, data.user.id, ref_code);
+      } catch (linkErr) {
+        console.error("[signup] Referral link failed:", linkErr);
+      }
+    }
 
     // Send welcome email (non-blocking)
     try {

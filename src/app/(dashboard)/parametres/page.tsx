@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import Image from "next/image";
 import { CompanyAutocomplete } from "@/components/company-autocomplete";
 import type { CompanyData } from "@/components/company-autocomplete";
+import { generateReferralCode } from "@/lib/referral";
 
 export default function ParametresPage() {
   const [loading, setLoading] = useState(false);
@@ -130,23 +131,32 @@ export default function ParametresPage() {
       if (data?.deposit_fixed_amount) {
         setDepositFixedAmount(String(data.deposit_fixed_amount));
       }
-      if (data?.referral_code) {
-        setReferralCode(data.referral_code);
+      // Auto-generate referral code for existing users
+      let code = data?.referral_code || "";
+      if (data && !code) {
+        const newCode = generateReferralCode(
+          user.user_metadata?.full_name || user.email?.split("@")[0] || "USER"
+        );
+        await supabase
+          .from("profiles")
+          .update({ referral_code: newCode })
+          .eq("id", user.id);
+        code = newCode;
       }
+      setReferralCode(code);
+
       if (data?.is_founder) {
         setIsFounder(true);
         setFounderNumber(data.founder_number ?? null);
       }
 
-      // Load referral count
-      if (data?.referral_code) {
-        const { count } = await supabase
-          .from("referrals")
-          .select("*", { count: "exact", head: true })
-          .eq("referrer_id", user.id)
-          .eq("status", "completed");
-        setReferralCount(count ?? 0);
-      }
+      // Load referral count (always)
+      const { count } = await supabase
+        .from("referrals")
+        .select("*", { count: "exact", head: true })
+        .eq("referrer_id", user.id)
+        .eq("status", "completed");
+      setReferralCount(count ?? 0);
     }
     loadProfile();
 
@@ -832,45 +842,44 @@ export default function ParametresPage() {
         )}
 
         {/* Referral section */}
-        {referralCode && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="h-5 w-5" />
-                Parrainez vos contacts
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Offrez 1 mois Pro à -50% à vos filleuls. Vous recevez 1 mois gratuit dès qu&apos;ils s&apos;abonnent.
-              </p>
-              <div className="space-y-2">
-                <Label>Votre lien de parrainage</Label>
-                <div className="flex gap-2">
-                  <Input
-                    readOnly
-                    value={`https://devizly.fr/r/${referralCode}`}
-                    className="flex-1"
-                  />
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => {
-                      navigator.clipboard.writeText(`https://devizly.fr/r/${referralCode}`);
-                      setRefCopied(true);
-                      setTimeout(() => setRefCopied(false), 2000);
-                    }}
-                  >
-                    {refCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                  </Button>
-                </div>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Zap className="h-5 w-5" />
+              Parrainez vos contacts
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Offrez 1 mois Pro à -50% à vos filleuls. Vous recevez 1 mois gratuit dès qu&apos;ils s&apos;abonnent.
+            </p>
+            <div className="space-y-2">
+              <Label>Votre lien de parrainage</Label>
+              <div className="flex gap-2">
+                <Input
+                  readOnly
+                  value={referralCode ? `https://devizly.fr/r/${referralCode}` : "Chargement..."}
+                  className="flex-1 font-mono text-sm"
+                />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  disabled={!referralCode}
+                  onClick={() => {
+                    navigator.clipboard.writeText(`https://devizly.fr/r/${referralCode}`);
+                    setRefCopied(true);
+                    setTimeout(() => setRefCopied(false), 2000);
+                  }}
+                >
+                  {refCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                </Button>
               </div>
-              <p className="text-sm text-muted-foreground">
-                {referralCount} filleul{referralCount !== 1 ? "s" : ""} actif{referralCount !== 1 ? "s" : ""}
-              </p>
-            </CardContent>
-          </Card>
-        )}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {referralCount} filleul{referralCount !== 1 ? "s" : ""} actif{referralCount !== 1 ? "s" : ""}
+            </p>
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader>

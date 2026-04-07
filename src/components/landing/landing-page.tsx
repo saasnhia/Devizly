@@ -37,6 +37,15 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
       <div className="aurora-page grain">
         <CustomCursor />
         <EditorialNav />
+        <div className="w-full border-b border-yellow-500/20 bg-yellow-500/10 px-4 py-2.5 text-center">
+          <span className="text-sm font-semibold text-yellow-400">&#11088; Offre Fondateur</span>
+          <span className="text-sm text-yellow-400/80">
+            {" "}— Les 100 premiers abonnés Pro obtiennent 9&euro;/mois à vie.{" "}
+          </span>
+          <a href="/pricing" className="text-sm font-semibold text-yellow-300 underline underline-offset-2">
+            En profiter &rarr;
+          </a>
+        </div>
         <EditorialHero segment={segment} />
         <SectionDivider />
         <ValueProposition />

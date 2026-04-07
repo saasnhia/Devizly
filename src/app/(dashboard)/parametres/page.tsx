@@ -130,25 +130,32 @@ export default function ParametresPage() {
       if (data?.deposit_fixed_amount) {
         setDepositFixedAmount(String(data.deposit_fixed_amount));
       }
-      // Auto-generate referral code for existing users
+      // Referral code
       if (data?.referral_code) {
         setReferralCode(data.referral_code);
       } else if (data) {
+        // Auto-generate for existing users without one
         try {
-          const prefix = (user.user_metadata?.full_name || user.email?.split("@")[0] || "USER")
+          const raw = (user.user_metadata?.full_name || user.email?.split("@")[0] || "USER")
             .normalize("NFD")
             .replace(/[\u0300-\u036f]/g, "")
             .toUpperCase()
             .replace(/[^A-Z0-9]/g, "")
             .slice(0, 6) || "USER";
-          const suffix = Math.random().toString(36).substring(2, 6).toUpperCase();
-          const newCode = `${prefix}-${suffix}`;
-          const { error: refErr } = await supabase
+          const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
+          const code = `${raw}-${rand}`;
+          console.log("[REFERRAL] Generating code:", code, "for user:", user.id);
+          const { data: updated, error: refErr } = await supabase
             .from("profiles")
-            .update({ referral_code: newCode })
-            .eq("id", user.id);
-          setReferralCode(refErr ? "ERREUR-RELOAD" : newCode);
-        } catch {
+            .update({ referral_code: code })
+            .eq("id", user.id)
+            .select("referral_code")
+            .single();
+          console.log("[REFERRAL] Update result:", { updated, refErr });
+          // Show the code even if DB save fails
+          setReferralCode(updated?.referral_code ?? code);
+        } catch (e) {
+          console.error("[REFERRAL] Exception:", e);
           setReferralCode("ERREUR-RELOAD");
         }
       }

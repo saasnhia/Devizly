@@ -134,7 +134,6 @@ export default function PricingPage() {
   const [currentPlan, setCurrentPlan] = useState<string>("free");
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [isAnnual, setIsAnnual] = useState(false);
-  const [foundersRemaining, setFoundersRemaining] = useState<number | null>(null);
 
   useEffect(() => {
     async function loadProfile() {
@@ -150,10 +149,6 @@ export default function PricingPage() {
     }
     loadProfile();
 
-    fetch("/api/founder-count")
-      .then((r) => r.json())
-      .then((d) => setFoundersRemaining(d.remaining ?? null))
-      .catch(() => {});
   }, []);
 
   async function handleCheckout(priceId: string, planId: string) {
@@ -199,16 +194,14 @@ export default function PricingPage() {
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
 
         {/* ── Founder banner ── */}
-        {foundersRemaining !== null && foundersRemaining > 0 && (
-          <div className="mx-auto mb-8 flex w-fit items-center gap-2 rounded-full border border-yellow-500/30 bg-yellow-500/10 px-4 py-2">
-            <span className="text-sm font-semibold text-yellow-400">
-              &#11088; Offre Fondateur
-            </span>
-            <span className="text-sm text-yellow-400/70">
-              — Les 100 premiers abonnés Pro : 9&euro;/mois à vie ({100 - foundersRemaining}/100 pris)
-            </span>
-          </div>
-        )}
+        <div className="mx-auto mb-8 flex w-fit items-center gap-2 rounded-full border border-yellow-500/30 bg-yellow-500/10 px-4 py-2">
+          <span className="text-sm font-semibold text-yellow-400">
+            &#11088; Offre Fondateur
+          </span>
+          <span className="text-sm text-yellow-400/70">
+            — Les 100 premiers abonnés Pro : 9&euro;/mois à vie
+          </span>
+        </div>
 
         {/* ── Header ── */}
         <div className="text-center">

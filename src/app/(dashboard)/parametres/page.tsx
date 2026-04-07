@@ -21,7 +21,6 @@ import { toast } from "sonner";
 import Image from "next/image";
 import { CompanyAutocomplete } from "@/components/company-autocomplete";
 import type { CompanyData } from "@/components/company-autocomplete";
-import { generateReferralCode } from "@/lib/referral";
 
 export default function ParametresPage() {
   const [loading, setLoading] = useState(false);
@@ -132,18 +131,27 @@ export default function ParametresPage() {
         setDepositFixedAmount(String(data.deposit_fixed_amount));
       }
       // Auto-generate referral code for existing users
-      let code = data?.referral_code || "";
-      if (data && !code) {
-        const newCode = generateReferralCode(
-          user.user_metadata?.full_name || user.email?.split("@")[0] || "USER"
-        );
-        await supabase
-          .from("profiles")
-          .update({ referral_code: newCode })
-          .eq("id", user.id);
-        code = newCode;
+      if (data?.referral_code) {
+        setReferralCode(data.referral_code);
+      } else if (data) {
+        try {
+          const prefix = (user.user_metadata?.full_name || user.email?.split("@")[0] || "USER")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toUpperCase()
+            .replace(/[^A-Z0-9]/g, "")
+            .slice(0, 6) || "USER";
+          const suffix = Math.random().toString(36).substring(2, 6).toUpperCase();
+          const newCode = `${prefix}-${suffix}`;
+          const { error: refErr } = await supabase
+            .from("profiles")
+            .update({ referral_code: newCode })
+            .eq("id", user.id);
+          setReferralCode(refErr ? "ERREUR-RELOAD" : newCode);
+        } catch {
+          setReferralCode("ERREUR-RELOAD");
+        }
       }
-      setReferralCode(code);
 
       if (data?.is_founder) {
         setIsFounder(true);
@@ -856,23 +864,33 @@ export default function ParametresPage() {
             <div className="space-y-2">
               <Label>Votre lien de parrainage</Label>
               <div className="flex gap-2">
-                <Input
-                  readOnly
-                  value={referralCode ? `https://devizly.fr/r/${referralCode}` : "Chargement..."}
-                  className="flex-1 font-mono text-sm"
-                />
-                <Button
-                  variant="outline"
-                  size="icon"
-                  disabled={!referralCode}
-                  onClick={() => {
-                    navigator.clipboard.writeText(`https://devizly.fr/r/${referralCode}`);
-                    setRefCopied(true);
-                    setTimeout(() => setRefCopied(false), 2000);
-                  }}
-                >
-                  {refCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                </Button>
+                {!referralCode ? (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground py-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Chargement...
+                  </div>
+                ) : referralCode === "ERREUR-RELOAD" ? (
+                  <p className="text-sm text-red-400 py-2">Erreur — rechargez la page</p>
+                ) : (
+                  <>
+                    <Input
+                      readOnly
+                      value={`https://devizly.fr/r/${referralCode}`}
+                      className="flex-1 font-mono text-sm"
+                    />
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => {
+                        navigator.clipboard.writeText(`https://devizly.fr/r/${referralCode}`);
+                        setRefCopied(true);
+                        setTimeout(() => setRefCopied(false), 2000);
+                      }}
+                    >
+                      {refCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
             <p className="text-xs text-muted-foreground">

@@ -56,6 +56,20 @@ export async function POST(request: Request) {
 
     const appUrl = getSiteUrl();
 
+    // Check if user has a pending referral → apply PARRAIN50 coupon
+    let hasReferral = false;
+    try {
+      const { data: referral } = await supabase
+        .from("referrals")
+        .select("id")
+        .eq("referred_id", user.id)
+        .eq("status", "pending")
+        .single();
+      hasReferral = !!referral;
+    } catch {
+      // No referral or query error — proceed without coupon
+    }
+
     const session = await getStripe().checkout.sessions.create({
       customer: customerId,
       mode: "subscription",
@@ -63,6 +77,7 @@ export async function POST(request: Request) {
       success_url: `${appUrl}/dashboard?checkout=success`,
       cancel_url: `${appUrl}/pricing?checkout=cancel`,
       metadata: { supabase_user_id: user.id },
+      ...(hasReferral ? { discounts: [{ coupon: "PARRAIN50" }] } : {}),
     });
 
     return NextResponse.json({ url: session.url });

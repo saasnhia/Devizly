@@ -213,6 +213,18 @@ export async function POST(request: Request) {
               })
               .eq("id", userId);
             console.log(`[FOUNDER] User ${userId} est le fondateur #${founderNumber}`);
+
+            // Apply FONDATEUR coupon to the subscription
+            try {
+              if (subscription.id) {
+                await getStripe().subscriptions.update(subscription.id, {
+                  discounts: [{ coupon: "FONDATEUR" }],
+                });
+                console.log(`[FOUNDER] Coupon FONDATEUR appliqué à ${subscription.id}`);
+              }
+            } catch (couponErr) {
+              console.error("[FOUNDER] Erreur application coupon:", couponErr);
+            }
           }
         } catch (founderErr) {
           console.error("[Webhook] Founder badge failed:", founderErr);

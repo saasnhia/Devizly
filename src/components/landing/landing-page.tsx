@@ -37,18 +37,11 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
     <SmoothScroll>
       <div className="aurora-page grain">
         <CustomCursor />
-        <div className="flex w-full flex-wrap items-center justify-center gap-2 border-b border-[#5B5BD6]/20 bg-[#0d0d14] px-4 py-2 text-center text-sm">
+        <Link href="/pricing" className="block w-full cursor-pointer border-b border-[#5B5BD6]/20 bg-[#0d0d14] px-4 py-2 text-center text-xs transition-colors hover:bg-[#111120]">
           <span className="text-slate-400">&#11088; Offre Fondateur</span>
-          <span className="text-slate-500">&mdash;</span>
-          <span className="font-medium text-white">Les 100 premiers abonnés Pro : 9&euro;/mois à vie</span>
-          <span className="text-slate-500">&middot;</span>
-          <span className="rounded bg-[#22c55e]/10 px-2 py-0.5 font-mono text-xs text-[#22c55e]">
-            Code FONDATEUR appliqué automatiquement
-          </span>
-          <Link href="/pricing" className="ml-1 font-semibold text-[#5B5BD6] underline underline-offset-2 transition-colors hover:text-[#818cf8]">
-            En profiter &rarr;
-          </Link>
-        </div>
+          <span className="mx-2 font-medium text-white">100 premiers Pro : 9&euro;/mois à vie</span>
+          <span className="font-semibold text-[#5B5BD6]">En profiter &rarr;</span>
+        </Link>
         <EditorialNav />
         <EditorialHero segment={segment} />
         <SectionDivider />

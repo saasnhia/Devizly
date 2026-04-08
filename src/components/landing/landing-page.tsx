@@ -37,10 +37,10 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
     <SmoothScroll>
       <div className="aurora-page grain">
         <CustomCursor />
-        <Link href="/pricing" className="relative z-50 hidden w-full cursor-pointer border-b border-[#5B5BD6]/20 bg-[#0d0d14] px-4 py-2 text-center text-xs transition-colors hover:bg-[#111120] sm:block">
-          <span className="text-slate-400">&#11088; Offre Fondateur</span>
-          <span className="mx-2 font-medium text-white">100 premiers Pro : 9&euro;/mois à vie</span>
-          <span className="font-semibold text-[#5B5BD6]">En profiter &rarr;</span>
+        <Link href="/pricing" className="block w-full bg-[#0d0d14] border-b border-[#5B5BD6]/20 py-2 px-3 text-center text-xs hover:bg-[#111120] transition-colors cursor-pointer z-50 relative">
+          <span className="text-slate-400">⭐ Offre Fondateur</span>
+          <span className="text-white font-medium mx-1.5">100 premiers Pro : 9€/mois à vie</span>
+          <span className="text-[#5B5BD6] font-semibold">En profiter →</span>
         </Link>
         <EditorialNav />
         <EditorialHero segment={segment} />

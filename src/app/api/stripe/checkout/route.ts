@@ -56,8 +56,8 @@ export async function POST(request: Request) {
 
     const appUrl = getSiteUrl();
 
-    // Check if user has a pending referral → apply PARRAIN50 coupon
-    let hasReferral = false;
+    // Determine coupon: PARRAIN50 for referrals, FONDATEUR if slots remain
+    let discount: Array<{ coupon: string }> | null = null;
     try {
       const { data: referral } = await supabase
         .from("referrals")
@@ -65,9 +65,20 @@ export async function POST(request: Request) {
         .eq("referred_id", user.id)
         .eq("status", "pending")
         .single();
-      hasReferral = !!referral;
+
+      if (referral) {
+        discount = [{ coupon: "PARRAIN50" }];
+      } else {
+        const { count: founderCount } = await supabase
+          .from("profiles")
+          .select("*", { count: "exact", head: true })
+          .eq("is_founder", true);
+        if ((founderCount ?? 0) < 100) {
+          discount = [{ coupon: "FONDATEUR" }];
+        }
+      }
     } catch {
-      // No referral or query error — proceed without coupon
+      // Non-blocking — proceed without coupon
     }
 
     const session = await getStripe().checkout.sessions.create({
@@ -77,7 +88,7 @@ export async function POST(request: Request) {
       success_url: `${appUrl}/dashboard?checkout=success`,
       cancel_url: `${appUrl}/pricing?checkout=cancel`,
       metadata: { supabase_user_id: user.id },
-      ...(hasReferral ? { discounts: [{ coupon: "PARRAIN50" }] } : {}),
+      ...(discount ? { discounts: discount } : {}),
     });
 
     return NextResponse.json({ url: session.url });

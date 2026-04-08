@@ -16,7 +16,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Save, Loader2, CreditCard, Building, ExternalLink, Upload, Trash2, ImageIcon, Wallet, CheckCircle2, Zap, Globe, Copy, Check, Calendar } from "lucide-react";
+import { Save, Loader2, CreditCard, Building, ExternalLink, Upload, Trash2, ImageIcon, Wallet, CheckCircle2, Zap, Globe, Copy, Check, Calendar, FileText } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
 import { CompanyAutocomplete } from "@/components/company-autocomplete";
@@ -58,6 +58,7 @@ export default function ParametresPage() {
   const [isFounder, setIsFounder] = useState(false);
   const [founderNumber, setFounderNumber] = useState<number | null>(null);
   const [refCopied, setRefCopied] = useState(false);
+  const [ibanWarning, setIbanWarning] = useState(false);
   const [profile, setProfile] = useState({
     full_name: "",
     company_name: "",
@@ -70,6 +71,11 @@ export default function ParametresPage() {
     is_micro_entrepreneur: false,
     legal_form: "",
     rcs_number: "",
+    company_city: "",
+    company_postal_code: "",
+    company_country: "FR",
+    iban: "",
+    bic: "",
   });
 
   useEffect(() => {
@@ -78,6 +84,13 @@ export default function ParametresPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
       setCurrentUserId(user.id);
+
+      // Load IBAN/BIC from profiles only (never from user_metadata)
+      const { data: billingRow } = await supabase
+        .from("profiles")
+        .select("iban, bic, company_city, company_postal_code, company_country")
+        .eq("id", user.id)
+        .single();
 
       if (user.user_metadata) {
         setProfile({
@@ -92,6 +105,11 @@ export default function ParametresPage() {
           is_micro_entrepreneur: user.user_metadata.is_micro_entrepreneur || false,
           legal_form: user.user_metadata.legal_form || "",
           rcs_number: user.user_metadata.rcs_number || "",
+          company_city: billingRow?.company_city || user.user_metadata.company_city || "",
+          company_postal_code: billingRow?.company_postal_code || user.user_metadata.company_postal_code || "",
+          company_country: billingRow?.company_country || user.user_metadata.company_country || "FR",
+          iban: billingRow?.iban || "",
+          bic: billingRow?.bic || "",
         });
       }
 
@@ -258,14 +276,19 @@ export default function ParametresPage() {
   async function handleSave() {
     setLoading(true);
     const supabase = createClient();
-    const { error } = await supabase.auth.updateUser({ data: profile });
+
+    // IBAN/BIC are sensitive — NEVER store in auth.user_metadata (JWT-visible)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { iban: _iban, bic: _bic, ...metadataFields } = profile;
+    const { error } = await supabase.auth.updateUser({ data: metadataFields });
     if (error) {
       toast.error(error.message);
       setLoading(false);
       return;
     }
 
-    // Sync profile fields to profiles table (used by API routes)
+    // Sync ALL fields to profiles table (used by API routes)
+    // IBAN/BIC go here ONLY — never in auth.updateUser above
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       await supabase
@@ -289,6 +312,11 @@ export default function ParametresPage() {
           required_deposit_percentage: parseInt(requiredDepositPercentage, 10) || 30,
           deposit_mode: depositMode,
           deposit_fixed_amount: parseInt(depositFixedAmount, 10) || 0,
+          company_city: profile.company_city || null,
+          company_postal_code: profile.company_postal_code || null,
+          company_country: profile.company_country || null,
+          iban: profile.iban || null,
+          bic: profile.bic || null,
         })
         .eq("id", user.id);
     }
@@ -658,6 +686,103 @@ export default function ParametresPage() {
                 </p>
               </div>
             )}
+
+            <Separator className="my-8" />
+
+            {/* ── Adresse et coordonnées bancaires (Factur-X) ── */}
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-base font-semibold">Adresse et coordonnées bancaires</h3>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Informations obligatoires pour la facturation électronique Factur-X (réforme 2027).
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="company_postal_code">Code postal</Label>
+                  <Input
+                    id="company_postal_code"
+                    value={profile.company_postal_code}
+                    onChange={(e) => setProfile({ ...profile, company_postal_code: e.target.value })}
+                    placeholder="75001"
+                    maxLength={10}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="company_city">Ville</Label>
+                  <Input
+                    id="company_city"
+                    value={profile.company_city}
+                    onChange={(e) => setProfile({ ...profile, company_city: e.target.value })}
+                    placeholder="Paris"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="company_country">Pays</Label>
+                <Select
+                  value={profile.company_country || "FR"}
+                  onValueChange={(value) => setProfile({ ...profile, company_country: value })}
+                >
+                  <SelectTrigger id="company_country">
+                    <SelectValue placeholder="France" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="FR">France</SelectItem>
+                    <SelectItem value="BE">Belgique</SelectItem>
+                    <SelectItem value="LU">Luxembourg</SelectItem>
+                    <SelectItem value="CH">Suisse</SelectItem>
+                    <SelectItem value="DE">Allemagne</SelectItem>
+                    <SelectItem value="ES">Espagne</SelectItem>
+                    <SelectItem value="IT">Italie</SelectItem>
+                    <SelectItem value="NL">Pays-Bas</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <Separator className="my-4" />
+
+              <div className="space-y-2">
+                <Label htmlFor="iban">IBAN</Label>
+                <Input
+                  id="iban"
+                  value={profile.iban}
+                  onChange={(e) => setProfile({ ...profile, iban: e.target.value.toUpperCase().replace(/\s/g, "") })}
+                  onBlur={() => {
+                    if (profile.iban && !/^[A-Z]{2}\d{2}[A-Z0-9]{1,30}$/.test(profile.iban)) {
+                      setIbanWarning(true);
+                    } else {
+                      setIbanWarning(false);
+                    }
+                  }}
+                  placeholder="FR7612345678901234567890123"
+                  maxLength={34}
+                  className="font-mono"
+                />
+                {ibanWarning && (
+                  <p className="text-sm text-amber-500 mt-1">
+                    Le format IBAN semble invalide. Vérifiez votre saisie.
+                  </p>
+                )}
+                <p className="text-xs text-muted-foreground mt-1">
+                  Recommandé pour permettre à vos clients de payer par virement SEPA.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="bic">BIC / SWIFT</Label>
+                <Input
+                  id="bic"
+                  value={profile.bic}
+                  onChange={(e) => setProfile({ ...profile, bic: e.target.value.toUpperCase() })}
+                  placeholder="BNPAFRPPXXX"
+                  maxLength={11}
+                  className="font-mono"
+                />
+              </div>
+            </div>
 
             <Separator />
 
@@ -1084,6 +1209,39 @@ export default function ParametresPage() {
               )}
             </>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Facturation électronique (2027) */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5 text-violet-400" />
+            Facturation électronique (2027)
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="rounded-lg border border-violet-500/20 bg-violet-500/5 p-4">
+            <p className="text-sm">
+              À partir du <strong>1er septembre 2027</strong>, toutes les TPE, PME
+              et micro-entrepreneurs devront émettre leurs factures au format
+              électronique structuré (Factur-X) via une Plateforme Agréée (PA).
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Devizly intégrera prochainement <strong>Pennylane</strong>,
+              Plateforme Agréée immatriculée DGFiP, pour transmettre
+              automatiquement vos factures en toute conformité.
+            </p>
+          </div>
+
+          <Button disabled variant="outline" className="w-full">
+            Connecter Pennylane (bientôt disponible)
+          </Button>
+
+          <p className="text-xs text-muted-foreground text-center">
+            Aucune action requise pour l&apos;instant. Cette section sera activée
+            avant septembre 2027.
+          </p>
         </CardContent>
       </Card>
 

@@ -22,6 +22,7 @@ export interface Client {
   city: string | null;
   postal_code: string | null;
   siret: string | null;
+  country: string | null;
   portal_token: string | null;
   created_at: string;
 }
@@ -96,6 +97,17 @@ export interface UserProfile {
   company_phone: string | null;
   logo_url: string | null;
   default_tva_rate: number;
+  company_city: string | null;
+  company_postal_code: string | null;
+  company_country: string | null;
+  iban: string | null;
+  bic: string | null;
+  pa_provider: string | null;
+  /** pa_credentials_encrypted: NEVER SELECT from client queries, server-only */
+  pa_credentials_encrypted: string | null;
+  pa_company_id: string | null;
+  pa_connected_at: string | null;
+  pa_last_sync_at: string | null;
 }
 
 export interface StripeSubscription {
@@ -106,6 +118,7 @@ export interface StripeSubscription {
 }
 
 export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'overdue';
+export type PaStatus = 'pending' | 'sent' | 'delivered' | 'accepted' | 'rejected' | 'error';
 export type RecurringFrequency = 'monthly' | 'quarterly' | 'yearly';
 
 export interface Invoice {
@@ -122,6 +135,12 @@ export interface Invoice {
   stripe_checkout_url: string | null;
   stripe_payment_intent_id: string | null;
   pdf_url: string | null;
+  facturx_pdf_path: string | null;
+  facturx_generated_at: string | null;
+  pa_invoice_id: string | null;
+  pa_status: PaStatus | null;
+  pa_sent_at: string | null;
+  pa_error: string | null;
   created_at: string;
 }
 

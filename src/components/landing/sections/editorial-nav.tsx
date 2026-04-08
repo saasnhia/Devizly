@@ -35,7 +35,7 @@ export function EditorialNav() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 sm:top-[33px] left-0 right-0 z-50 transition-all duration-300 ${
         hidden ? "-translate-y-full" : "translate-y-0"
       } ${
         scrolled

@@ -34,7 +34,7 @@ function QuoteDocument() {
 
   return (
     <div
-      className="quote-doc w-[340px] max-w-[92vw] rounded-2xl bg-white p-5 text-[11px] leading-relaxed text-[#1a1a1a] sm:w-[380px]"
+      className="quote-doc w-full max-w-[340px] rounded-2xl bg-white p-4 text-[11px] leading-relaxed text-[#1a1a1a] lg:max-w-[460px] lg:w-[460px] lg:p-6"
       style={{
         boxShadow:
           "0 1px 0 rgba(255,255,255,0.8) inset, 0 0 0 1px rgba(255,255,255,0.08), 0 40px 100px -20px rgba(0,0,0,0.75), 0 80px 160px -40px rgba(99,102,241,0.35), -30px 30px 90px -20px rgba(99,102,241,0.2)",
@@ -60,25 +60,26 @@ function QuoteDocument() {
       <p className="mb-4 text-[10px] text-[#71717a]">Valide jusqu&rsquo;au 08/05/2026</p>
 
       {/* Table */}
-      <div className="mb-3 border-b border-[#e4e4e7] pb-1">
-        <div className="mb-1 grid grid-cols-12 text-[9px] font-semibold uppercase tracking-wide text-[#a1a1aa]">
-          <span className="col-span-6">Description</span>
-          <span className="col-span-2 text-center">Qt&eacute;</span>
-          <span className="col-span-2 text-right">Prix unit.</span>
-          <span className="col-span-2 text-right">Total</span>
-        </div>
-        {QUOTE_LINES.map((l) => (
-          <div
-            key={l.desc}
-            className="grid grid-cols-12 border-t border-[#f4f4f5] py-1 text-[10px]"
-          >
-            <span className="col-span-6 text-[#3f3f46]">{l.desc}</span>
-            <span className="col-span-2 text-center text-[#71717a]">{l.qty}</span>
-            <span className="col-span-2 text-right text-[#71717a]">{fmt(l.price)}&nbsp;&euro;</span>
-            <span className="col-span-2 text-right font-medium text-[#1a1a1a]">{fmt(l.qty * l.price)}&nbsp;&euro;</span>
-          </div>
-        ))}
-      </div>
+      <table className="mb-3 w-full border-collapse text-[9px] sm:text-[10px]">
+        <thead>
+          <tr className="border-b border-[#e4e4e7]">
+            <th className="pb-1.5 text-left font-semibold uppercase tracking-wide text-[#a1a1aa]">Description</th>
+            <th className="w-7 pb-1.5 text-center font-semibold uppercase tracking-wide text-[#a1a1aa]">Qté</th>
+            <th className="w-[62px] pb-1.5 pr-2 text-right font-semibold uppercase tracking-wide text-[#a1a1aa] whitespace-nowrap">Prix unit.</th>
+            <th className="w-[62px] pb-1.5 text-right font-semibold uppercase tracking-wide text-[#a1a1aa] whitespace-nowrap">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {QUOTE_LINES.map((l) => (
+            <tr key={l.desc} className="border-t border-[#f4f4f5]">
+              <td className="py-1 pr-2 text-[#3f3f46] break-words">{l.desc}</td>
+              <td className="py-1 text-center text-[#71717a]">{l.qty}</td>
+              <td className="py-1 pr-2 text-right text-[#71717a] whitespace-nowrap">{fmt(l.price)}&nbsp;&euro;</td>
+              <td className="py-1 text-right font-medium text-[#1a1a1a] whitespace-nowrap">{fmt(l.qty * l.price)}&nbsp;&euro;</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
       {/* Totals */}
       <div className="mb-4 space-y-0.5 text-right text-[10px]">
@@ -302,8 +303,8 @@ export function EditorialHero({ segment }: { segment?: string }) {
         {/* ── Right column: 3D quote scene ── */}
         <div
           ref={sceneRef}
-          className="quote-scene relative flex h-[480px] items-center justify-center lg:h-[640px]"
-          style={{ perspective: "2400px" }}
+          className="quote-scene relative flex items-center justify-center h-auto py-8 lg:h-[640px] lg:py-0"
+          style={{ perspective: "2400px" } as React.CSSProperties}
         >
           <div ref={stageRef} className="quote-stage relative">
             <QuoteDocument />

@@ -410,6 +410,22 @@ html.lenis, html.lenis body {
   }
 }
 
+/* ═══ Mobile: disable 3D on quote scene ═══ */
+@media (max-width: 1023px) {
+  .quote-scene {
+    perspective: none !important;
+  }
+  .quote-stage {
+    animation: none !important;
+    transform: none !important;
+    transform-style: flat !important;
+  }
+  .float-card-a,
+  .float-card-b {
+    display: none !important;
+  }
+}
+
 /* ═══ Hero terminal cursor blink ═══ */
 @keyframes cursor-blink-hero {
   0%, 49% { opacity: 1; }

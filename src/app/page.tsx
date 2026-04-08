@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import { LandingPage } from "@/components/landing/landing-page";
 import { JsonLd } from "@/components/seo/json-ld";
-import { getAllPosts } from "@/lib/blog";
 
 export const metadata: Metadata = {
   title: "Logiciel Devis Gratuit en Ligne",
   description:
-    "Créez vos devis professionnels en 2 minutes avec l'IA. Signature électronique, paiement Stripe, relances automatiques. Essai gratuit — sans CB.",
+    "Cr\u00e9ez vos devis professionnels en 2 minutes avec l\u2019IA. Signature \u00e9lectronique, paiement Stripe, relances automatiques. Essai gratuit \u2014 sans CB.",
   alternates: { canonical: "https://devizly.fr" },
 };
 
@@ -24,10 +23,10 @@ const faqSchema = {
     },
     {
       "@type": "Question",
-      name: "Comment créer un devis en ligne ?",
+      name: "Comment cr\u00e9er un devis en ligne ?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Inscrivez-vous sur devizly.fr, renseignez les infos client et l'IA génère le devis en 2 minutes.",
+        text: "Inscrivez-vous sur devizly.fr, renseignez les infos client et l\u2019IA g\u00e9n\u00e8re le devis en 2 minutes.",
       },
     },
     {
@@ -43,15 +42,15 @@ const faqSchema = {
       name: "Puis-je envoyer des factures ?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Oui, facturation automatique après signature du devis.",
+        text: "Oui, facturation automatique apr\u00e8s signature du devis.",
       },
     },
     {
       "@type": "Question",
-      name: "Est-ce conforme à la loi française ?",
+      name: "Est-ce conforme \u00e0 la loi fran\u00e7aise ?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Oui, mentions légales obligatoires, TVA, numérotation séquentielle.",
+        text: "Oui, mentions l\u00e9gales obligatoires, TVA, num\u00e9rotation s\u00e9quentielle.",
       },
     },
     {
@@ -59,27 +58,17 @@ const faqSchema = {
       name: "Comment recevoir un paiement ?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Via Stripe Connect intégré directement dans le devis.",
+        text: "Via Stripe Connect int\u00e9gr\u00e9 directement dans le devis.",
       },
     },
   ],
 };
 
-export default async function Page() {
-  const posts = getAllPosts();
-  const recentPosts = posts.slice(0, 3).map((p) => ({
-    slug: p.slug,
-    title: p.title,
-    description: p.description,
-    date: p.date,
-    category: p.category,
-    readingTime: p.readingTime,
-  }));
-
+export default function Page() {
   return (
     <>
       <JsonLd data={faqSchema} />
-      <LandingPage recentPosts={recentPosts} />
+      <LandingPage />
     </>
   );
 }

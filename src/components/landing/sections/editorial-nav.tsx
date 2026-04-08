@@ -1,123 +1,145 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { DevizlyLogo } from "@/components/devizly-logo";
-import { Menu, X } from "lucide-react";
+
+const NAV_LINKS = [
+  { label: "Fonctionnalités", href: "#fonctionnalites" },
+  { label: "Démo", href: "/demo" },
+  { label: "Tarifs", href: "#tarifs" },
+  { label: "FAQ", href: "#faq" },
+  { label: "Blog", href: "/blog" },
+];
 
 export function EditorialNav() {
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
-  const [hidden, setHidden] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const lastScrollY = useRef(0);
 
   useEffect(() => {
-    const onScroll = () => {
-      const y = window.scrollY;
-      setScrolled(y > 50);
-      // Hide on scroll down, show on scroll up (only after 100px)
-      if (y > 100) {
-        setHidden(y > lastScrollY.current && y - lastScrollY.current > 5);
-      } else {
-        setHidden(false);
-      }
-      lastScrollY.current = y;
-    };
+    const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  function scrollTo(id: string) {
-    setMobileOpen(false);
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth" });
-  }
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
 
   return (
     <nav
       className={`fixed top-[33px] left-0 right-0 z-40 transition-all duration-300 ${
-        hidden ? "-translate-y-full" : "translate-y-0"
-      } ${
         scrolled
           ? "bg-[#08090a]/80 backdrop-blur-xl border-b border-white/[0.04]"
           : "bg-transparent"
       }`}
     >
-      <div
-        className={`mx-auto flex max-w-6xl items-center justify-between px-6 transition-all duration-300 ${
-          scrolled ? "h-14" : "h-16"
-        }`}
-      >
-        <Link href="/" className="transition-all hover:opacity-80">
-          <DevizlyLogo
-            width={120}
-            height={32}
-            className={`text-white transition-transform duration-300 ${
-              scrolled ? "scale-95" : "scale-100"
-            }`}
-          />
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 h-16">
+        {/* Logo */}
+        <Link href="/" className="shrink-0 transition-opacity hover:opacity-80">
+          <DevizlyLogo width={120} height={32} className="text-white" />
         </Link>
 
-        {/* Desktop nav */}
+        {/* Desktop links */}
         <div className="hidden items-center gap-8 md:flex">
-          <button onClick={() => scrollTo("fonctionnalites")} className="text-sm text-slate-400 transition-colors hover:text-white">
-            Fonctionnalités
-          </button>
-          <button onClick={() => scrollTo("tarifs")} className="text-sm text-slate-400 transition-colors hover:text-white">
-            Tarifs
-          </button>
-          <Link href="/blog" className="text-sm text-slate-400 transition-colors hover:text-white">
-            Blog
-          </Link>
+          {NAV_LINKS.map((link) => {
+            const isActive = link.href.startsWith("/") && pathname === link.href;
+            const cls = `text-sm transition-colors hover:text-white ${
+              isActive ? "text-white font-medium" : "text-slate-400"
+            }`;
+            return link.href.startsWith("/") ? (
+              <Link key={link.label} href={link.href} className={cls}>
+                {link.label}
+              </Link>
+            ) : (
+              <a key={link.label} href={link.href} className={cls}>
+                {link.label}
+              </a>
+            );
+          })}
         </div>
 
+        {/* Desktop CTA */}
         <div className="hidden items-center gap-4 md:flex">
-          <Link href="/login" className={`text-slate-400 transition-all hover:text-white ${scrolled ? "text-xs" : "text-sm"}`}>
+          <Link
+            href="/login"
+            className="text-sm text-slate-400 transition-colors hover:text-white"
+          >
             Se connecter
           </Link>
           <Link
             href="/signup"
-            className={`rounded-xl bg-[#5B5BD6] font-semibold text-white transition-all hover:bg-[#4B4BC6] ${
-              scrolled ? "px-4 py-2 text-xs" : "px-5 py-2.5 text-sm"
-            }`}
+            className="rounded-xl bg-[#5B5BD6] px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-[#4B4BC6]"
           >
             Essayer gratuitement &rarr;
           </Link>
         </div>
 
-        {/* Mobile hamburger */}
-        <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden text-white p-2" aria-label="Menu">
-          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        {/* Mobile burger */}
+        <button
+          onClick={() => setMobileOpen(!mobileOpen)}
+          className="relative z-50 flex h-10 w-10 items-center justify-center md:hidden"
+          aria-label="Menu"
+        >
+          <div className="flex flex-col gap-1.5">
+            <span
+              className={`block h-0.5 w-5 bg-white transition-all duration-300 origin-center ${
+                mobileOpen ? "translate-y-[4px] rotate-45" : ""
+              }`}
+            />
+            <span
+              className={`block h-0.5 w-5 bg-white transition-all duration-300 origin-center ${
+                mobileOpen ? "-translate-y-[4px] -rotate-45" : ""
+              }`}
+            />
+          </div>
         </button>
       </div>
 
-      {/* Mobile menu */}
-      {mobileOpen && (
-        <div className="border-t border-white/[0.04] bg-[#08090a]/95 backdrop-blur-xl px-6 py-6 md:hidden">
-          <div className="flex flex-col gap-4">
-            <button onClick={() => scrollTo("fonctionnalites")} className="text-left text-sm text-slate-300 hover:text-white">
-              Fonctionnalités
-            </button>
-            <button onClick={() => scrollTo("tarifs")} className="text-left text-sm text-slate-300 hover:text-white">
-              Tarifs
-            </button>
-            <Link href="/blog" className="text-sm text-slate-300 hover:text-white" onClick={() => setMobileOpen(false)}>
-              Blog
-            </Link>
-            <div className="h-px bg-white/[0.06]" />
-            <Link href="/login" className="text-sm text-slate-300 hover:text-white" onClick={() => setMobileOpen(false)}>
+      {/* Mobile overlay */}
+      <div
+        className={`fixed inset-0 top-0 z-40 bg-[#08090a]/98 backdrop-blur-xl transition-opacity duration-300 md:hidden ${
+          mobileOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
+        }`}
+      >
+        <div className="flex h-full flex-col items-center justify-center gap-8 px-8">
+          {NAV_LINKS.map((link) => {
+            const Tag = link.href.startsWith("/") ? Link : "a";
+            return (
+              <Tag
+                key={link.label}
+                href={link.href}
+                onClick={() => setMobileOpen(false)}
+                className="text-2xl font-medium text-white transition-colors hover:text-[#818cf8]"
+              >
+                {link.label}
+              </Tag>
+            );
+          })}
+          <div className="mt-4 flex w-full max-w-xs flex-col gap-3">
+            <Link
+              href="/login"
+              onClick={() => setMobileOpen(false)}
+              className="rounded-xl border border-white/10 py-3 text-center text-sm font-medium text-white transition-colors hover:bg-white/[0.04]"
+            >
               Se connecter
             </Link>
             <Link
               href="/signup"
-              className="rounded-xl bg-[#5B5BD6] px-5 py-3 text-center text-sm font-semibold text-white"
               onClick={() => setMobileOpen(false)}
+              className="rounded-xl bg-[#5B5BD6] py-3 text-center text-sm font-semibold text-white transition-all hover:bg-[#4B4BC6]"
             >
               Essayer gratuitement &rarr;
             </Link>
           </div>
         </div>
-      )}
+      </div>
     </nav>
   );
 }

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
+import { Geist, Geist_Mono, Plus_Jakarta_Sans, Instrument_Serif } from "next/font/google";
 import { Toaster } from "sonner";
 import { CookieBanner } from "@/components/cookie-banner";
 import { ServiceWorkerRegister } from "@/components/sw-register";
@@ -23,6 +23,22 @@ const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   display: "swap",
   weight: ["400", "500", "600", "700", "800"],
+});
+
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-instrument-serif",
+  subsets: ["latin"],
+  display: "swap",
+  weight: "400",
+  style: "normal",
+});
+
+const instrumentSerifItalic = Instrument_Serif({
+  variable: "--font-instrument-serif-italic",
+  subsets: ["latin"],
+  display: "swap",
+  weight: "400",
+  style: "italic",
 });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://devizly.fr";
@@ -139,7 +155,7 @@ export default function RootLayout({
         <JsonLd data={websiteSchema} />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${plusJakarta.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${plusJakarta.variable} ${instrumentSerif.variable} ${instrumentSerifItalic.variable} antialiased`}
       >
         {children}
         <Toaster richColors position="top-right" />

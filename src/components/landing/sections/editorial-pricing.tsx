@@ -1,173 +1,123 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Check } from "lucide-react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Check, ArrowRight } from "lucide-react";
+import { useReveal } from "../hooks/useReveal";
 import { plans } from "../data/landing-data";
-import { MagneticButton } from "../magnetic-button";
 
-gsap.registerPlugin(ScrollTrigger);
-
-function PricingLine({ plan, index }: { plan: (typeof plans)[number]; index: number }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const borderRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!ref.current) return;
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        ref.current,
-        { x: -60, opacity: 0 },
-        {
-          x: 0,
-          opacity: 1,
-          duration: 0.6,
-          delay: index * 0.2,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: ref.current,
-            start: "top 85%",
-            toggleActions: "play none none none",
-          },
-        }
-      );
-
-      // Pro border draw animation
-      if (plan.popular && borderRef.current) {
-        gsap.fromTo(
-          borderRef.current,
-          { scaleY: 0 },
-          {
-            scaleY: 1,
-            duration: 0.8,
-            delay: index * 0.2 + 0.3,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: ref.current,
-              start: "top 85%",
-              toggleActions: "play none none none",
-            },
-          }
-        );
-      }
-    });
-    return () => ctx.revert();
-  }, [index, plan.popular]);
-
+function PricingCard({
+  plan,
+}: {
+  plan: (typeof plans)[number];
+}) {
   return (
     <div
-      ref={ref}
-      className={`pricing-line glow-card relative flex flex-col gap-4 border-b border-white/[0.06] py-6 sm:flex-row sm:items-center sm:gap-6 overflow-hidden ${
-        plan.popular ? "pl-6" : ""
+      className={`relative flex flex-col overflow-visible rounded-2xl p-6 transition-shadow ${
+        plan.popular
+          ? "border-2 border-[#5B5BD6] bg-gradient-to-br from-[#111116] to-[#13111f] shadow-[0_0_40px_rgba(99,102,241,0.12)]"
+          : "border border-white/[0.08] bg-[#111116]"
       }`}
-      style={{ opacity: 0 }}
     >
-      {/* Shimmer overlay */}
-      <div className="pricing-shimmer-overlay pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-[#5B5BD6]/[0.06] to-transparent" style={{ transform: "translateX(-100%)" }} />
-
-      {/* Pro border animated */}
+      {/* Popular badge — floats on top border */}
       {plan.popular && (
-        <div
-          ref={borderRef}
-          className="absolute left-0 top-0 h-full w-0.5 bg-[#5B5BD6] origin-top"
-          style={{ transform: "scaleY(0)" }}
-        />
+        <span
+          className="absolute right-6 z-10 text-[11px] font-semibold text-white"
+          style={{
+            top: "-1px",
+            transform: "translateY(-50%)",
+            background: "linear-gradient(180deg, #818cf8, #6366f1)",
+            padding: "5px 14px",
+            borderRadius: "9999px",
+            boxShadow: "0 4px 14px rgba(99,102,241,0.35)",
+          }}
+        >
+          Populaire
+        </span>
       )}
 
-      {/* Name + price */}
-      <div className="shrink-0 sm:w-48 relative z-[1]">
-        <div className="flex items-center gap-2">
-          <span className="text-xl font-bold text-white">{plan.name}</span>
-          {plan.popular && (
-            <span className="rounded-full bg-[#5B5BD6]/15 px-2.5 py-0.5 text-[10px] font-semibold text-[#818cf8]">
-              Populaire
-            </span>
-          )}
-        </div>
-        {plan.price > 0 ? (
-          <p className="mt-0.5 text-sm text-slate-400">
-            {plan.price}&euro;{plan.period}
-          </p>
-        ) : (
-          <p className="mt-0.5 text-sm text-slate-500">{plan.description}</p>
+      <h3 className="text-xl font-bold text-white">{plan.name}</h3>
+      <p className="mt-1 text-sm text-slate-400">{plan.description}</p>
+
+      <div className="mt-5">
+        <span className="text-5xl font-bold text-white">
+          {plan.price}&euro;
+        </span>
+        {plan.price > 0 && (
+          <span className="text-lg text-slate-400">{plan.period}</span>
+        )}
+        {plan.price === 0 && (
+          <p className="mt-1 text-xs text-slate-500">Gratuit pour toujours</p>
         )}
       </div>
 
-      {/* Features inline */}
-      <div className="flex flex-1 flex-wrap items-center gap-x-4 gap-y-1.5 relative z-[1]">
+      <ul className="mt-6 flex-1 space-y-2.5">
         {plan.features.map((f) => (
-          <span key={f} className="flex items-center gap-1 text-sm text-slate-400">
-            <Check className="h-3 w-3 text-[#5B5BD6]" />
+          <li key={f} className="flex items-center gap-2 text-sm text-slate-200">
+            <Check className="h-4 w-4 shrink-0 text-[#22c55e]" />
             {f}
-          </span>
+          </li>
         ))}
-      </div>
+      </ul>
 
-      {/* CTA */}
-      {plan.popular ? (
-        <MagneticButton
-          as="a"
-          href={plan.href}
-          className={`group inline-flex shrink-0 items-center gap-1.5 rounded-xl px-6 py-3 text-sm font-semibold transition-all bg-[#5B5BD6] text-white hover:bg-[#4B4BC6] relative z-[1]`}
-        >
-          {plan.cta}
-          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-        </MagneticButton>
-      ) : (
+      <div className="mt-8">
         <Link
           href={plan.href}
-          className="group inline-flex shrink-0 items-center gap-1.5 rounded-xl px-6 py-3 text-sm font-semibold transition-all border border-white/10 text-white hover:border-white/20 hover:bg-white/[0.03] relative z-[1]"
+          className={`group flex w-full items-center justify-center gap-1.5 rounded-xl py-3 text-sm font-semibold transition-all ${
+            plan.popular
+              ? "bg-[#5B5BD6] text-white hover:bg-[#4B4BC6]"
+              : "border border-white/10 text-white hover:border-white/20 hover:bg-white/[0.03]"
+          }`}
         >
           {plan.cta}
           <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
         </Link>
-      )}
+      </div>
     </div>
   );
 }
 
-function FounderBanner() {
-  const [remaining, setRemaining] = useState<number | null>(null);
-
-  useEffect(() => {
-    fetch("/api/founder-count")
-      .then((r) => r.json())
-      .then((d) => setRemaining(d.remaining ?? null))
-      .catch(() => {});
-  }, []);
-
-  if (remaining === null || remaining <= 0) return null;
-
-  return (
-    <p className="reveal-up mt-8 text-center text-sm text-slate-500">
-      &#11088;{" "}
-      <strong className="text-white">Offre Fondateur</strong> — Les 100
-      premiers abonnés Pro obtiennent 9&euro;/mois à vie.{" "}
-      <span className="text-[#5B5BD6]">{remaining}/100 places restantes</span>
-    </p>
-  );
-}
-
 export function EditorialPricing() {
-  return (
-    <section id="tarifs" className="py-24 lg:py-32">
-      <div className="mx-auto max-w-5xl px-6">
-        {/* Headline */}
-        <h2 className="reveal-up mb-16 text-center text-4xl font-bold tracking-tight text-white lg:text-5xl">
-          Gratuit pour démarrer.{" "}
-          <span className="text-[#5B5BD6]">19&euro;/mois</span> pour tout débloquer.
-        </h2>
+  const ref = useReveal<HTMLElement>();
 
-        {/* Plan lines */}
-        <div className="space-y-0">
+  return (
+    <section ref={ref} id="tarifs" className="reveal-fade py-24 lg:py-32">
+      <div className="mx-auto max-w-5xl px-6">
+        <h2
+          className="mb-4 text-center font-bold tracking-tight text-white"
+          style={{ fontSize: "clamp(28px, 5vw, 48px)" }}
+        >
+          Gratuit pour d&eacute;marrer.{" "}
+          <span className="text-[#5B5BD6]">19&euro;/mois</span> pour tout d&eacute;bloquer.
+        </h2>
+        <p className="mx-auto mb-14 max-w-md text-center text-base text-slate-400">
+          Commencez gratuitement. &Eacute;voluez quand vous &ecirc;tes pr&ecirc;t.
+        </p>
+
+        {/* Cards — Pro first on mobile via order */}
+        <div className="grid gap-6 md:grid-cols-3">
           {plans.map((plan, i) => (
-            <PricingLine key={plan.name} plan={plan} index={i} />
+            <div
+              key={plan.name}
+              className={i === 1 ? "order-first md:order-none" : ""}
+            >
+              <PricingCard plan={plan} />
+            </div>
           ))}
         </div>
 
-        <FounderBanner />
+        {/* Trust bar */}
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-8 text-sm text-slate-500">
+          <span>&#10003; Sans carte bancaire</span>
+          <span>&#10003; Annulation &agrave; tout moment</span>
+          <span>&#10003; RGPD &amp; h&eacute;berg&eacute; en France</span>
+        </div>
+
+        {/* Founder banner */}
+        <p className="mt-8 text-center text-sm text-slate-500">
+          &#11088;{" "}
+          <strong className="text-white">Offre Fondateur</strong> &mdash; Les 100
+          premiers abonn&eacute;s Pro obtiennent 9&euro;/mois &agrave; vie.
+        </p>
       </div>
     </section>
   );

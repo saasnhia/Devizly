@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useState } from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { SmoothScroll } from "./smooth-scroll";
 import { CustomCursor } from "./custom-cursor";
@@ -36,13 +37,17 @@ function LandingPageInner({ recentPosts }: { recentPosts: RecentPost[] }) {
     <SmoothScroll>
       <div className="aurora-page grain">
         <CustomCursor />
-        <div className="flex w-full items-center justify-center gap-2 border-b border-[#5B5BD6]/20 bg-[#0d0d14] px-4 py-2 text-center text-sm">
+        <div className="flex w-full flex-wrap items-center justify-center gap-2 border-b border-[#5B5BD6]/20 bg-[#0d0d14] px-4 py-2 text-center text-sm">
           <span className="text-slate-400">&#11088; Offre Fondateur</span>
           <span className="text-slate-500">&mdash;</span>
           <span className="font-medium text-white">Les 100 premiers abonnés Pro : 9&euro;/mois à vie</span>
-          <a href="/pricing" className="ml-1 font-semibold text-[#5B5BD6] underline underline-offset-2 transition-colors hover:text-[#818cf8]">
+          <span className="text-slate-500">&middot;</span>
+          <span className="rounded bg-[#22c55e]/10 px-2 py-0.5 font-mono text-xs text-[#22c55e]">
+            Code FONDATEUR appliqué automatiquement
+          </span>
+          <Link href="/pricing" className="ml-1 font-semibold text-[#5B5BD6] underline underline-offset-2 transition-colors hover:text-[#818cf8]">
             En profiter &rarr;
-          </a>
+          </Link>
         </div>
         <EditorialNav />
         <EditorialHero segment={segment} />

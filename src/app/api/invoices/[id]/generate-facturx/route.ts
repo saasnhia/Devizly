@@ -86,22 +86,130 @@ export async function POST(
     ];
   }
 
-  const isExempt = profile.tva_applicable === false;
-  const tvaRate = isExempt ? 0 : (profile.default_tva_rate ?? 20);
+  // 4. VAT computation from profile + lines
+  const isExempt =
+    profile.is_micro_entrepreneur === true ||
+    profile.tva_applicable === false;
+  const effectiveTvaRate = isExempt
+    ? 0
+    : Number(profile.default_tva_rate) || 20;
+  const vatCategory: "E" | "S" = isExempt ? "E" : "S";
+  const exemptionReason: string | undefined = isExempt
+    ? "TVA non applicable, article 293 B du CGI"
+    : undefined;
 
-  // 4. Build InvoiceData payload
+  const round2 = (n: number) => Math.round(n * 100) / 100;
+
+  // Per-line computed amounts (kept locally for aggregation; not sent
+  // in the payload because Pydantic InvoiceLine has no net/tax fields).
+  type ComputedLine = {
+    line_id: string;
+    description: string;
+    quantity: number;
+    unit_code: string;
+    unit_price_ht: number;
+    vat_category_code: "E" | "S";
+    vat_rate: number;
+    vat_exemption_reason: string | undefined;
+    _net: number;
+    _tax: number;
+  };
+
+  const computedLines: ComputedLine[] = items.map(
+    (item: QuoteItem, idx: number) => {
+      const qty = Number(item.quantity) || 0;
+      const unitPrice = Number(item.unit_price) || 0;
+      const netAmount =
+        item.total != null && !Number.isNaN(Number(item.total))
+          ? Number(item.total)
+          : round2(qty * unitPrice);
+      const taxAmount = round2((netAmount * effectiveTvaRate) / 100);
+      return {
+        line_id: String(idx + 1),
+        description: item.description,
+        quantity: qty,
+        unit_code: "C62",
+        unit_price_ht: unitPrice,
+        vat_category_code: vatCategory,
+        vat_rate: effectiveTvaRate,
+        vat_exemption_reason: exemptionReason,
+        _net: netAmount,
+        _tax: taxAmount,
+      };
+    }
+  );
+
+  // Aggregate vat_breakdowns by distinct rate (key = rate.toFixed(2)
+  // to avoid float-collision bugs).
+  const breakdownMap = new Map<
+    string,
+    { rate: number; basis: number; tax: number }
+  >();
+  for (const line of computedLines) {
+    const key = line.vat_rate.toFixed(2);
+    const existing =
+      breakdownMap.get(key) || { rate: line.vat_rate, basis: 0, tax: 0 };
+    existing.basis = round2(existing.basis + line._net);
+    existing.tax = round2(existing.tax + line._tax);
+    breakdownMap.set(key, existing);
+  }
+
+  const vatBreakdowns = Array.from(breakdownMap.values())
+    .sort((a, b) => a.rate - b.rate)
+    .map((b) => ({
+      basis_amount: b.basis,
+      category_code: vatCategory,
+      rate: b.rate,
+      exemption_reason: exemptionReason,
+      tax_amount: b.tax,
+    }));
+
+  // Totals computed from lines (authoritative)
+  const totalHt = round2(
+    computedLines.reduce((s, l) => s + l._net, 0)
+  );
+  const totalVat = round2(
+    vatBreakdowns.reduce((s, b) => s + b.tax_amount, 0)
+  );
+  const totalTtc = round2(totalHt + totalVat);
+
+  // Sanity check vs invoice.amount (TTC in DB)
+  const dbAmount = Number(invoice.amount) || 0;
+  const gap = Math.abs(totalTtc - dbAmount);
+  if (gap > 0.01) {
+    console.warn(
+      `[facturx relay] Computed TTC (${totalTtc}) differs from ` +
+        `invoice.amount (${dbAmount}) by ${gap.toFixed(2)}€ — ` +
+        `using computed values`
+    );
+  }
+
+  // 5. Build InvoiceData payload (matches lib/models.py Pydantic schema)
+  const payloadLines = computedLines.map((l) => ({
+    line_id: l.line_id,
+    description: l.description,
+    quantity: l.quantity,
+    unit_code: l.unit_code,
+    unit_price_ht: l.unit_price_ht,
+    vat_category_code: l.vat_category_code,
+    vat_rate: l.vat_rate,
+    vat_exemption_reason: l.vat_exemption_reason,
+  }));
+
+  const cleanSellerSiret = (profile.company_siret || "").replace(/\D/g, "");
+  const cleanBuyerSiret =
+    (invoice.clients?.siret || "").replace(/\D/g, "") || undefined;
+
   const payload = {
     invoice_number: invoice.invoice_number,
     invoice_type_code: "380",
     issue_date: new Date(invoice.created_at).toISOString().split("T")[0],
     currency: invoice.currency || "EUR",
     buyer_reference: invoice.quote_id || undefined,
-    notes: isExempt
-      ? "TVA non applicable, article 293 B du CGI"
-      : undefined,
+    notes: exemptionReason,
     seller: {
       name: profile.company_name,
-      siret: profile.company_siret,
+      siret: cleanSellerSiret,
       vat_number: profile.tva_number || undefined,
       legal_form: profile.legal_form || undefined,
       rcs_number: profile.rcs_number || undefined,
@@ -120,44 +228,23 @@ export async function POST(
     },
     buyer: {
       name: invoice.clients?.name || "Client",
-      siret: invoice.clients?.siret || undefined,
+      siret: cleanBuyerSiret,
       address: {
         line1: invoice.clients?.address || "",
         postal_code: invoice.clients?.postal_code || "",
         city: invoice.clients?.city || "",
-        country_code: "FR",
+        country_code: invoice.clients?.country || "FR",
       },
       email: invoice.clients?.email || undefined,
     },
-    lines: items.map((item: QuoteItem, idx: number) => ({
-      line_id: String(idx + 1),
-      description: item.description,
-      quantity: item.quantity,
-      unit_code: "C62",
-      unit_price_ht: item.unit_price,
-      vat_category_code: isExempt ? "E" : "S",
-      vat_rate: tvaRate,
-      vat_exemption_reason: isExempt
-        ? "TVA non applicable, article 293 B du CGI"
-        : undefined,
-    })),
+    lines: payloadLines,
     totals: {
-      total_ht: invoice.amount,
-      total_vat: 0, // TODO Phase 2B: calculate from lines
-      total_ttc: invoice.amount,
-      amount_payable: invoice.amount,
+      total_ht: totalHt,
+      total_vat: totalVat,
+      total_ttc: totalTtc,
+      amount_payable: totalTtc,
     },
-    vat_breakdowns: [
-      {
-        basis_amount: invoice.amount,
-        category_code: isExempt ? "E" : "S",
-        rate: tvaRate,
-        exemption_reason: isExempt
-          ? "TVA non applicable, article 293 B du CGI"
-          : undefined,
-        tax_amount: 0, // TODO Phase 2B
-      },
-    ],
+    vat_breakdowns: vatBreakdowns,
     payment: {
       due_date:
         invoice.due_date ||
@@ -177,7 +264,15 @@ export async function POST(
     );
   }
 
+  // For function-to-function calls on Vercel, use VERCEL_URL which is
+  // auto-injected per deployment (preview → preview URL, prod → prod URL).
+  // VERCEL_URL does not include protocol. Falls back to NEXT_PUBLIC_SITE_URL
+  // for local dev and non-Vercel envs.
+  const vercelHost = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : null;
   const baseUrl =
+    vercelHost ||
     process.env.NEXT_PUBLIC_SITE_URL ||
     process.env.NEXT_PUBLIC_APP_URL ||
     "http://localhost:3000";

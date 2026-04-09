@@ -6,14 +6,18 @@ import os
 import sys
 import traceback
 
-# Ensure lib/ is importable
+# CRITICAL: sys.path insert MUST come BEFORE 'import facturx' so that
+# our local saxonche stub (api/facturx/saxonche/) takes precedence over
+# the pip-installed one (which we deliberately exclude to stay under
+# Vercel's 250MB bundle limit). See api/facturx/saxonche/README.md.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-import facturx
-from lib.models import InvoiceData
-from lib.xml_builder import build_cii_xml
-from lib.pdf_builder import build_base_pdf
-from lib.pdfa_converter import add_pdfa_output_intent
+import facturx  # noqa: E402
+
+from lib.models import InvoiceData  # noqa: E402
+from lib.xml_builder import build_cii_xml  # noqa: E402
+from lib.pdf_builder import build_base_pdf  # noqa: E402
+from lib.pdfa_converter import add_pdfa_output_intent  # noqa: E402
 
 FONTS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "lib", "fonts")
 ICC_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "sRGB.icc")

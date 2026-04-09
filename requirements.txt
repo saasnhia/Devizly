@@ -2,6 +2,5 @@ factur-x==4.2
 reportlab==4.4.10
 pikepdf==10.5.1
 lxml==6.0.2
-Pillow==12.2.0
 pypdf==6.9.2
 pydantic==2.10.4

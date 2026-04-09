@@ -1,0 +1,65 @@
+{
+  "invoice_number": "INV-2026-0001",
+  "invoice_type_code": "380",
+  "issue_date": "2026-04-09",
+  "currency": "EUR",
+  "buyer_reference": "DEV-2026-0042",
+  "notes": "TVA non applicable, article 293 B du CGI",
+  "seller": {
+    "name": "Jean Dupont",
+    "siret": "12345678901234",
+    "legal_form": "Entrepreneur individuel",
+    "address": {
+      "line1": "15 rue de la Republique",
+      "postal_code": "75001",
+      "city": "Paris",
+      "country_code": "FR"
+    },
+    "email": "jean.dupont@example.com",
+    "iban": "FR7612345678901234567890123",
+    "is_micro_entrepreneur": true,
+    "vat_applicable": false
+  },
+  "buyer": {
+    "name": "Societe Client SARL",
+    "siret": "98765432109876",
+    "address": {
+      "line1": "42 avenue des Champs",
+      "postal_code": "69002",
+      "city": "Lyon",
+      "country_code": "FR"
+    }
+  },
+  "lines": [
+    {
+      "line_id": "1",
+      "description": "Prestation de developpement web - forfait",
+      "quantity": "1",
+      "unit_code": "C62",
+      "unit_price_ht": "1500.00",
+      "vat_category_code": "E",
+      "vat_rate": "0",
+      "vat_exemption_reason": "TVA non applicable, article 293 B du CGI"
+    }
+  ],
+  "totals": {
+    "total_ht": "1500.00",
+    "total_vat": "0.00",
+    "total_ttc": "1500.00",
+    "amount_payable": "1500.00"
+  },
+  "vat_breakdowns": [
+    {
+      "basis_amount": "1500.00",
+      "category_code": "E",
+      "rate": "0",
+      "exemption_reason": "TVA non applicable, article 293 B du CGI",
+      "tax_amount": "0.00"
+    }
+  ],
+  "payment": {
+    "due_date": "2026-05-09",
+    "terms": "Paiement a 30 jours",
+    "iban": "FR7612345678901234567890123"
+  }
+}

@@ -6,13 +6,12 @@ import os
 import sys
 import traceback
 
-# CRITICAL: sys.path insert MUST come BEFORE 'import facturx' so that
-# our local saxonche stub (api/facturx/saxonche/) takes precedence over
-# the pip-installed one (which we deliberately exclude to stay under
-# Vercel's 250MB bundle limit). See api/facturx/saxonche/README.md.
+# Ensure lib/ is importable
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-import facturx  # noqa: E402
+# Use vendored factur-x to exclude saxonche (~100 MB bundle savings)
+# and trim unused XSDs (~50 MB). See lib/facturx_vendored/README.md.
+from lib.facturx_vendored import generate_from_binary  # noqa: E402
 
 from lib.models import InvoiceData  # noqa: E402
 from lib.xml_builder import build_cii_xml  # noqa: E402
@@ -66,7 +65,7 @@ class handler(BaseHTTPRequestHandler):
             pdf_with_intent = add_pdfa_output_intent(pdf_bytes, ICC_PATH)
 
             # 4. Embed XML into PDF via factur-x library
-            facturx_pdf = facturx.generate_from_binary(
+            facturx_pdf = generate_from_binary(
                 pdf_with_intent,
                 xml_bytes,
                 flavor="factur-x",

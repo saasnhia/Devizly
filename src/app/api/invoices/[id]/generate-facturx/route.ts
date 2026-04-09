@@ -5,19 +5,43 @@ export const runtime = "nodejs";
 export const maxDuration = 30;
 
 export async function POST(
-  _req: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id: invoiceId } = await params;
 
+  // Auth: cookie session in priority, fall back to Authorization: Bearer
+  // for testing (e.g., cross-origin tests when OAuth callback is hardcoded
+  // to production domain). Bearer validation uses the same Supabase JWT
+  // signature check as cookie flow, so security is identical.
   const supabase = await createClient();
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
+  let user = null;
+  const { data: { user: cookieUser } } = await supabase.auth.getUser();
 
-  if (authError || !user) {
-    return NextResponse.json({ error: "Non authentifie" }, { status: 401 });
+  if (cookieUser) {
+    user = cookieUser;
+  } else {
+    // Fallback: accept Bearer token from Authorization header
+    const authHeader = request.headers.get("authorization");
+    if (authHeader?.startsWith("Bearer ")) {
+      const token = authHeader.slice(7);
+      const {
+        data: { user: bearerUser },
+        error: bearerError,
+      } = await supabase.auth.getUser(token);
+      if (bearerError) {
+        console.warn(
+          "[facturx relay] Bearer token validation failed:",
+          bearerError.message
+        );
+      } else if (bearerUser) {
+        user = bearerUser;
+      }
+    }
+  }
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   // 1. Fetch invoice with client

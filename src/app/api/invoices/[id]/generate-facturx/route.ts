@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -14,8 +15,16 @@ export async function POST(
   // for testing (e.g., cross-origin tests when OAuth callback is hardcoded
   // to production domain). Bearer validation uses the same Supabase JWT
   // signature check as cookie flow, so security is identical.
+  //
+  // For RLS-aware queries, we need a Supabase client whose underlying
+  // PostgREST requests carry the user's JWT. The cookie SSR client does
+  // this automatically from cookies. For Bearer flow, we instantiate a
+  // separate token-scoped client (supabase-js) that injects the token
+  // as Authorization header on every request. RLS still applies — we
+  // never use the service role key here.
   const supabase = await createClient();
   let user = null;
+  let dbClient: ReturnType<typeof createSupabaseClient> | Awaited<ReturnType<typeof createClient>> = supabase;
   const { data: { user: cookieUser } } = await supabase.auth.getUser();
 
   if (cookieUser) {
@@ -36,6 +45,15 @@ export async function POST(
         );
       } else if (bearerUser) {
         user = bearerUser;
+        // Create a token-scoped client so RLS queries work without cookies
+        dbClient = createSupabaseClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+          {
+            global: { headers: { Authorization: `Bearer ${token}` } },
+            auth: { persistSession: false, autoRefreshToken: false },
+          }
+        );
       }
     }
   }
@@ -45,7 +63,7 @@ export async function POST(
   }
 
   // 1. Fetch invoice with client
-  const { data: invoice, error: invoiceError } = await supabase
+  const { data: invoice, error: invoiceError } = await dbClient
     .from("invoices")
     .select("*, clients(*)")
     .eq("id", invoiceId)
@@ -60,7 +78,7 @@ export async function POST(
   }
 
   // 2. Fetch seller profile
-  const { data: profile } = await supabase
+  const { data: profile } = await dbClient
     .from("profiles")
     .select("*")
     .eq("id", user.id)
@@ -87,7 +105,7 @@ export async function POST(
   let items: QuoteItem[] = [];
 
   if (invoice.quote_id) {
-    const { data: quoteItems } = await supabase
+    const { data: quoteItems } = await dbClient
       .from("quote_items")
       .select("*")
       .eq("quote_id", invoice.quote_id)
@@ -323,7 +341,7 @@ export async function POST(
 
   // 6. Upload to Supabase Storage
   const filePath = `${user.id}/${invoice.invoice_number}.pdf`;
-  const { error: uploadError } = await supabase.storage
+  const { error: uploadError } = await dbClient.storage
     .from("invoices")
     .upload(filePath, pdfBuffer, {
       contentType: "application/pdf",
@@ -338,7 +356,7 @@ export async function POST(
   }
 
   // 7. Update invoice record
-  const { error: updateError } = await supabase
+  const { error: updateError } = await dbClient
     .from("invoices")
     .update({
       facturx_pdf_path: filePath,
@@ -354,7 +372,7 @@ export async function POST(
   }
 
   // 8. Return signed URL for download
-  const { data: signedUrl } = await supabase.storage
+  const { data: signedUrl } = await dbClient.storage
     .from("invoices")
     .createSignedUrl(filePath, 3600);
 

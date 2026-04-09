@@ -320,12 +320,24 @@ export async function POST(
     "http://localhost:3000";
   const facturxUrl = `${baseUrl}/api/facturx/generate`;
 
+  const facturxHeaders: Record<string, string> = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${facturxSecret}`,
+  };
+
+  // Forward Vercel Protection Bypass token when present (preview environments
+  // with Deployment Protection enabled). VERCEL_AUTOMATION_BYPASS_SECRET is
+  // auto-injected by Vercel when "Protection Bypass for Automation" is
+  // enabled in the dashboard. It's NOT set in production (no Deployment
+  // Protection on prod deployments), so this is a no-op in prod.
+  if (process.env.VERCEL_AUTOMATION_BYPASS_SECRET) {
+    facturxHeaders["x-vercel-protection-bypass"] =
+      process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
+  }
+
   const facturxResponse = await fetch(facturxUrl, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${facturxSecret}`,
-    },
+    headers: facturxHeaders,
     body: JSON.stringify(payload),
   });
 

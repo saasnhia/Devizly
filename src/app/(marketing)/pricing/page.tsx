@@ -17,7 +17,7 @@ type PlanFeature = {
 
 const comparisonFeatures: PlanFeature[] = [
   { text: "Devis par mois", free: false, pro: false, business: false }, // special row
-  // Free features (no gate in code)
+  // Free features (all plans)
   { text: "Génération IA", free: true, pro: true, business: true },
   { text: "Templates Devizly (10+)", free: true, pro: true, business: true },
   { text: "Gestion clients", free: true, pro: true, business: true },
@@ -28,18 +28,23 @@ const comparisonFeatures: PlanFeature[] = [
   { text: "Calendly intégré", free: true, pro: true, business: true },
   { text: "Export PDF", free: true, pro: true, business: true },
   { text: "Analytics devis", free: true, pro: true, business: true },
+  { text: "Facturation automatique", free: true, pro: true, business: true },
+  { text: "Factures Factur-X (PDF/A-3)", free: true, pro: true, business: true },
+  { text: "Relances automatiques J+2/5/7", free: true, pro: true, business: true },
+  { text: "Briefing quotidien", free: true, pro: true, business: true },
   // Pro gates (plan !== "free")
-  { text: "Facturation automatique", free: false, pro: true, business: true },
-  { text: "Relances automatiques J+2/5/7", free: false, pro: true, business: true },
+  { text: "Devis illimités", free: false, pro: true, business: true },
   { text: "Templates relances personnalisés", free: false, pro: true, business: true },
-  { text: "Envoi contrats", free: false, pro: true, business: true },
+  { text: "Envoi de contrats", free: false, pro: true, business: true },
+  { text: "Multi-clients", free: false, pro: true, business: true },
+  { text: "Logo personnalisé", free: false, pro: true, business: true },
   // Business gates (plan === "business")
+  { text: "Envoi automatique Pennylane", free: false, pro: false, business: true },
   { text: "Lead forms (5+ types)", free: false, pro: false, business: true },
   { text: "Contrats récurrents", free: false, pro: false, business: true },
   { text: "Gestion d'équipe", free: false, pro: false, business: true },
-  { text: "Export CSV comptable", free: false, pro: false, business: true },
-  { text: "Export FEC", free: false, pro: false, business: true },
-  { text: "Branding personnalisé", free: false, pro: false, business: true },
+  { text: "Export CSV + FEC", free: false, pro: false, business: true },
+  { text: "Branding personnalisé complet", free: false, pro: false, business: true },
   { text: "Support prioritaire 24h", free: false, pro: false, business: true },
 ];
 
@@ -55,17 +60,19 @@ const plans = [
     name: "Gratuit",
     monthlyPrice: "0",
     annualPrice: "0",
-    description: "Pour tester sans engagement",
+    description: "Toutes les features, 3 devis/mois",
     cta: "Commencer gratuitement",
     priceId: null,
     popular: false,
     features: [
       "3 devis par mois",
       "Génération IA",
-      "Signature électronique eIDAS",
-      "Acompte Stripe",
-      "Calendly intégré",
-      "Export PDF",
+      "Signature eIDAS",
+      "Acompte Stripe (30/50%)",
+      "Facturation automatique",
+      "Factures Factur-X (PDF/A-3)",
+      "Relances auto J+2, J+5, J+7",
+      "Briefing quotidien",
     ],
   },
   {
@@ -80,10 +87,10 @@ const plans = [
     features: [
       "Devis illimités",
       "Tout le plan Gratuit",
-      "Facturation automatique",
-      "Relances J+2, J+5, J+7",
-      "Templates relances",
-      "Envoi contrats",
+      "Envoi de contrats",
+      "Templates relances personnalisés",
+      "Multi-clients",
+      "Logo personnalisé",
     ],
   },
   {
@@ -97,12 +104,14 @@ const plans = [
     popular: false,
     features: [
       "Tout le plan Pro",
+      "Envoi automatique Pennylane",
       "Lead forms (5+ types)",
       "Contrats récurrents",
-      "Gestion d'équipe (5)",
+      "Gestion d'équipe",
       "Export CSV + FEC",
-      "Branding personnalisé",
+      "Branding personnalisé complet",
       "Support prioritaire 24h",
+      "Conformité e-facturation 2026",
     ],
   },
 ];

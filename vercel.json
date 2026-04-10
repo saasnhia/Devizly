@@ -16,5 +16,12 @@
       "path": "/api/cron/reset-quota",
       "schedule": "0 0 1 * *"
     }
-  ]
+  ],
+  "functions": {
+    "api/facturx/generate.py": {
+      "runtime": "@vercel/python@4.3.0",
+      "maxDuration": 30,
+      "excludeFiles": "{.next,node_modules,public,src,supabase,scripts,remotion,tests,docs,.git,.github,.cursor,.vscode,content,emails,.vercel,.idea,coverage}/**"
+    }
+  }
 }

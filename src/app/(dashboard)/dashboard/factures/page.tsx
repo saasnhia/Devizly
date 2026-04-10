@@ -141,6 +141,11 @@ export default async function FacturesPage() {
                   <tr key={inv.id} className="border-b last:border-0">
                     <td className="px-4 py-3 font-mono text-xs font-medium">
                       {inv.invoice_number}
+                      {inv.facturx_pdf_path && (
+                        <span className="ml-1.5 inline-flex items-center rounded-full bg-violet-100 px-1.5 py-0.5 text-[10px] font-medium text-violet-700">
+                          FX
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       {inv.client?.name || "—"}
@@ -162,6 +167,7 @@ export default async function FacturesPage() {
                         invoiceId={inv.id}
                         status={inv.status}
                         checkoutUrl={inv.stripe_checkout_url}
+                        facturxPdfPath={inv.facturx_pdf_path}
                       />
                     </td>
                   </tr>

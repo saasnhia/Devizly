@@ -87,7 +87,7 @@ export const plans = [
       "Branding personnalisé",
       "Support prioritaire 24h",
       "Envoi automatique Pennylane",
-      "Conformité réforme e-facturation 2027",
+      "Conformité e-facturation 2026",
     ],
     cta: "Choisir Business",
     popular: false,
@@ -130,7 +130,7 @@ export const faqs = [
   },
   {
     q: "Qu'est-ce que Factur-X et pourquoi c'est important ?",
-    a: "Factur-X est le standard français de facturation électronique (PDF + XML structuré). À partir de septembre 2027, toutes les entreprises devront émettre leurs factures dans ce format. Devizly génère automatiquement des factures Factur-X conformes au profil BASIC, validées PDF/A-3 — vous êtes déjà prêt pour la réforme, sans rien changer à vos habitudes.",
+    a: "Factur-X est le standard français de facturation électronique (PDF + XML structuré). À partir de septembre 2026, la facturation électronique devient obligatoire. Les PME et micro-entreprises devront émettre en format électronique au plus tard en septembre 2027 — Devizly vous y prépare dès maintenant avec des factures Factur-X conformes au profil BASIC, validées PDF/A-3.",
   },
   {
     q: "Devizly est-il compatible avec mon expert-comptable sur Pennylane ?",

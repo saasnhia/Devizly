@@ -298,7 +298,7 @@ export function EditorialHero({ segment }: { segment?: string }) {
               <span className="text-green-400">&#10003;</span> IA française
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="text-green-400">&#10003;</span> Prêt réforme 2027
+              <span className="text-green-400">&#10003;</span> Prêt réforme 2026
             </span>
           </div>
         </div>

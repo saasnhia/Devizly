@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Send, Copy, ExternalLink, Download, FileText, FileCheck, Loader2 } from "lucide-react";
+import { Send, Copy, ExternalLink, Download, FileText, FileCheck, Loader2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
 interface InvoiceActionsProps {
@@ -10,6 +10,8 @@ interface InvoiceActionsProps {
   status: string;
   checkoutUrl: string | null;
   facturxPdfPath: string | null;
+  paStatus: string | null;
+  pennylaneConnected: boolean;
 }
 
 export function InvoiceActions({
@@ -17,10 +19,14 @@ export function InvoiceActions({
   status,
   checkoutUrl,
   facturxPdfPath,
+  paStatus,
+  pennylaneConnected,
 }: InvoiceActionsProps) {
   const [sending, setSending] = useState(false);
   const [facturxLoading, setFacturxLoading] = useState(false);
   const [hasFacturx, setHasFacturx] = useState(!!facturxPdfPath);
+  const [pennylaneLoading, setPennylaneLoading] = useState(false);
+  const [currentPaStatus, setCurrentPaStatus] = useState(paStatus);
 
   async function handleSend() {
     setSending(true);
@@ -72,6 +78,32 @@ export function InvoiceActions({
     }
   }
 
+  async function handlePennylane() {
+    setPennylaneLoading(true);
+    try {
+      const res = await fetch(`/api/invoices/${invoiceId}/push-pennylane`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || data.detail || "Erreur Pennylane");
+      }
+      setCurrentPaStatus("sent");
+      if (data.pennylane_url) {
+        window.open(data.pennylane_url, "_blank");
+      }
+      toast.success("Facture envoyée à Pennylane");
+    } catch (err) {
+      setCurrentPaStatus("error");
+      toast.error(
+        err instanceof Error ? err.message : "Erreur envoi Pennylane"
+      );
+    } finally {
+      setPennylaneLoading(false);
+    }
+  }
+
   return (
     <div className="flex items-center justify-end gap-1">
       <Button
@@ -112,6 +144,40 @@ export function InvoiceActions({
           </>
         )}
       </Button>
+
+      {hasFacturx && pennylaneConnected && currentPaStatus !== "sent" && (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-7 px-2 text-xs"
+          onClick={handlePennylane}
+          disabled={pennylaneLoading}
+          title={currentPaStatus === "error" ? "Réessayer Pennylane" : "Envoyer à Pennylane"}
+        >
+          {pennylaneLoading ? (
+            <>
+              <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+              ...
+            </>
+          ) : currentPaStatus === "error" ? (
+            <>
+              <AlertTriangle className="mr-1 h-3 w-3 text-red-500" />
+              PA
+            </>
+          ) : (
+            <>
+              <Send className="mr-1 h-3 w-3 text-violet-500" />
+              PA
+            </>
+          )}
+        </Button>
+      )}
+
+      {hasFacturx && currentPaStatus === "sent" && (
+        <span className="inline-flex items-center rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700">
+          PA ✓
+        </span>
+      )}
 
       {(status === "draft" || status === "sent") && (
         <Button

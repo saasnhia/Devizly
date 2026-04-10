@@ -59,6 +59,10 @@ export default function ParametresPage() {
   const [founderNumber, setFounderNumber] = useState<number | null>(null);
   const [refCopied, setRefCopied] = useState(false);
   const [ibanWarning, setIbanWarning] = useState(false);
+  const [pennylaneToken, setPennylaneToken] = useState("");
+  const [pennylaneConnected, setPennylaneConnected] = useState(false);
+  const [pennylaneConnectedAt, setPennylaneConnectedAt] = useState<string | null>(null);
+  const [pennylaneLoading, setPennylaneLoading] = useState(false);
   const [profile, setProfile] = useState({
     full_name: "",
     company_name: "",
@@ -88,7 +92,7 @@ export default function ParametresPage() {
       // Load IBAN/BIC from profiles only (never from user_metadata)
       const { data: billingRow } = await supabase
         .from("profiles")
-        .select("iban, bic, company_city, company_postal_code, company_country")
+        .select("iban, bic, company_city, company_postal_code, company_country, pa_provider, pa_connected_at")
         .eq("id", user.id)
         .single();
 
@@ -111,6 +115,12 @@ export default function ParametresPage() {
           iban: billingRow?.iban || "",
           bic: billingRow?.bic || "",
         });
+      }
+
+      // Load Pennylane connection state from profiles
+      if (billingRow?.pa_provider === "pennylane") {
+        setPennylaneConnected(true);
+        setPennylaneConnectedAt(billingRow.pa_connected_at || null);
       }
 
       const { data } = await supabase
@@ -1212,36 +1222,120 @@ export default function ParametresPage() {
         </CardContent>
       </Card>
 
-      {/* Facturation électronique (2027) */}
+      {/* Plateforme Agréée — Pennylane */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5 text-violet-400" />
-            Facturation électronique (2027)
+            Plateforme Agréée — Pennylane
           </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Connectez votre compte Pennylane pour envoyer vos factures
+            Factur-X automatiquement à votre expert-comptable.
+          </p>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="rounded-lg border border-violet-500/20 bg-violet-500/5 p-4">
-            <p className="text-sm">
-              À partir du <strong>1er septembre 2027</strong>, toutes les TPE, PME
-              et micro-entrepreneurs devront émettre leurs factures au format
-              électronique structuré (Factur-X) via une Plateforme Agréée (PA).
-            </p>
-            <p className="text-sm text-muted-foreground mt-2">
-              Devizly intégrera prochainement <strong>Pennylane</strong>,
-              Plateforme Agréée immatriculée DGFiP, pour transmettre
-              automatiquement vos factures en toute conformité.
-            </p>
-          </div>
-
-          <Button disabled variant="outline" className="w-full">
-            Connecter Pennylane (bientôt disponible)
-          </Button>
-
-          <p className="text-xs text-muted-foreground text-center">
-            Aucune action requise pour l&apos;instant. Cette section sera activée
-            avant septembre 2027.
-          </p>
+          {pennylaneConnected ? (
+            <>
+              <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+                <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-emerald-800">
+                    Pennylane connecté
+                  </p>
+                  {pennylaneConnectedAt && (
+                    <p className="text-xs text-emerald-600">
+                      Depuis le{" "}
+                      {new Date(pennylaneConnectedAt).toLocaleDateString("fr-FR", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
+                disabled={pennylaneLoading}
+                onClick={async () => {
+                  setPennylaneLoading(true);
+                  try {
+                    const res = await fetch("/api/settings/pennylane", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ action: "disconnect" }),
+                    });
+                    if (!res.ok) throw new Error("Erreur déconnexion");
+                    setPennylaneConnected(false);
+                    setPennylaneConnectedAt(null);
+                    toast.success("Pennylane déconnecté");
+                  } catch {
+                    toast.error("Erreur lors de la déconnexion");
+                  } finally {
+                    setPennylaneLoading(false);
+                  }
+                }}
+              >
+                {pennylaneLoading ? "..." : "Déconnecter Pennylane"}
+              </Button>
+            </>
+          ) : (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="pennylane-token">Token API Pennylane</Label>
+                <Input
+                  id="pennylane-token"
+                  type="password"
+                  value={pennylaneToken}
+                  onChange={(e) => setPennylaneToken(e.target.value)}
+                  placeholder="plnl_..."
+                  className="font-mono"
+                />
+                <a
+                  href="https://help.pennylane.com/fr/articles/18770"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-violet-600 hover:underline"
+                >
+                  Comment obtenir mon token ? →
+                </a>
+              </div>
+              <Button
+                className="w-full"
+                disabled={pennylaneLoading || pennylaneToken.length < 10}
+                onClick={async () => {
+                  setPennylaneLoading(true);
+                  try {
+                    const res = await fetch("/api/settings/pennylane", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ token: pennylaneToken }),
+                    });
+                    const data = await res.json();
+                    if (!res.ok) throw new Error(data.error || "Erreur connexion");
+                    setPennylaneConnected(true);
+                    setPennylaneConnectedAt(data.connected_at || new Date().toISOString());
+                    setPennylaneToken("");
+                    toast.success("Pennylane connecté");
+                  } catch (err) {
+                    toast.error(
+                      err instanceof Error ? err.message : "Erreur de connexion"
+                    );
+                  } finally {
+                    setPennylaneLoading(false);
+                  }
+                }}
+              >
+                {pennylaneLoading ? "Connexion..." : "Connecter Pennylane"}
+              </Button>
+              <p className="text-xs text-muted-foreground text-center">
+                Votre token est stocké de manière sécurisée et n&apos;est jamais
+                exposé côté client.
+              </p>
+            </>
+          )}
         </CardContent>
       </Card>
 

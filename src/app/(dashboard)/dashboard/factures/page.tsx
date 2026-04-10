@@ -31,6 +31,14 @@ export default async function FacturesPage() {
 
   if (!user) redirect("/login");
 
+  // Check if Pennylane is connected
+  const { data: userProfile } = await supabase
+    .from("profiles")
+    .select("pa_provider")
+    .eq("id", user.id)
+    .single();
+  const pennylaneConnected = userProfile?.pa_provider === "pennylane";
+
   // Fetch invoices with client info
   const { data: invoices, error: invoicesError } = await supabase
     .from("invoices")
@@ -146,6 +154,16 @@ export default async function FacturesPage() {
                           FX
                         </span>
                       )}
+                      {inv.pa_status === "sent" && (
+                        <span className="ml-1 inline-flex items-center rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700">
+                          PA
+                        </span>
+                      )}
+                      {inv.pa_status === "error" && (
+                        <span className="ml-1 inline-flex items-center rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-medium text-red-700">
+                          PA !
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       {inv.client?.name || "—"}
@@ -168,6 +186,8 @@ export default async function FacturesPage() {
                         status={inv.status}
                         checkoutUrl={inv.stripe_checkout_url}
                         facturxPdfPath={inv.facturx_pdf_path}
+                        paStatus={inv.pa_status}
+                        pennylaneConnected={pennylaneConnected}
                       />
                     </td>
                   </tr>

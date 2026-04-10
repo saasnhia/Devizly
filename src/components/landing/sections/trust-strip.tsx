@@ -6,6 +6,7 @@ const items = [
   { label: "SIRET", italic: false },
   { label: "TVA", italic: false },
   { label: "eIDAS", italic: true },
+  { label: "Factur-X", italic: true },
   { label: "RGPD", italic: false },
   { label: "CGI 293B", italic: true },
   { label: "DGFiP", italic: false },

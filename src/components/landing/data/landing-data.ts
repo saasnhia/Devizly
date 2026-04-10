@@ -67,6 +67,7 @@ export const plans = [
       "Relances J+2, J+5, J+7",
       "Templates relances",
       "Envoi contrats",
+      "Factures Factur-X (PDF/A-3 conforme)",
     ],
     cta: "Choisir Pro",
     popular: true,
@@ -85,6 +86,8 @@ export const plans = [
       "Export CSV comptable",
       "Branding personnalisé",
       "Support prioritaire 24h",
+      "Envoi automatique Pennylane",
+      "Conformité réforme e-facturation 2027",
     ],
     cta: "Choisir Business",
     popular: false,
@@ -119,11 +122,19 @@ export const faqs = [
   },
   {
     q: "Devizly fonctionne-t-il avec mon logiciel comptable ?",
-    a: "Vous pouvez exporter vos factures en CSV compatible avec la plupart des logiciels comptables (Pennylane, Indy, etc.).",
+    a: "Oui. Devizly s'intègre directement avec Pennylane : vos factures Factur-X sont envoyées automatiquement à votre expert-comptable, sans export manuel. Pour les autres logiciels (Indy, Sage, etc.), vous pouvez exporter vos données au format CSV ou FEC depuis le tableau de bord.",
   },
   {
     q: "La signature électronique a-t-elle une valeur juridique ?",
     a: "Oui. La signature Devizly est conforme au règlement européen eIDAS. Elle est horodatée, traçable et juridiquement opposable.",
+  },
+  {
+    q: "Qu'est-ce que Factur-X et pourquoi c'est important ?",
+    a: "Factur-X est le standard français de facturation électronique (PDF + XML structuré). À partir de septembre 2027, toutes les entreprises devront émettre leurs factures dans ce format. Devizly génère automatiquement des factures Factur-X conformes au profil BASIC, validées PDF/A-3 — vous êtes déjà prêt pour la réforme, sans rien changer à vos habitudes.",
+  },
+  {
+    q: "Devizly est-il compatible avec mon expert-comptable sur Pennylane ?",
+    a: "Oui. Si votre expert-comptable utilise Pennylane, vous pouvez connecter votre compte en un clic dans les paramètres. Vos factures Factur-X seront envoyées automatiquement — plus besoin de transmettre vos documents manuellement. Les écritures comptables sont générées automatiquement côté Pennylane.",
   },
 ];
 

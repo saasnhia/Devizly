@@ -48,6 +48,11 @@ function PricingCard({
         {plan.price === 0 && (
           <p className="mt-1 text-xs text-slate-500">Gratuit pour toujours</p>
         )}
+        {plan.popular && (
+          <span className="mt-2 inline-flex items-center rounded-full border border-[#5B5BD6]/20 bg-[#5B5BD6]/10 px-2 py-0.5 text-[10px] font-medium text-[#818cf8]">
+            Prêt réforme 2027
+          </span>
+        )}
       </div>
 
       <ul className="mt-6 flex-1 space-y-2.5">

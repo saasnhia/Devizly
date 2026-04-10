@@ -72,7 +72,8 @@ export async function GET(request: Request) {
       sms_used: number | null;
       sms_reset_at: string | null;
     } | null;
-    if (!profile || profile.subscription_status === "free") continue;
+    if (!profile) continue;
+    // NOTE: Auto-reminders available on all plans (free included).
     if (profile.relance_enabled === false) continue;
 
     // Use custom delays or default [2, 5, 7]

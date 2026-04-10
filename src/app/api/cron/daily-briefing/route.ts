@@ -27,11 +27,12 @@ export async function GET(request: Request) {
   let totalSent = 0;
   const errors: string[] = [];
 
-  // Fetch all active users (pro or business only)
+  // NOTE: Daily briefing available on all plans (free included).
+  // Previously restricted to pro/business.
   const { data: profiles } = await supabase
     .from("profiles")
     .select("id, full_name, company_name, subscription_status")
-    .in("subscription_status", ["pro", "business"]);
+    .not("subscription_status", "is", null);
 
   if (!profiles || profiles.length === 0) {
     return NextResponse.json({ sent: 0, message: "No active users" });

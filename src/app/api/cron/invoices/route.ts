@@ -62,7 +62,8 @@ export async function GET(request: Request) {
       subscription_status: string;
     } | null;
 
-    if (!profile || profile.subscription_status === "free") continue;
+    if (!profile) continue;
+    // NOTE: Recurring invoices available on all plans (free included).
 
     const client = Array.isArray(quote.clients) ? quote.clients[0] : quote.clients;
     const clientName = (client as { name: string } | null)?.name || "Client";

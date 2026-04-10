@@ -149,24 +149,8 @@ export default async function RelancesPage() {
       <RelanceCustomizeButton />
 
       {/* Status banner */}
-      {plan === "free" ? (
-        <Card className="border-violet-200 bg-violet-50/50">
-          <CardContent className="flex items-center justify-between pt-6">
-            <div className="flex items-center gap-3">
-              <Sparkles className="h-5 w-5 text-violet-500" />
-              <div>
-                <p className="text-sm font-semibold">Relances automatiques — Pro requis</p>
-                <p className="text-xs text-muted-foreground">
-                  Passez au plan Pro pour activer les relances J+2, J+5, J+7
-                </p>
-              </div>
-            </div>
-            <Button asChild size="sm">
-              <Link href="/pricing">Passer au Pro</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      ) : !relanceEnabled ? (
+      {/* NOTE: Relances available on all plans (free included). */}
+      {!relanceEnabled ? (
         <Card className="border-amber-200 bg-amber-50/50">
           <CardContent className="flex items-center justify-between pt-6">
             <div className="flex items-center gap-3">

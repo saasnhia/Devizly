@@ -53,16 +53,9 @@ export async function POST(request: Request) {
     .single();
 
   const plan = (profile?.subscription_status || "free") as PlanId;
-  if (plan === "free") {
-    return NextResponse.json(
-      {
-        error: "PLAN_REQUIRED",
-        message: "Facturation — Pro requis",
-        upgradeUrl: "/pricing",
-      },
-      { status: 403 }
-    );
-  }
+  // NOTE: Invoice generation is available on all plans (including free).
+  // The only limit on free plan is 3 quotes/month.
+  void plan;
 
   // Check for existing invoice to avoid duplicates
   const { data: existing } = await supabase

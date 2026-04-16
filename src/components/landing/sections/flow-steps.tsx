@@ -114,6 +114,7 @@ const steps = [
 
 export function FlowSteps() {
   const ref = useReveal<HTMLElement>();
+  const gridRef = useReveal<HTMLDivElement>(0.2);
 
   return (
     <section ref={ref} id="fonctionnalites" className="reveal-fade py-24 lg:py-32">
@@ -136,12 +137,18 @@ export function FlowSteps() {
         </p>
 
         {/* Steps grid */}
-        <div className="relative mt-16 grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-6">
+        <div
+          ref={gridRef}
+          className="steps-grid relative mt-16 grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-6"
+        >
           {/* Connecting line (desktop only) */}
           <div className="pointer-events-none absolute top-10 left-[16.67%] right-[16.67%] hidden h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent md:block" />
 
           {steps.map((step) => (
-            <div key={step.num} className="relative">
+            <div
+              key={step.num}
+              className="step-card card-lift-sm relative rounded-2xl border border-transparent p-4 md:p-5"
+            >
               {/* Number badge */}
               <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-xl bg-[#6366f1]/[0.12]">
                 <span className="font-serif text-lg italic text-[#818cf8]">

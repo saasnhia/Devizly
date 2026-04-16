@@ -10,18 +10,19 @@ function PricingCard({
 }: {
   plan: (typeof plans)[number];
 }) {
-  return (
+  const cardInner = (
     <div
-      className={`relative flex flex-col overflow-visible rounded-2xl p-6 transition-shadow ${
+      className={`relative flex h-full flex-col p-6 ${
         plan.popular
-          ? "border-2 border-[#5B5BD6] bg-gradient-to-br from-[#111116] to-[#13111f] shadow-[0_0_40px_rgba(99,102,241,0.12)]"
-          : "border border-white/[0.08] bg-[#111116]"
+          ? "rounded-[14px] bg-gradient-to-br from-[#111116] to-[#13111f]"
+          : "rounded-2xl border border-white/[0.08] bg-[#111116]"
       }`}
+      style={plan.popular ? { zIndex: 1 } : undefined}
     >
       {/* Popular badge — floats on top border */}
       {plan.popular && (
         <span
-          className="absolute right-6 z-10 text-[11px] font-semibold text-white"
+          className="badge-shimmer absolute right-6 z-10 text-[11px] font-semibold text-white"
           style={{
             top: "-1px",
             transform: "translateY(-50%)",
@@ -49,15 +50,18 @@ function PricingCard({
           <p className="mt-1 text-xs text-slate-500">Gratuit pour toujours</p>
         )}
         {plan.popular && (
-          <span className="mt-2 inline-flex items-center rounded-full border border-[#5B5BD6]/20 bg-[#5B5BD6]/10 px-2 py-0.5 text-[10px] font-medium text-[#818cf8]">
+          <span className="badge-shimmer mt-2 inline-flex items-center rounded-full border border-[#5B5BD6]/20 bg-[#5B5BD6]/10 px-2 py-0.5 text-[10px] font-medium text-[#818cf8]">
             Prêt réforme 2026
           </span>
         )}
       </div>
 
-      <ul className="mt-6 flex-1 space-y-2.5">
+      <ul className="stagger-parent in mt-6 flex-1 space-y-2.5">
         {plan.features.map((f) => (
-          <li key={f} className="flex items-center gap-2 text-sm text-slate-200">
+          <li
+            key={f}
+            className="stagger-item flex items-center gap-2 text-sm text-slate-200"
+          >
             <Check className="h-4 w-4 shrink-0 text-[#22c55e]" />
             {f}
           </li>
@@ -67,16 +71,33 @@ function PricingCard({
       <div className="mt-8">
         <Link
           href={plan.href}
-          className={`group flex w-full items-center justify-center gap-1.5 rounded-xl py-3 text-sm font-semibold transition-all ${
+          className={`btn-shine group flex w-full items-center justify-center gap-1.5 rounded-xl py-3 text-sm font-semibold transition-all ${
             plan.popular
-              ? "bg-[#5B5BD6] text-white hover:bg-[#4B4BC6]"
+              ? "bg-[#5B5BD6] text-white hover:bg-[#4B4BC6] hover:shadow-[0_0_32px_rgba(91,91,214,0.45)]"
               : "border border-white/10 text-white hover:border-white/20 hover:bg-white/[0.03]"
           }`}
         >
-          {plan.cta}
-          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+          <span className="inline-flex items-center gap-1.5">
+            {plan.cta}
+            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+          </span>
         </Link>
       </div>
+    </div>
+  );
+
+  // Popular card: wrap with conic-gradient border (inset inner by 2px)
+  if (plan.popular) {
+    return (
+      <div className="card-lift conic-border relative overflow-visible rounded-2xl p-[2px]">
+        {cardInner}
+      </div>
+    );
+  }
+
+  return (
+    <div className="card-lift relative overflow-visible rounded-2xl">
+      {cardInner}
     </div>
   );
 }

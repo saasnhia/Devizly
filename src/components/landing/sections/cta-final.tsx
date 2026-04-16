@@ -8,19 +8,16 @@ export function CtaFinal() {
   const ref = useReveal<HTMLElement>(0.1);
 
   return (
-    <section ref={ref} className="reveal-fade relative pt-36 pb-32 lg:pt-40 lg:pb-40 scroll-mt-20">
-      {/* Radial glow */}
+    <section
+      ref={ref}
+      className="reveal-fade relative overflow-hidden pt-36 pb-32 lg:pt-40 lg:pb-40 scroll-mt-20"
+    >
+      {/* Mesh gradient background — 3 radials drifting slowly */}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <div
-          style={{
-            width: "600px",
-            height: "400px",
-            background:
-              "radial-gradient(ellipse at center, rgba(99,102,241,0.10), transparent 70%)",
-            filter: "blur(30px)",
-          }}
-        />
+        <div className="cta-mesh-bg" />
       </div>
+
+      {/* Subtle grain overlay on top of mesh (inherits from .grain on body) */}
 
       <div className="relative mx-auto max-w-4xl px-6 text-center">
         <h2
@@ -39,10 +36,12 @@ export function CtaFinal() {
         <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
           <Link
             href="/signup"
-            className="group inline-flex items-center gap-2 rounded-xl bg-[#5B5BD6] px-10 py-5 text-lg font-semibold text-white transition-all hover:bg-[#4B4BC6] hover:shadow-[0_0_48px_rgba(91,91,214,0.4)]"
+            className="btn-shine group inline-flex items-center gap-2 rounded-xl bg-[#5B5BD6] px-10 py-5 text-lg font-semibold text-white transition-all hover:bg-[#4B4BC6] hover:shadow-[0_0_48px_rgba(91,91,214,0.4)]"
           >
-            Cr&eacute;er mon compte gratuit
-            <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+            <span className="inline-flex items-center gap-2">
+              Cr&eacute;er mon compte gratuit
+              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+            </span>
           </Link>
           <Link
             href="/demo"

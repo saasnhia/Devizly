@@ -232,7 +232,7 @@ export function EditorialHero({ segment }: { segment?: string }) {
         {/* ── Left column ── */}
         <div>
           {/* Badge */}
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#5B5BD6]/30 bg-[#5B5BD6]/10 px-4 py-1.5">
+          <div className="badge-float mb-6 inline-flex items-center gap-2 rounded-full border border-[#5B5BD6]/30 bg-[#5B5BD6]/10 px-4 py-1.5">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#5B5BD6] opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-[#5B5BD6]" />
@@ -273,10 +273,12 @@ export function EditorialHero({ segment }: { segment?: string }) {
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
             <Link
               href="/signup"
-              className="group inline-flex items-center justify-center gap-2 rounded-xl bg-[#5B5BD6] px-8 py-4 text-base font-semibold text-white transition-all hover:bg-[#4B4BC6] hover:shadow-[0_0_48px_rgba(91,91,214,0.4)] sm:text-lg"
+              className="btn-shine group inline-flex items-center justify-center gap-2 rounded-xl bg-[#5B5BD6] px-8 py-4 text-base font-semibold text-white transition-all hover:bg-[#4B4BC6] hover:shadow-[0_0_48px_rgba(91,91,214,0.4)] sm:text-lg"
             >
-              Cr&eacute;er mon premier devis
-              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+              <span className="inline-flex items-center gap-2">
+                Cr&eacute;er mon premier devis
+                <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+              </span>
             </Link>
             <Link
               href="/demo"
@@ -286,18 +288,18 @@ export function EditorialHero({ segment }: { segment?: string }) {
             </Link>
           </div>
 
-          {/* Trust checks — BUG 8 fix */}
-          <div className="mt-6 flex flex-wrap gap-x-[22px] gap-y-2 text-xs text-slate-500">
-            <span className="flex items-center gap-1.5">
+          {/* Trust checks — staggered reveal */}
+          <div className="stagger-parent in mt-6 flex flex-wrap gap-x-[22px] gap-y-2 text-xs text-slate-500">
+            <span className="stagger-item flex items-center gap-1.5">
               <span className="text-green-400">&#10003;</span> Sans carte bancaire
             </span>
-            <span className="flex items-center gap-1.5">
+            <span className="stagger-item flex items-center gap-1.5">
               <span className="text-green-400">&#10003;</span> RGPD
             </span>
-            <span className="flex items-center gap-1.5">
+            <span className="stagger-item flex items-center gap-1.5">
               <span className="text-green-400">&#10003;</span> IA française
             </span>
-            <span className="flex items-center gap-1.5">
+            <span className="stagger-item flex items-center gap-1.5">
               <span className="text-green-400">&#10003;</span> Prêt réforme 2026
             </span>
           </div>

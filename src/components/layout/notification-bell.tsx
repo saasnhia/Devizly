@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import {
   Bell,
@@ -15,9 +15,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import type { Notification, NotificationType } from "@/types";
-
-const POLL_INTERVAL = 30_000; // 30 seconds
+import { useNotificationsPoll } from "@/lib/notifications/poll-store";
+import type { NotificationType } from "@/types";
 
 function typeIcon(type: NotificationType) {
   switch (type) {
@@ -56,26 +55,8 @@ function timeAgo(dateStr: string): string {
 }
 
 export function NotificationBell() {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const { notifications, setNotifications } = useNotificationsPoll();
   const [open, setOpen] = useState(false);
-
-  const fetchNotifications = useCallback(async () => {
-    try {
-      const res = await fetch("/api/notifications");
-      if (!res.ok) return;
-      const json = await res.json() as { notifications: Notification[] };
-      setNotifications(json.notifications ?? []);
-    } catch {
-      // Silently ignore network errors during polling
-    }
-  }, []);
-
-  // Initial fetch + polling
-  useEffect(() => {
-    fetchNotifications();
-    const interval = setInterval(fetchNotifications, POLL_INTERVAL);
-    return () => clearInterval(interval);
-  }, [fetchNotifications]);
 
   // When popover opens, mark all unread as read
   async function handleOpenChange(isOpen: boolean) {

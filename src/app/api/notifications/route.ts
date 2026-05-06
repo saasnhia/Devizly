@@ -13,18 +13,32 @@ export async function GET() {
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   }
 
-  const { data, error } = await supabase
-    .from("notifications")
-    .select("*")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false })
-    .limit(50);
+  try {
+    const { data, error } = await supabase
+      .from("notifications")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(50);
 
-  if (error) {
-    return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 });
+    if (error) {
+      if (error.code === "42P01") {
+        console.warn("[notifications] table missing, returning empty");
+      } else {
+        console.warn(
+          "[notifications] db error, returning empty:",
+          error.code,
+          error.message,
+        );
+      }
+      return NextResponse.json({ notifications: [] }, { status: 200 });
+    }
+
+    return NextResponse.json({ notifications: data ?? [] });
+  } catch (err) {
+    console.warn("[notifications] unexpected error, returning empty:", err);
+    return NextResponse.json({ notifications: [] }, { status: 200 });
   }
-
-  return NextResponse.json({ notifications: data ?? [] });
 }
 
 export async function POST(request: Request) {

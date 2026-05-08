@@ -287,6 +287,35 @@ export default function ParametresPage() {
     setLoading(true);
     const supabase = createClient();
 
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error("Session expirée — reconnectez-vous");
+      setLoading(false);
+      return;
+    }
+
+    const SIRET_TAKEN_MSG =
+      "Ce SIRET est déjà associé à un compte Devizly. Si c'est vous, connectez-vous avec votre email d'origine. Si c'est une erreur, contactez-nous.";
+
+    // Anti-abus : SIRET unique cross-comptes (DB index idx_profiles_company_siret_unique)
+    const siretRaw = (profile.company_siret || "").trim();
+    if (siretRaw) {
+      const candidates = Array.from(
+        new Set([siretRaw, siretRaw.replace(/\s/g, "")].filter(Boolean))
+      );
+      const { data: dups } = await supabase
+        .from("profiles")
+        .select("id")
+        .in("company_siret", candidates)
+        .neq("id", user.id)
+        .limit(1);
+      if (dups && dups.length > 0) {
+        toast.error(SIRET_TAKEN_MSG);
+        setLoading(false);
+        return;
+      }
+    }
+
     // IBAN/BIC are sensitive — NEVER store in auth.user_metadata (JWT-visible)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { iban: _iban, bic: _bic, ...metadataFields } = profile;
@@ -299,36 +328,48 @@ export default function ParametresPage() {
 
     // Sync ALL fields to profiles table (used by API routes)
     // IBAN/BIC go here ONLY — never in auth.updateUser above
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      await supabase
-        .from("profiles")
-        .update({
-          full_name: profile.full_name || null,
-          company_name: profile.company_name || null,
-          company_address: profile.company_address || null,
-          company_siret: profile.company_siret || null,
-          company_phone: profile.company_phone || null,
-          default_tva_rate: parseFloat(profile.default_tva_rate) || 20,
-          calendly_url: calendlyUrl || null,
-          tva_number: profile.tva_number || null,
-          tva_applicable: !profile.is_micro_entrepreneur,
-          is_micro_entrepreneur: profile.is_micro_entrepreneur,
-          legal_form: profile.legal_form || null,
-          rcs_number: profile.rcs_number || null,
-          slug: slug.toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 50) || null,
-          brand_color: brandColor || "#8B5CF6",
-          require_deposit_before_sign: requireDepositBeforeSign,
-          required_deposit_percentage: parseInt(requiredDepositPercentage, 10) || 30,
-          deposit_mode: depositMode,
-          deposit_fixed_amount: parseInt(depositFixedAmount, 10) || 0,
-          company_city: profile.company_city || null,
-          company_postal_code: profile.company_postal_code || null,
-          company_country: profile.company_country || null,
-          iban: profile.iban || null,
-          bic: profile.bic || null,
-        })
-        .eq("id", user.id);
+    const { error: profileErr } = await supabase
+      .from("profiles")
+      .update({
+        full_name: profile.full_name || null,
+        company_name: profile.company_name || null,
+        company_address: profile.company_address || null,
+        company_siret: profile.company_siret || null,
+        company_phone: profile.company_phone || null,
+        default_tva_rate: parseFloat(profile.default_tva_rate) || 20,
+        calendly_url: calendlyUrl || null,
+        tva_number: profile.tva_number || null,
+        tva_applicable: !profile.is_micro_entrepreneur,
+        is_micro_entrepreneur: profile.is_micro_entrepreneur,
+        legal_form: profile.legal_form || null,
+        rcs_number: profile.rcs_number || null,
+        slug: slug.toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 50) || null,
+        brand_color: brandColor || "#8B5CF6",
+        require_deposit_before_sign: requireDepositBeforeSign,
+        required_deposit_percentage: parseInt(requiredDepositPercentage, 10) || 30,
+        deposit_mode: depositMode,
+        deposit_fixed_amount: parseInt(depositFixedAmount, 10) || 0,
+        company_city: profile.company_city || null,
+        company_postal_code: profile.company_postal_code || null,
+        company_country: profile.company_country || null,
+        iban: profile.iban || null,
+        bic: profile.bic || null,
+      })
+      .eq("id", user.id);
+
+    if (profileErr) {
+      // 23505 = unique_violation — filet de sécurité si l'index unique normalisé attrape un cas non couvert par le pré-check
+      const msg = profileErr.message || "";
+      if (
+        profileErr.code === "23505" &&
+        (msg.includes("idx_profiles_company_siret") || msg.toLowerCase().includes("siret"))
+      ) {
+        toast.error(SIRET_TAKEN_MSG);
+      } else {
+        toast.error(msg || "Erreur lors de la sauvegarde");
+      }
+      setLoading(false);
+      return;
     }
 
     toast.success("Paramètres sauvegardés");

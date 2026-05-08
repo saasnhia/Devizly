@@ -40,6 +40,11 @@ function PricingCard({
       <p className="mt-1 text-sm text-slate-400">{plan.description}</p>
 
       <div className="mt-5">
+        {plan.originalPrice && (
+          <span className="mr-2 text-2xl font-medium text-slate-500 line-through">
+            {plan.originalPrice}&euro;
+          </span>
+        )}
         <span className="text-5xl font-bold text-white">
           {plan.price}&euro;
         </span>
@@ -49,7 +54,14 @@ function PricingCard({
         {plan.price === 0 && (
           <p className="mt-1 text-xs text-slate-500">Gratuit pour toujours</p>
         )}
-        {plan.popular && (
+        {plan.founderOffer && (
+          <div className="mt-2">
+            <span className="inline-flex items-center gap-1 rounded-full border border-yellow-400/30 bg-yellow-400/10 px-2.5 py-0.5 text-[11px] font-semibold text-yellow-300">
+              &#11088; Offre Fondateur &mdash; 100 premi&egrave;res places
+            </span>
+          </div>
+        )}
+        {plan.popular && !plan.founderOffer && (
           <span className="badge-shimmer mt-2 inline-flex items-center rounded-full border border-[#5B5BD6]/20 bg-[#5B5BD6]/10 px-2 py-0.5 text-[10px] font-medium text-[#818cf8]">
             Prêt réforme 2026
           </span>
@@ -113,7 +125,7 @@ export function EditorialPricing() {
           style={{ fontSize: "clamp(28px, 5vw, 48px)" }}
         >
           Gratuit pour d&eacute;marrer.{" "}
-          <span className="text-[#5B5BD6]">19&euro;/mois</span> pour tout d&eacute;bloquer.
+          <span className="text-[#5B5BD6]">9&euro;/mois &agrave; vie</span> pour tout d&eacute;bloquer.
         </h2>
         <p className="mx-auto mb-14 max-w-md text-center text-base text-slate-400">
           Commencez gratuitement. &Eacute;voluez quand vous &ecirc;tes pr&ecirc;t.

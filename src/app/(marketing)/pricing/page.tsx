@@ -54,9 +54,24 @@ const devisLimits: Record<string, string> = {
   business: "Illimités",
 };
 
-const plans = [
+type PlanCard = {
+  id: "free" | "pro" | "business";
+  name: string;
+  monthlyPrice: string;
+  monthlyOriginalPrice?: string;
+  annualPrice: string;
+  annualOriginalPrice?: string;
+  description: string;
+  cta: string;
+  priceId: string | null;
+  popular: boolean;
+  founderOffer?: boolean;
+  features: string[];
+};
+
+const plans: PlanCard[] = [
   {
-    id: "free" as const,
+    id: "free",
     name: "Gratuit",
     monthlyPrice: "0",
     annualPrice: "0",
@@ -76,14 +91,17 @@ const plans = [
     ],
   },
   {
-    id: "pro" as const,
+    id: "pro",
     name: "Pro",
-    monthlyPrice: "19",
-    annualPrice: "15",
+    monthlyPrice: "9",
+    monthlyOriginalPrice: "19",
+    annualPrice: "9",
+    annualOriginalPrice: "19",
     description: "Pour les indépendants actifs",
-    cta: "Choisir Pro",
+    cta: "Profiter de l'offre",
     priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO || null,
     popular: true,
+    founderOffer: true,
     features: [
       "Devis illimités",
       "Tout le plan Gratuit",
@@ -94,7 +112,7 @@ const plans = [
     ],
   },
   {
-    id: "business" as const,
+    id: "business",
     name: "Business",
     monthlyPrice: "39",
     annualPrice: "31",
@@ -142,7 +160,8 @@ const IS_BETA = process.env.NEXT_PUBLIC_BETA_MODE === "true";
 export default function PricingPage() {
   const [currentPlan, setCurrentPlan] = useState<string>("free");
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
-  const [isAnnual, setIsAnnual] = useState(false);
+  // Founder offer is flat 9€/month for life — no annual toggle.
+  const isAnnual = false;
 
   useEffect(() => {
     async function loadProfile() {
@@ -229,32 +248,7 @@ export default function PricingPage() {
           </div>
         )}
 
-        {/* ── Toggle ── */}
-        <div className="mt-10 flex items-center justify-center gap-3">
-          <div className="inline-flex rounded-lg bg-[#1a1a2e] p-1">
-            <button
-              onClick={() => setIsAnnual(false)}
-              className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-all ${
-                !isAnnual ? "bg-[#5B5BD6] text-white" : "text-slate-400"
-              }`}
-            >
-              Mensuel
-            </button>
-            <button
-              onClick={() => setIsAnnual(true)}
-              className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-all ${
-                isAnnual ? "bg-[#5B5BD6] text-white" : "text-slate-400"
-              }`}
-            >
-              Annuel
-            </button>
-          </div>
-          {isAnnual && (
-            <span className="rounded-full bg-green-500/15 px-2.5 py-0.5 text-xs font-semibold text-green-400">
-              2 mois offerts
-            </span>
-          )}
-        </div>
+        {/* Annual toggle hidden — Founder offer is flat 9€/month for life. */}
 
         {/* ── Plan cards ── */}
         <div className="mt-12 grid gap-6 md:grid-cols-3">
@@ -292,20 +286,35 @@ export default function PricingPage() {
                 <p className="mt-1 text-sm text-slate-400">{plan.description}</p>
 
                 <div className="mt-5">
+                  {(isAnnual ? plan.annualOriginalPrice : plan.monthlyOriginalPrice) && (
+                    <span className="mr-2 text-2xl font-medium text-slate-500 line-through">
+                      {isAnnual ? plan.annualOriginalPrice : plan.monthlyOriginalPrice}&euro;
+                    </span>
+                  )}
                   <span className="text-5xl font-bold text-white">{price}&euro;</span>
                   {price !== "0" && (
-                    <span className="text-lg text-slate-400">/mois HT</span>
+                    <span className="text-lg text-slate-400">
+                      {plan.founderOffer ? "/mois à vie" : "/mois HT"}
+                    </span>
                   )}
                   {price === "0" && (
                     <p className="mt-1 text-xs text-slate-500">Gratuit pour toujours</p>
                   )}
-                  {isAnnual && plan.monthlyPrice !== "0" && (
-                    <p className="mt-1 text-xs text-slate-500">
-                      soit {Number(plan.annualPrice) * 12}&euro;/an{" "}
-                      <span className="font-semibold text-green-400">
-                        (-{Math.round((1 - Number(plan.annualPrice) / Number(plan.monthlyPrice)) * 100)}%)
+                  {isAnnual && plan.monthlyPrice !== "0" &&
+                    Number(plan.annualPrice) < Number(plan.monthlyPrice) && (
+                      <p className="mt-1 text-xs text-slate-500">
+                        soit {Number(plan.annualPrice) * 12}&euro;/an{" "}
+                        <span className="font-semibold text-green-400">
+                          (-{Math.round((1 - Number(plan.annualPrice) / Number(plan.monthlyPrice)) * 100)}%)
+                        </span>
+                      </p>
+                    )}
+                  {plan.founderOffer && (
+                    <div className="mt-3">
+                      <span className="inline-flex items-center gap-1 rounded-full border border-yellow-400/30 bg-yellow-400/10 px-2.5 py-0.5 text-[11px] font-semibold text-yellow-300">
+                        &#11088; Offre Fondateur &mdash; 100 premières places
                       </span>
-                    </p>
+                    </div>
                   )}
                 </div>
 
@@ -433,6 +442,9 @@ export default function PricingPage() {
                   <td className="px-5 py-4 font-medium text-white">Prix</td>
                   {plans.map((p) => {
                     const price = isAnnual ? p.annualPrice : p.monthlyPrice;
+                    const original = isAnnual
+                      ? p.annualOriginalPrice
+                      : p.monthlyOriginalPrice;
                     return (
                       <td
                         key={p.id}
@@ -440,6 +452,11 @@ export default function PricingPage() {
                           p.popular ? "text-[#5B5BD6]" : "text-white"
                         }`}
                       >
+                        {original && (
+                          <span className="mr-1.5 text-sm font-medium text-slate-500 line-through">
+                            {original}&euro;
+                          </span>
+                        )}
                         {price}&euro;{price !== "0" ? "/mois" : ""}
                       </td>
                     );

@@ -37,7 +37,20 @@ export const steps = [
   },
 ];
 
-export const plans = [
+export interface Plan {
+  name: string;
+  price: number;
+  originalPrice?: number;
+  period: string;
+  description: string;
+  features: string[];
+  cta: string;
+  popular: boolean;
+  href: string;
+  founderOffer?: boolean;
+}
+
+export const plans: Plan[] = [
   {
     name: "Gratuit",
     price: 0,
@@ -61,8 +74,9 @@ export const plans = [
   },
   {
     name: "Pro",
-    price: 19,
-    period: "/mois HT",
+    price: 9,
+    originalPrice: 19,
+    period: "/mois à vie",
     description: "Pour les indépendants actifs",
     features: [
       "Devis illimités",
@@ -72,9 +86,10 @@ export const plans = [
       "Multi-clients",
       "Logo personnalisé",
     ],
-    cta: "Choisir Pro",
+    cta: "Profiter de l'offre",
     popular: true,
     href: "/signup?plan=pro",
+    founderOffer: true,
   },
   {
     name: "Business",

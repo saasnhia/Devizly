@@ -12,16 +12,16 @@ export async function GET() {
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   }
 
-  // Check Business plan
+  // Check plan — Pro+ only
   const { data: profile } = await supabase
     .from("profiles")
     .select("subscription_status")
     .eq("id", user.id)
     .single();
 
-  if (profile?.subscription_status !== "business") {
+  if (!profile || profile.subscription_status === "free") {
     return NextResponse.json(
-      { error: "Fonctionnalité réservée au plan Business" },
+      { error: "Fonctionnalité réservée au plan Pro ou Business" },
       { status: 403 }
     );
   }
@@ -50,16 +50,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   }
 
-  // Check Business plan
+  // Check plan — Pro+ only
   const { data: profile } = await supabase
     .from("profiles")
     .select("subscription_status")
     .eq("id", user.id)
     .single();
 
-  if (profile?.subscription_status !== "business") {
+  if (!profile || profile.subscription_status === "free") {
     return NextResponse.json(
-      { error: "Fonctionnalité réservée au plan Business" },
+      { error: "Fonctionnalité réservée au plan Pro ou Business" },
       { status: 403 }
     );
   }

@@ -463,7 +463,7 @@ export default function ContratsPage() {
       if (profile?.subscription_status) {
         setPlan(profile.subscription_status);
       }
-      if (profile?.subscription_status !== "business") {
+      if (!profile || profile.subscription_status === "free") {
         return;
       }
 
@@ -499,7 +499,7 @@ export default function ContratsPage() {
   }, [fetchData]);
 
   // ── Plan gate ──────────────────────────────────────────────
-  if (!loading && plan !== "business") {
+  if (!loading && plan === "free") {
     return (
       <div className="space-y-6">
         <h1 className="text-2xl font-bold">Contrats</h1>
@@ -509,14 +509,15 @@ export default function ContratsPage() {
               <FileSignature className="h-8 w-8 text-violet-600" />
             </div>
             <h2 className="text-xl font-bold mb-2">
-              Contrats récurrents — Plan Business
+              Envoi de contrats — Plan Pro
             </h2>
             <p className="text-muted-foreground max-w-md mx-auto mb-6">
-              Gérez vos contrats récurrents, suivez vos revenus mensuels et
-              générez automatiquement des factures pour chaque période.
+              Créez des contrats avec signature électronique eIDAS, gérez vos
+              revenus récurrents et générez automatiquement des factures pour
+              chaque période.
             </p>
             <Button asChild>
-              <Link href="/pricing">Passer au Business — 39€/mois</Link>
+              <Link href="/pricing">Passer au Pro — 9€/mois à vie</Link>
             </Button>
           </CardContent>
         </Card>

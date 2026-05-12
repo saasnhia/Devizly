@@ -30,7 +30,7 @@ export function generateMetadata({
     try {
       const post = getPostBySlug(slug);
       return {
-        title: post.title,
+        title: `${post.title} | Devizly`,
         description: post.description,
         alternates: { canonical: `https://devizly.fr/blog/${slug}` },
         openGraph: {

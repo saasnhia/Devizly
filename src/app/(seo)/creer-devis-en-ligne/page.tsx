@@ -9,21 +9,21 @@ import { ComparisonTable } from "@/components/seo/comparison-table";
 import { SocialProof } from "@/components/seo/social-proof";
 
 export const metadata: Metadata = {
-  title: "Créer un Devis en Ligne Gratuit et Professionnel",
+  title: "Créer un Devis en Ligne — IA + Signature en 30s | Devizly",
   description:
-    "Créez un devis professionnel en ligne gratuitement en 2 minutes. Mentions légales automatiques, signature électronique, envoi par email. Sans inscription longue, sans CB.",
+    "Créez un devis pro en 30s avec l'IA. Mentions légales auto, signature électronique, envoi email. Gratuit, sans inscription longue.",
   alternates: { canonical: "https://devizly.fr/creer-devis-en-ligne" },
   openGraph: {
-    title: "Créer un Devis en Ligne Gratuit et Professionnel",
+    title: "Créer un Devis en Ligne — IA + Signature en 30s",
     description:
-      "Créez un devis professionnel en ligne gratuitement en 2 minutes. Mentions légales automatiques, signature électronique, envoi par email.",
+      "Créez un devis pro en 30s avec l'IA. Mentions légales auto, signature électronique, envoi email. Gratuit, sans inscription longue.",
     url: "https://devizly.fr/creer-devis-en-ligne",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Devizly — Créer un devis en ligne gratuit" }],
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Devizly — Créer un devis en ligne gratuit en 30s" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Créer un Devis en Ligne Gratuit et Professionnel",
-    description: "Devis professionnel en 2 minutes. Mentions légales auto, signature électronique, envoi par email.",
+    title: "Créer un Devis en Ligne — IA + Signature en 30s",
+    description: "Devis pro IA en 30s. Mentions légales auto, signature électronique, envoi email. Gratuit.",
     images: ["/og-image.png"],
   },
 };

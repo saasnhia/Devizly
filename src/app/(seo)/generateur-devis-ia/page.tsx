@@ -9,21 +9,21 @@ import { ComparisonTable } from "@/components/seo/comparison-table";
 import { SocialProof } from "@/components/seo/social-proof";
 
 export const metadata: Metadata = {
-  title: "Générateur de Devis IA Gratuit",
+  title: "Générateur de Devis IA — Créez un Devis en 30s | Devizly",
   description:
-    "Générez vos devis professionnels par intelligence artificielle en 2 minutes. L'IA structure vos prestations, ajoute les mentions légales. Gratuit, hébergé en France.",
+    "Générez un devis pro par IA en 30 secondes. Prestations structurées, mentions légales auto, signature & paiement. Hébergé en France.",
   alternates: { canonical: "https://devizly.fr/generateur-devis-ia" },
   openGraph: {
-    title: "Générateur de Devis IA Gratuit — Devizly",
+    title: "Générateur de Devis IA — Créez un Devis en 30s",
     description:
-      "Devis professionnels générés par IA en 30 secondes. Prestations structurées, mentions légales auto. Hébergé en France, RGPD.",
+      "Générez un devis pro par IA en 30 secondes. Prestations structurées, mentions légales auto, signature & paiement. Hébergé en France.",
     url: "https://devizly.fr/generateur-devis-ia",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Devizly — Générateur de devis par intelligence artificielle" }],
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Devizly — Générateur de devis par intelligence artificielle en 30s" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Générateur de Devis IA Gratuit",
-    description: "Devis IA en 30s. L'IA structure vos prestations et ajoute les mentions légales. Gratuit, hébergé en France.",
+    title: "Générateur de Devis IA — Créez un Devis en 30s",
+    description: "Devis IA en 30s. Prestations structurées, mentions légales auto, signature & paiement. Hébergé en France.",
     images: ["/og-image.png"],
   },
 };

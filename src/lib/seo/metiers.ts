@@ -29,9 +29,9 @@ export const METIERS: MetierSeo[] = [
   {
     slug: "plombier",
     nom: "Plombier",
-    title: "Logiciel de Devis pour Plombier — Gratuit",
+    title: "Logiciel Devis Plombier — IA en 30s, Gratuit | Devizly",
     description:
-      "Créez vos devis plomberie en 2 minutes avec l'IA. Mentions obligatoires, TVA 10 %/20 %, acompte Stripe intégré. Logiciel gratuit pour plombiers indépendants.",
+      "Créez vos devis plombier en 30s avec l'IA. Signature eIDAS, paiement Stripe, relances auto. 3 devis gratuits/mois, sans CB.",
     h1: "Logiciel de devis pour plombier — Gratuit et sans engagement",
     intro:
       "Entre les interventions d'urgence, les chantiers planifiés et les devis à rédiger le soir, un plombier indépendant perd en moyenne 5 heures par semaine sur l'administratif. Devizly vous permet de créer un devis plomberie conforme en 2 minutes : décrivez l'intervention (remplacement chauffe-eau, réfection colonne, dépannage fuite), l'IA structure les postes et calcule les montants.",
@@ -63,9 +63,9 @@ export const METIERS: MetierSeo[] = [
   {
     slug: "electricien",
     nom: "Électricien",
-    title: "Créer un Devis Électricien Professionnel",
+    title: "Logiciel Devis Électricien — IA en 30s, Gratuit | Devizly",
     description:
-      "Logiciel de devis pour électricien. Normes NF C 15-100, TVA 10 %/20 %, mentions obligatoires, signature électronique. Créez vos devis en 2 minutes avec l'IA.",
+      "Créez vos devis électricien NF C 15-100 en 30s avec l'IA. Signature eIDAS, paiement Stripe, relances auto. 3 devis gratuits/mois.",
     h1: "Créer un devis électricien professionnel en 2 minutes",
     intro:
       "Un électricien indépendant jongle entre la mise en conformité de tableaux, le câblage de maisons neuves et la pose de bornes de recharge. Chaque chantier nécessite un devis précis listant les fournitures (disjoncteurs, câbles, prises), la main-d'œuvre et les mises aux normes. Devizly génère ce devis en quelques clics grâce à l'IA, avec toutes les mentions légales pré-remplies.",
@@ -97,9 +97,9 @@ export const METIERS: MetierSeo[] = [
   {
     slug: "peintre",
     nom: "Peintre",
-    title: "Devis Peinture — Logiciel pour Peintres",
+    title: "Logiciel Devis Peintre — IA en 30s, Gratuit | Devizly",
     description:
-      "Le logiciel de devis des peintres indépendants. Calcul au m², fournitures et main-d'œuvre séparées, TVA 10 %/20 %. Créez vos devis peinture en 2 minutes.",
+      "Créez vos devis peinture au m² en 30s avec l'IA. Fourniture/main-d'œuvre séparées, TVA auto, signature eIDAS. 3 devis gratuits/mois.",
     h1: "Devis peinture : le logiciel des peintres indépendants",
     intro:
       "En tant que peintre en bâtiment, chaque chantier est différent : peinture intérieure, ravalement de façade, pose de papier peint, traitement de surfaces. Le devis doit détailler les surfaces en m², distinguer la fourniture de la main-d'œuvre et appliquer le bon taux de TVA. Devizly automatise tout cela : décrivez le chantier, l'IA structure votre devis au m² avec les bonnes lignes de postes.",
@@ -131,9 +131,9 @@ export const METIERS: MetierSeo[] = [
   {
     slug: "couvreur",
     nom: "Couvreur",
-    title: "Logiciel de Devis pour Couvreur et Charpentier",
+    title: "Logiciel Devis Couvreur — IA en 30s, Gratuit | Devizly",
     description:
-      "Créez vos devis toiture et couverture en 2 minutes. Décennale obligatoire, TVA 10 %/20 %, acompte intégré. Logiciel gratuit pour couvreurs indépendants.",
+      "Créez vos devis toiture en 30s avec l'IA. Décennale, TVA travaux, acompte Stripe, relances auto. 3 devis gratuits/mois, sans CB.",
     h1: "Logiciel de devis pour couvreur et charpentier",
     intro:
       "Les travaux de toiture sont parmi les plus engageants financièrement pour vos clients : réfection complète, remplacement de charpente, pose de velux, traitement de charpente. Un devis précis et conforme est indispensable pour rassurer le client et sécuriser votre engagement. Devizly vous aide à structurer chaque devis toiture avec le détail des matériaux, la main-d'œuvre et les garanties obligatoires.",
@@ -165,9 +165,9 @@ export const METIERS: MetierSeo[] = [
   {
     slug: "renovation",
     nom: "Rénovation",
-    title: "Logiciel de Devis Rénovation pour les Pros",
+    title: "Logiciel Devis Rénovation — IA en 30s, Gratuit | Devizly",
     description:
-      "Créez vos devis rénovation professionnels en 2 minutes. TVA 5,5 %/10 %/20 %, multiples corps de métier, mentions légales auto. Logiciel gratuit pour entreprises du bâtiment.",
+      "Créez vos devis rénovation en 30s avec l'IA. Multi-lots, TVA 5,5/10/20% par ligne, attestation Cerfa, signature eIDAS. 3 gratuits/mois.",
     h1: "Logiciel de devis rénovation pour les pros du bâtiment",
     intro:
       "Un chantier de rénovation implique souvent plusieurs corps de métier : maçonnerie, plomberie, électricité, peinture, menuiserie. Le devis doit organiser ces lots clairement, appliquer les bons taux de TVA selon la nature des travaux et fournir un chiffrage global cohérent. Devizly structure automatiquement votre devis en lots distincts avec les bons taux de TVA sur chaque ligne.",
@@ -199,9 +199,9 @@ export const METIERS: MetierSeo[] = [
   {
     slug: "macon",
     nom: "Maçon",
-    title: "Créer un Devis Maçonnerie Professionnel",
+    title: "Logiciel Devis Maçon — IA en 30s, Gratuit | Devizly",
     description:
-      "Logiciel de devis pour maçon. Gros œuvre, fondations, extension. Décennale, TVA 10 %/20 %, mentions obligatoires auto. Créez vos devis maçonnerie en 2 minutes.",
+      "Créez vos devis maçonnerie en 30s avec l'IA. Décennale, métrés précis, échéancier de paiement, signature eIDAS. 3 devis gratuits/mois.",
     h1: "Créer un devis maçonnerie professionnel en ligne",
     intro:
       "Le maçon est au cœur de tout chantier de construction ou de rénovation : fondations, murs porteurs, dalles, extensions, clôtures. Vos devis doivent être précis sur les quantités (m³ de béton, m² de parpaings, tonnes d'acier) et conformes aux obligations légales. Devizly vous aide à structurer un devis maçonnerie détaillé en quelques minutes.",
@@ -233,9 +233,9 @@ export const METIERS: MetierSeo[] = [
   {
     slug: "menuisier",
     nom: "Menuisier",
-    title: "Logiciel de Devis pour Menuisier — Gratuit",
+    title: "Logiciel Devis Menuisier — IA en 30s, Gratuit | Devizly",
     description:
-      "Créez vos devis menuiserie en 2 minutes. Pose, fourniture, sur-mesure. TVA 10 %/20 %, mentions obligatoires, signature électronique. Gratuit pour menuisiers indépendants.",
+      "Créez vos devis menuiserie en 30s avec l'IA. Fabrication/pose séparées, TVA 5,5/10/20%, signature eIDAS. 3 devis gratuits/mois.",
     h1: "Logiciel de devis pour menuisier — Simple et conforme",
     intro:
       "Menuisier d'agencement, poseur de fenêtres, fabricant de meubles sur-mesure : vos devis doivent distinguer clairement la fabrication, la fourniture et la pose. Chaque projet est unique — un escalier sur-mesure ne se chiffre pas comme une pose de fenêtres PVC. Devizly vous permet de détailler chaque poste rapidement, avec les bonnes mentions légales et le bon taux de TVA.",
@@ -267,9 +267,9 @@ export const METIERS: MetierSeo[] = [
   {
     slug: "carreleur",
     nom: "Carreleur",
-    title: "Créer un Devis Carrelage Professionnel",
+    title: "Logiciel Devis Carreleur — IA en 30s, Gratuit | Devizly",
     description:
-      "Logiciel de devis pour carreleur. Calcul au m², fourniture et pose, TVA 10 %/20 %. Créez vos devis carrelage en 2 minutes avec l'IA. Gratuit.",
+      "Créez vos devis carrelage au m² en 30s avec l'IA. Fourniture/pose, calcul des chutes, TVA auto, signature eIDAS. 3 gratuits/mois.",
     h1: "Créer un devis carrelage professionnel en 2 minutes",
     intro:
       "Le carreleur doit chiffrer précisément chaque chantier : surface à carreler, type de carrelage, préparation du support, pose droite ou diagonale, joints, plinthes. Devizly structure votre devis carrelage au m² avec la distinction fourniture/pose, les bonnes quantités (incluant les chutes) et les mentions légales obligatoires.",
@@ -301,9 +301,9 @@ export const METIERS: MetierSeo[] = [
   {
     slug: "climatisation",
     nom: "Climatisation",
-    title: "Logiciel de Devis Climatisation pour Installateurs",
+    title: "Logiciel Devis Climatisation — IA en 30s | Devizly",
     description:
-      "Créez vos devis climatisation et PAC en 2 minutes. Attestation fluides, TVA 10 %/20 %, mentions obligatoires. Logiciel gratuit pour installateurs et frigoristes.",
+      "Créez vos devis climatisation en 30s avec l'IA. Attestation fluides, RGE QualiPAC, TVA auto, signature eIDAS. 3 gratuits/mois.",
     h1: "Logiciel de devis climatisation pour installateurs",
     intro:
       "L'installation de climatisation et de pompes à chaleur est un marché en pleine croissance. Vos devis doivent refléter la technicité de vos interventions : dimensionnement, choix du matériel, mise en service, attestation de capacité à manipuler les fluides frigorigènes. Devizly structure vos devis climatisation avec tous les postes nécessaires et les mentions réglementaires spécifiques à votre métier.",
@@ -335,9 +335,9 @@ export const METIERS: MetierSeo[] = [
   {
     slug: "isolation",
     nom: "Isolation",
-    title: "Créer un Devis Isolation RGE Professionnel",
+    title: "Logiciel Devis Isolation RGE — IA en 30s | Devizly",
     description:
-      "Logiciel de devis pour professionnels de l'isolation. TVA 5,5 %, RGE, MaPrimeRénov', CEE. Créez vos devis isolation en 2 minutes. Gratuit pour artisans certifiés.",
+      "Créez vos devis isolation RGE en 30s avec l'IA. R thermique auto, MaPrimeRénov', CEE, signature eIDAS. 3 devis gratuits/mois.",
     h1: "Créer un devis isolation RGE professionnel",
     intro:
       "Le marché de l'isolation thermique est porté par la transition énergétique : MaPrimeRénov', CEE, éco-PTZ. Vos clients attendent un devis clair qui détaille les performances thermiques, les matériaux et les aides financières auxquelles ils peuvent prétendre. Devizly vous aide à structurer un devis isolation complet, conforme aux exigences RGE et prêt pour les dossiers d'aide.",

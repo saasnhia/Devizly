@@ -9,21 +9,21 @@ import { ComparisonTable } from "@/components/seo/comparison-table";
 import { SocialProof } from "@/components/seo/social-proof";
 
 export const metadata: Metadata = {
-  title: "Créer un Devis Auto-Entrepreneur Gratuit",
+  title: "Devis Auto-Entrepreneur — Gratuit en 30s avec l'IA | Devizly",
   description:
-    "Créez vos devis auto-entrepreneur conformes en 2 minutes. Franchise TVA, mentions obligatoires, SIRET. Logiciel gratuit et simple pour micro-entrepreneurs.",
+    "Créez vos devis auto-entrepreneur conformes en 30s avec l'IA. Franchise TVA, SIRET, mentions auto. 3 devis gratuits/mois, sans CB.",
   alternates: { canonical: "https://devizly.fr/devis-auto-entrepreneur" },
   openGraph: {
-    title: "Créer un Devis Auto-Entrepreneur Gratuit",
+    title: "Devis Auto-Entrepreneur — Gratuit en 30s avec l'IA",
     description:
-      "Devis auto-entrepreneur conformes en 2 minutes. Franchise TVA, mentions obligatoires, SIRET. Gratuit pour micro-entrepreneurs.",
+      "Créez vos devis auto-entrepreneur conformes en 30s avec l'IA. Franchise TVA, SIRET, mentions auto. 3 devis gratuits/mois, sans CB.",
     url: "https://devizly.fr/devis-auto-entrepreneur",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Devizly — Devis auto-entrepreneur gratuit" }],
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Devizly — Devis auto-entrepreneur gratuit en 30s" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Créer un Devis Auto-Entrepreneur Gratuit",
-    description: "Devis conformes en 2 min. Franchise TVA, SIRET, mentions obligatoires. Gratuit, sans CB.",
+    title: "Devis Auto-Entrepreneur — Gratuit en 30s avec l'IA",
+    description: "Devis auto-entrepreneur conformes IA en 30s. Franchise TVA, SIRET, mentions auto. 3 gratuits/mois.",
     images: ["/og-image.png"],
   },
 };

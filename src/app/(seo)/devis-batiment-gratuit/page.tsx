@@ -9,21 +9,21 @@ import { ComparisonTable } from "@/components/seo/comparison-table";
 import { SocialProof } from "@/components/seo/social-proof";
 
 export const metadata: Metadata = {
-  title: "Devis Bâtiment Gratuit en Ligne",
+  title: "Devis Bâtiment Gratuit — IA + Décennale en 30s | Devizly",
   description:
-    "Créez vos devis bâtiment gratuits en ligne en 2 minutes. TVA travaux 10%/20%, garantie décennale, acompte Stripe. Logiciel conforme pour entreprises du BTP.",
+    "Créez un devis BTP conforme en 30 secondes avec l'IA. TVA 5,5/10/20%, décennale, acompte Stripe. 3 devis gratuits, sans CB.",
   alternates: { canonical: "https://devizly.fr/devis-batiment-gratuit" },
   openGraph: {
-    title: "Devis Bâtiment Gratuit en Ligne — Devizly",
+    title: "Devis Bâtiment Gratuit — IA + Décennale en 30s",
     description:
-      "Devis BTP en 2 minutes. TVA travaux 5,5%/10%/20%, garantie décennale, acompte Stripe intégré. Conforme pour entreprises du bâtiment.",
+      "Créez un devis BTP conforme en 30 secondes avec l'IA. TVA 5,5/10/20%, décennale, acompte Stripe. 3 devis gratuits, sans CB.",
     url: "https://devizly.fr/devis-batiment-gratuit",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Devizly — Devis bâtiment gratuit en ligne" }],
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Devizly — Devis bâtiment gratuit en 30s avec l'IA" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Devis Bâtiment Gratuit en Ligne",
-    description: "Devis BTP en 2 min. TVA travaux auto, décennale, acompte Stripe. Gratuit, sans CB.",
+    title: "Devis Bâtiment Gratuit — IA + Décennale en 30s",
+    description: "Devis BTP IA en 30s. TVA travaux auto, décennale, acompte Stripe. 3 devis gratuits, sans CB.",
     images: ["/og-image.png"],
   },
 };

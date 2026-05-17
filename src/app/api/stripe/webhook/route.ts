@@ -195,6 +195,26 @@ export async function POST(request: Request) {
         .eq("id", userId);
       if (subErr) console.error("[Webhook] Subscription activation failed:", { userId, plan, error: subErr.message });
 
+      // Promo "2 semaines offertes" — marquer le code comme utilise
+      // et bloquer tout nouveau benefice promo pour cet utilisateur.
+      const promoCode = session.metadata?.promo_code;
+      if (promoCode) {
+        try {
+          await supabase
+            .from("promo_codes")
+            .update({ redeemed_at: new Date().toISOString() })
+            .eq("code", promoCode)
+            .is("redeemed_at", null);
+          await supabase
+            .from("profiles")
+            .update({ promo_redeemed: true })
+            .eq("id", userId);
+          console.log(`[PROMO] Code ${promoCode} redeemed par ${userId}`);
+        } catch (promoErr) {
+          console.error("[Webhook] Promo redeem failed:", promoErr);
+        }
+      }
+
       // Founder badge (first 100 paying subscribers)
       if (plan !== "free") {
         try {

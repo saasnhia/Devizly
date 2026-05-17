@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getStripe } from "@/lib/stripe";
 import { getSiteUrl } from "@/lib/url";
 import { checkRateLimit } from "@/lib/ratelimit";
+import { PROMO_CAMPAIGN, PROMO_TRIAL_DAYS } from "@/lib/promo";
 
 export async function POST(request: Request) {
   const limited = await checkRateLimit(request);
@@ -15,7 +16,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   }
 
-  const { priceId } = await request.json();
+  const { priceId, promoCode } = await request.json();
 
   if (!priceId) {
     return NextResponse.json({ error: "priceId requis" }, { status: 400 });
@@ -81,14 +82,45 @@ export async function POST(request: Request) {
       // Non-blocking — proceed without coupon
     }
 
+    // Promo "2 semaines offertes" : si un code valide est fourni, la
+    // subscription demarre avec 14 jours d'essai gratuit (trial_period_days).
+    // Validation server-side sur la table promo_codes — la RLS garantit
+    // que l'utilisateur ne peut valider que SES propres codes.
+    let trialDays: number | undefined;
+    let validatedPromoCode: string | undefined;
+    if (typeof promoCode === "string" && promoCode.trim()) {
+      const { data: promo } = await supabase
+        .from("promo_codes")
+        .select("code, campaign, expires_at, redeemed_at")
+        .eq("code", promoCode.trim())
+        .maybeSingle();
+
+      if (
+        promo &&
+        promo.campaign === PROMO_CAMPAIGN &&
+        !promo.redeemed_at &&
+        new Date(promo.expires_at).getTime() > Date.now()
+      ) {
+        trialDays = PROMO_TRIAL_DAYS;
+        validatedPromoCode = promo.code;
+      }
+      // Code invalide/expire/deja utilise : on poursuit sans essai (graceful).
+    }
+
     const session = await getStripe().checkout.sessions.create({
       customer: customerId,
       mode: "subscription",
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${appUrl}/dashboard?checkout=success`,
       cancel_url: `${appUrl}/pricing?checkout=cancel`,
-      metadata: { supabase_user_id: user.id },
+      metadata: {
+        supabase_user_id: user.id,
+        ...(validatedPromoCode ? { promo_code: validatedPromoCode } : {}),
+      },
       ...(discount ? { discounts: discount } : {}),
+      ...(trialDays
+        ? { subscription_data: { trial_period_days: trialDays } }
+        : {}),
     });
 
     return NextResponse.json({ url: session.url });

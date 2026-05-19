@@ -5,6 +5,8 @@ import { checkSignupAbuse, recordSignupIp } from "@/lib/antiabuse";
 import { getResend } from "@/lib/resend";
 import { welcomeEmail } from "@/lib/emails/welcome";
 import { assignReferralCode, linkReferral } from "@/lib/referral";
+import { signUnsubscribeToken } from "@/lib/unsubscribe-token";
+import { getSiteUrl } from "@/lib/url";
 
 function createServiceClient() {
   return createServerClient(
@@ -95,12 +97,17 @@ export async function POST(request: Request) {
 
     // Send welcome email (non-blocking)
     try {
-      const { subject, html } = welcomeEmail({ userName: fullName });
+      const unsubscribeUrl = `${getSiteUrl()}/api/emails/unsubscribe?token=${signUnsubscribeToken(data.user.id)}`;
+      const { subject, html } = welcomeEmail({ userName: fullName, unsubscribeUrl });
       await getResend().emails.send({
         from: "Devizly <noreply@devizly.fr>",
         to: email,
         subject,
         html,
+        headers: {
+          "List-Unsubscribe": `<${unsubscribeUrl}>`,
+          "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+        },
       });
     } catch (emailErr) {
       console.error("[signup] Welcome email failed:", emailErr);

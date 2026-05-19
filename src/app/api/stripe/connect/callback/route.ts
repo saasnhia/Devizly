@@ -22,7 +22,8 @@ export async function GET(request: Request) {
   // Parse state: may contain "|wizard" suffix for onboarding flow
   const fromWizard = rawState?.includes("|wizard") ?? false;
   const state = rawState?.split("|")[0] ?? null;
-  const defaultRedirect = fromWizard ? "/wizard?step=2" : "/parametres";
+  // Wizard : l'etape Paiements est la #4 -> on revient sur #5 (Calendly) une fois connecte.
+  const defaultRedirect = fromWizard ? "/wizard?step=5" : "/parametres";
 
   console.log("[Stripe Callback] Params:", {
     code: code ? code.substring(0, 10) + "..." : null,
@@ -118,7 +119,7 @@ export async function GET(request: Request) {
   } catch (err) {
     console.error("[Stripe Callback] Exception:", err);
     return NextResponse.redirect(
-      `${appUrl}${fromWizard ? "/wizard?step=1" : "/parametres?stripe=error&reason=exception"}`
+      `${appUrl}${fromWizard ? "/wizard?step=4" : "/parametres?stripe=error&reason=exception"}`
     );
   }
 }

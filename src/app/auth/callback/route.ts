@@ -5,6 +5,8 @@ import { createServerClient } from "@supabase/ssr";
 import { getResend } from "@/lib/resend";
 import { welcomeEmail } from "@/lib/emails/welcome";
 import { assignReferralCode, linkReferral } from "@/lib/referral";
+import { signUnsubscribeToken } from "@/lib/unsubscribe-token";
+import { getSiteUrl } from "@/lib/url";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -42,12 +44,17 @@ export async function GET(request: Request) {
               console.error("[auth/callback] Referral setup failed:", refErr);
             }
 
-            const { subject, html } = welcomeEmail({ userName });
+            const unsubscribeUrl = `${getSiteUrl()}/api/emails/unsubscribe?token=${signUnsubscribeToken(user.id)}`;
+            const { subject, html } = welcomeEmail({ userName, unsubscribeUrl });
             await getResend().emails.send({
               from: "Devizly <noreply@devizly.fr>",
               to: user.email!,
               subject,
               html,
+              headers: {
+                "List-Unsubscribe": `<${unsubscribeUrl}>`,
+                "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+              },
             });
           }
         }

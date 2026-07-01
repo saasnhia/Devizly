@@ -27,6 +27,20 @@ def _fmt_amount(val) -> str:
     return f"{val:.2f}"
 
 
+def _add_note(doc, content, subject_code=None):
+    note = etree.SubElement(doc, _tag(RAM, "IncludedNote"))
+    etree.SubElement(note, _tag(RAM, "Content")).text = content
+    if subject_code:
+        etree.SubElement(note, _tag(RAM, "SubjectCode")).text = subject_code
+
+
+CATEGORY_NOTES = {
+    "goods": "Catégorie : Livraison de biens",
+    "services": "Catégorie : Prestation de services",
+    "mixed": "Catégorie : Livraison de biens et prestation de services",
+}
+
+
 def build_cii_xml(invoice: InvoiceData) -> bytes:
     """
     Build Factur-X BASIC CII XML conforming to EN 16931.
@@ -49,15 +63,29 @@ def build_cii_xml(invoice: InvoiceData) -> bytes:
     dt_str = etree.SubElement(issue, _tag(UDT, "DateTimeString"), format="102")
     dt_str.text = _fmt_date(invoice.issue_date)
 
+    # Mandatory-mention notes (reforme sept. 2026) — emitted first, ahead of
+    # the pre-existing free-text notes, so a PDP reading only the embedded
+    # XML (not the human-readable PDF) still sees them.
+    _add_note(
+        doc,
+        "Pénalités de retard : 3 × taux d'intérêt légal. Indemnité forfaitaire de "
+        "recouvrement : 40 €. Escompte pour paiement anticipé : néant.",
+    )
+    _add_note(
+        doc,
+        CATEGORY_NOTES.get(invoice.operation_category, CATEGORY_NOTES["services"]),
+        subject_code="AAI",
+    )
+    if invoice.seller.vat_regime == "debits":
+        _add_note(doc, "TVA acquittée sur les débits — art. 269-2-c du CGI")
+
     # Notes (293B mention, etc.)
     if invoice.notes:
-        note = etree.SubElement(doc, _tag(RAM, "IncludedNote"))
-        etree.SubElement(note, _tag(RAM, "Content")).text = invoice.notes
+        _add_note(doc, invoice.notes)
     # Also add exemption reason from VAT breakdowns as notes
     for vb in invoice.vat_breakdowns:
         if vb.exemption_reason and vb.exemption_reason != invoice.notes:
-            note = etree.SubElement(doc, _tag(RAM, "IncludedNote"))
-            etree.SubElement(note, _tag(RAM, "Content")).text = vb.exemption_reason
+            _add_note(doc, vb.exemption_reason)
 
     # -- SupplyChainTradeTransaction --
     txn = etree.SubElement(root, _tag(RSM, "SupplyChainTradeTransaction"))
@@ -157,6 +185,20 @@ def build_cii_xml(invoice: InvoiceData) -> bytes:
 
     # -- ApplicableHeaderTradeDelivery (non-empty required by FNFE-MPE) --
     deliv = etree.SubElement(txn, _tag(RAM, "ApplicableHeaderTradeDelivery"))
+
+    # ShipToTradeParty must precede ActualDeliverySupplyChainEvent in the
+    # CII sequence. Only emitted when a delivery/chantier address differs
+    # from the buyer's billing address.
+    if invoice.delivery_address:
+        ship_to = etree.SubElement(deliv, _tag(RAM, "ShipToTradeParty"))
+        ship_addr = etree.SubElement(ship_to, _tag(RAM, "PostalTradeAddress"))
+        etree.SubElement(ship_addr, _tag(RAM, "PostcodeCode")).text = invoice.delivery_address.postal_code
+        etree.SubElement(ship_addr, _tag(RAM, "LineOne")).text = invoice.delivery_address.line1
+        if invoice.delivery_address.line2:
+            etree.SubElement(ship_addr, _tag(RAM, "LineTwo")).text = invoice.delivery_address.line2
+        etree.SubElement(ship_addr, _tag(RAM, "CityName")).text = invoice.delivery_address.city
+        etree.SubElement(ship_addr, _tag(RAM, "CountryID")).text = invoice.delivery_address.country_code
+
     deliv_event = etree.SubElement(deliv, _tag(RAM, "ActualDeliverySupplyChainEvent"))
     deliv_occ = etree.SubElement(deliv_event, _tag(RAM, "OccurrenceDateTime"))
     deliv_dt = etree.SubElement(deliv_occ, _tag(UDT, "DateTimeString"), format="102")

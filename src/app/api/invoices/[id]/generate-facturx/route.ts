@@ -95,7 +95,7 @@ export async function POST(
     );
   }
 
-  // 3. Fetch quote_items if linked to a quote
+  // 3. Fetch quote_items + payment_terms if linked to a quote
   type QuoteItem = {
     description: string;
     quantity: number;
@@ -103,17 +103,26 @@ export async function POST(
     total: number;
   };
   let items: QuoteItem[] = [];
+  let quotePaymentTerms: string | undefined;
 
   if (invoice.quote_id) {
-    const { data: quoteItems } = await dbClient
-      .from("quote_items")
-      .select("*")
-      .eq("quote_id", invoice.quote_id)
-      .order("position", { ascending: true });
+    const [{ data: quoteItems }, { data: quote }] = await Promise.all([
+      dbClient
+        .from("quote_items")
+        .select("*")
+        .eq("quote_id", invoice.quote_id)
+        .order("position", { ascending: true }),
+      dbClient
+        .from("quotes")
+        .select("payment_terms")
+        .eq("id", invoice.quote_id)
+        .single(),
+    ]);
 
     if (quoteItems && quoteItems.length > 0) {
       items = quoteItems as QuoteItem[];
     }
+    quotePaymentTerms = quote?.payment_terms || undefined;
   }
 
   // Fallback: single line with total amount
@@ -242,6 +251,17 @@ export async function POST(
   const cleanBuyerSiret =
     (invoice.clients?.siret || "").replace(/\D/g, "") || undefined;
 
+  // Warning only — the `clients` table has no dedicated "is professional"
+  // flag (just a free-text `name`), so we can't reliably distinguish B2B
+  // from B2C. A missing SIRET is surfaced as a warning to check manually,
+  // not a hard block, since B2C clients legitimately have none.
+  const warnings: string[] = [];
+  if (!cleanBuyerSiret) {
+    warnings.push(
+      "Aucun SIRET renseigné pour ce client. Si c'est un client professionnel (B2B), le SIREN est une mention obligatoire à partir de septembre 2026 — vérifiez sa fiche client."
+    );
+  }
+
   const payload = {
     invoice_number: invoice.invoice_number,
     invoice_type_code: "380",
@@ -249,6 +269,10 @@ export async function POST(
     currency: invoice.currency || "EUR",
     buyer_reference: invoice.quote_id || undefined,
     notes: exemptionReason,
+    // v1: hardcoded — the vast majority of Devizly artisans invoice
+    // services. Will be inferred from line contents or a quote-level field
+    // in a later commit.
+    operation_category: "services",
     seller: {
       name: profile.company_name,
       siret: cleanSellerSiret,
@@ -267,6 +291,7 @@ export async function POST(
       bic: profile.bic || undefined,
       is_micro_entrepreneur: profile.is_micro_entrepreneur || false,
       vat_applicable: !isExempt,
+      vat_regime: profile.vat_regime || "encaissement",
     },
     buyer: {
       name: invoice.clients?.name || "Client",
@@ -279,6 +304,9 @@ export async function POST(
       },
       email: invoice.clients?.email || undefined,
     },
+    // v1: chantier/delivery address field doesn't exist yet on quotes or
+    // invoices — will be added in a later commit with its own UI.
+    delivery_address: null,
     lines: payloadLines,
     totals: {
       total_ht: totalHt,
@@ -291,7 +319,7 @@ export async function POST(
       due_date:
         invoice.due_date ||
         new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0],
-      terms: "Paiement a 30 jours",
+      terms: quotePaymentTerms || "Paiement à 30 jours",
       iban: profile.iban || undefined,
       bic: profile.bic || undefined,
     },
@@ -393,5 +421,6 @@ export async function POST(
     invoice_number: invoice.invoice_number,
     facturx_pdf_path: filePath,
     download_url: signedUrl?.signedUrl,
+    warnings: warnings.length > 0 ? warnings : undefined,
   });
 }

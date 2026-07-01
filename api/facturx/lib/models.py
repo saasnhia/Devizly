@@ -29,6 +29,7 @@ class Seller(BaseModel):
     bic: Optional[str] = None
     is_micro_entrepreneur: bool = False
     vat_applicable: bool = True  # False si franchise 293B
+    vat_regime: Literal["encaissement", "debits"] = "encaissement"
 
 
 class Buyer(BaseModel):
@@ -82,8 +83,10 @@ class InvoiceData(BaseModel):
     issue_date: date
     currency: str = Field(default="EUR", pattern=r"^[A-Z]{3}$")
     buyer_reference: Optional[str] = None
+    operation_category: Literal["goods", "services", "mixed"] = "services"
     seller: Seller
     buyer: Buyer
+    delivery_address: Optional[Address] = None
     lines: List[InvoiceLine] = Field(min_length=1)
     totals: InvoiceTotals
     vat_breakdowns: List[VatBreakdown] = Field(min_length=1)

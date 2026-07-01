@@ -59,6 +59,12 @@ MOIS_FR = [
     "juillet", "août", "septembre", "octobre", "novembre", "décembre",
 ]
 
+CATEGORY_LABELS = {
+    "goods": "Catégorie : Livraison de biens",
+    "services": "Catégorie : Prestation de services",
+    "mixed": "Catégorie : Livraison de biens et prestation de services",
+}
+
 
 # ── Format helpers ────────────────────────────────────────
 
@@ -227,6 +233,27 @@ def build_base_pdf(invoice: InvoiceData, fonts_dir: str) -> bytes:
     y_left_end = draw_party_block(col_left_x, y_block, "ÉMETTEUR", invoice.seller)
     y_right_end = draw_party_block(col_right_x, y_block, "DESTINATAIRE", invoice.buyer)
     y_after_blocks = min(y_left_end, y_right_end) - 12
+
+    # Delivery / chantier address (only if distinct from the buyer's billing
+    # address — e.g. BTP artisans invoicing a jobsite different from the
+    # client's own address).
+    if invoice.delivery_address:
+        da = invoice.delivery_address
+        _set_text_color(c, GRAY_DARK)
+        c.setFont(FONT_BOLD, 8)
+        c.drawString(col_left_x, y_after_blocks, "LIEU D'EXÉCUTION / CHANTIER")
+        y_after_blocks -= 13
+
+        _set_text_color(c, BLACK)
+        c.setFont(FONT, 9)
+        c.drawString(col_left_x, y_after_blocks, da.line1)
+        y_after_blocks -= 12
+        c.drawString(col_left_x, y_after_blocks, f"{da.postal_code} {da.city}")
+        y_after_blocks -= 12
+        if da.country_code and da.country_code != "FR":
+            c.drawString(col_left_x, y_after_blocks, da.country_code)
+            y_after_blocks -= 12
+        y_after_blocks -= 6
 
     _hline(c, y_after_blocks)
 
@@ -399,7 +426,10 @@ def build_base_pdf(invoice: InvoiceData, fonts_dir: str) -> bytes:
         "recouvrement : 40 €. Escompte pour paiement anticipé : néant.",
         "Facture conforme au standard Factur-X BASIC (ordonnance 2021-1190). "
         "Générée via Devizly.fr",
+        CATEGORY_LABELS.get(invoice.operation_category, CATEGORY_LABELS["services"]),
     ]
+    if invoice.seller.vat_regime == "debits":
+        footer_lines.append("TVA acquittée sur les débits (art. 269-2-c du CGI)")
     if is_micro:
         footer_lines.append("TVA non applicable, article 293 B du CGI")
 

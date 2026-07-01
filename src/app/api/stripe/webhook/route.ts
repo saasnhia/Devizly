@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
 import { createServerClient } from "@supabase/ssr";
 import { tryAutoInvoice } from "@/lib/invoices/auto-invoice";
+import { recordEReportingTransaction } from "@/lib/e-reporting/record-transaction";
 import { createNotification } from "@/lib/notifications/create";
 import { resend } from "@/lib/resend";
 import { getSiteUrl } from "@/lib/url";
@@ -56,15 +57,18 @@ export async function POST(request: Request) {
       if (session.metadata?.invoice_payment === "true") {
         const invoiceNumber = session.metadata.invoice_number;
         if (invoiceNumber) {
-          const { error: invErr } = await supabase
+          const { data: updatedInvoice, error: invErr } = await supabase
             .from("invoices")
             .update({
               status: "paid",
               paid_at: new Date().toISOString(),
               stripe_payment_intent_id: (session.payment_intent as string) || null,
             })
-            .eq("invoice_number", invoiceNumber);
+            .eq("invoice_number", invoiceNumber)
+            .select("id")
+            .single();
           if (invErr) console.error("[Webhook] Invoice update failed:", { invoiceNumber, error: invErr.message });
+          else if (updatedInvoice) recordEReportingTransaction(updatedInvoice.id);
         }
         break;
       }

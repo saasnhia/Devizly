@@ -31,11 +31,20 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { name, email, phone, address, city, postal_code, siret } = body;
+  const { name, email, phone, address, city, postal_code, siret, client_type } = body;
 
   if (!name) {
     return NextResponse.json({ error: "Le nom est requis" }, { status: 400 });
   }
+
+  // Explicit choice wins. Otherwise infer from SIRET presence — covers
+  // CSV imports and any other caller that doesn't send client_type.
+  const resolvedClientType =
+    client_type === "b2b" || client_type === "b2c"
+      ? client_type
+      : siret && String(siret).trim()
+        ? "b2b"
+        : "b2c";
 
   const { data, error } = await supabase
     .from("clients")
@@ -48,6 +57,7 @@ export async function POST(request: Request) {
       city: city || null,
       postal_code: postal_code || null,
       siret: siret || null,
+      client_type: resolvedClientType,
     })
     .select()
     .single();

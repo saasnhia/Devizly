@@ -12,6 +12,8 @@ export interface Prospect {
   converted_quote_id: string | null;
 }
 
+export type ClientType = 'b2b' | 'b2c';
+
 export interface Client {
   id: string;
   user_id: string;
@@ -23,6 +25,7 @@ export interface Client {
   postal_code: string | null;
   siret: string | null;
   country: string | null;
+  client_type: ClientType;
   portal_token: string | null;
   created_at: string;
 }

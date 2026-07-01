@@ -21,10 +21,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { Plus, Search, Pencil, Trash2, Users, ExternalLink, Copy, Upload, Loader2, FileText } from "lucide-react";
 import { CompanyAutocomplete } from "@/components/company-autocomplete";
 import type { CompanyData } from "@/components/company-autocomplete";
-import type { Client } from "@/types";
+import type { Client, ClientType } from "@/types";
 import { toast } from "sonner";
 
 export default function ClientsPage() {
@@ -44,6 +52,7 @@ export default function ClientsPage() {
     city: "",
     postal_code: "",
     siret: "",
+    client_type: "b2c" as ClientType,
   });
 
   const fetchClients = useCallback(async () => {
@@ -65,7 +74,10 @@ export default function ClientsPage() {
   }, [fetchClients]);
 
   function resetForm() {
-    setForm({ name: "", email: "", phone: "", address: "", city: "", postal_code: "", siret: "" });
+    setForm({
+      name: "", email: "", phone: "", address: "", city: "", postal_code: "", siret: "",
+      client_type: "b2c",
+    });
     setEditingClient(null);
   }
 
@@ -79,8 +91,19 @@ export default function ClientsPage() {
       city: client.city || "",
       postal_code: client.postal_code || "",
       siret: client.siret || "",
+      client_type: client.client_type || "b2b",
     });
     setDialogOpen(true);
+  }
+
+  // SIRET presence is the strongest signal we have for B2B — auto-switch
+  // the type selector, but the user can still override it manually.
+  function handleSiretChange(value: string) {
+    setForm((f) => ({
+      ...f,
+      siret: value,
+      client_type: value.trim() ? "b2b" : "b2c",
+    }));
   }
 
   async function handleSave() {
@@ -290,6 +313,19 @@ export default function ClientsPage() {
             </DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
+                <Label>Type de client</Label>
+                <Select
+                  value={form.client_type}
+                  onValueChange={(v) => setForm({ ...form, client_type: v as ClientType })}
+                >
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="b2b">Professionnel (B2B)</SelectItem>
+                    <SelectItem value="b2c">Particulier (B2C)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
                 <Label>Nom *</Label>
                 <CompanyAutocomplete
                   value={form.name}
@@ -302,6 +338,7 @@ export default function ClientsPage() {
                       address: c.address,
                       city: c.city,
                       postal_code: c.postal_code,
+                      client_type: "b2b",
                     })
                   }
                 />
@@ -353,14 +390,16 @@ export default function ClientsPage() {
                   />
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label>SIRET</Label>
-                <Input
-                  value={form.siret}
-                  onChange={(e) => setForm({ ...form, siret: e.target.value })}
-                  placeholder="123 456 789 00012"
-                />
-              </div>
+              {form.client_type === "b2b" && (
+                <div className="space-y-2">
+                  <Label>SIRET</Label>
+                  <Input
+                    value={form.siret}
+                    onChange={(e) => handleSiretChange(e.target.value)}
+                    placeholder="123 456 789 00012"
+                  />
+                </div>
+              )}
               <Button className="w-full" onClick={handleSave}>
                 {editingClient ? "Modifier" : "Ajouter"}
               </Button>
@@ -398,6 +437,7 @@ export default function ClientsPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Nom</TableHead>
+                  <TableHead>Type</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Téléphone</TableHead>
                   <TableHead className="hidden sm:table-cell">SIRET</TableHead>
@@ -409,6 +449,13 @@ export default function ClientsPage() {
                 {filtered.map((client) => (
                   <TableRow key={client.id}>
                     <TableCell className="font-medium">{client.name}</TableCell>
+                    <TableCell>
+                      {client.client_type === "b2c" ? (
+                        <Badge variant="secondary">B2C</Badge>
+                      ) : (
+                        <Badge className="bg-violet-100 text-violet-700">B2B</Badge>
+                      )}
+                    </TableCell>
                     <TableCell>{client.email || "—"}</TableCell>
                     <TableCell>{client.phone || "—"}</TableCell>
                     <TableCell className="hidden font-mono text-sm sm:table-cell">

@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { generateInvoice } from "./generate-invoice";
+import { recordEReportingTransaction } from "@/lib/e-reporting/record-transaction";
 import { resend } from "@/lib/resend";
 import { invoiceEmail } from "@/lib/emails/invoice";
 import { formatCurrency, formatDate } from "@/lib/utils/quote";
@@ -67,6 +68,7 @@ export async function tryAutoInvoice(
           .from("invoices")
           .update({ status: "paid", paid_at: new Date().toISOString() })
           .eq("id", existingInvoice.id);
+        recordEReportingTransaction(existingInvoice.id);
       }
       return existingInvoice.id;
     }
@@ -80,6 +82,7 @@ export async function tryAutoInvoice(
         .from("invoices")
         .update({ status: "paid", paid_at: new Date().toISOString() })
         .eq("id", result.invoice.id);
+      recordEReportingTransaction(result.invoice.id);
     }
 
     // 5. Auto-send email if enabled

@@ -27,6 +27,7 @@ import {
   Timer,
   Calculator,
   Bell,
+  Globe,
   type LucideIcon,
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
@@ -69,6 +70,7 @@ const sections: NavSection[] = [
     items: [
       { href: "/dashboard/factures", label: "Factures", icon: Receipt },
       { href: "/dashboard/urssaf", label: "URSSAF", icon: Calculator },
+      { href: "/dashboard/e-reporting", label: "E-reporting", icon: Globe },
       { href: "/contrats", label: "Contrats", icon: FileSignature },
     ],
   },

@@ -16,7 +16,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Save, Loader2, CreditCard, Building, ExternalLink, Upload, Trash2, ImageIcon, Wallet, CheckCircle2, Zap, Globe, Copy, Check, Calendar, FileText } from "lucide-react";
+import { Save, Loader2, CreditCard, Building, ExternalLink, Upload, Trash2, ImageIcon, Wallet, CheckCircle2, Zap, Globe, Copy, Check, Calendar, FileText, Info } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
 import { CompanyAutocomplete } from "@/components/company-autocomplete";
@@ -1379,6 +1379,45 @@ export default function ParametresPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Réception factures fournisseurs — info only, shown if Pennylane
+          isn't connected (users with Pennylane are already covered for
+          reception via their expert-comptable). */}
+      {!pennylaneConnected && (
+        <Card className="border-sky-200 bg-sky-50">
+          <CardContent className="pt-6">
+            <div className="flex items-start gap-3">
+              <Info className="h-5 w-5 shrink-0 text-sky-500 mt-0.5" />
+              <div className="space-y-2 text-sm text-sky-900">
+                <p className="font-semibold">
+                  📋 Réforme sept. 2026 — Réception de factures
+                </p>
+                <p>
+                  À partir du 1er septembre 2026, vous devrez recevoir vos
+                  factures fournisseurs via une plateforme agréée (PA).
+                  Devizly gère l&apos;émission de vos factures, mais pas la
+                  réception.
+                </p>
+                <p>Pour la réception, vous pouvez utiliser :</p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Votre expert-comptable (s&apos;il utilise Pennylane, Cegid, etc.)</li>
+                  <li>Le Portail Public de Facturation (PPF) — gratuit</li>
+                  <li>Une plateforme agréée de votre choix</li>
+                </ul>
+                <a
+                  href="https://www.impots.gouv.fr/facturation-electronique"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 font-medium text-sky-700 hover:underline"
+                >
+                  Voir la liste des plateformes agréées
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Automations */}
       <Card>

@@ -40,11 +40,18 @@ export async function PUT(
   }
 
   const body = await request.json();
-  const { name, email, phone, address, city, postal_code, siret } = body;
+  const { name, email, phone, address, city, postal_code, siret, client_type } = body;
+
+  const updateFields: Record<string, unknown> = {
+    name, email, phone, address, city, postal_code, siret,
+  };
+  if (client_type === "b2b" || client_type === "b2c") {
+    updateFields.client_type = client_type;
+  }
 
   const { error } = await supabase
     .from("clients")
-    .update({ name, email, phone, address, city, postal_code, siret })
+    .update(updateFields)
     .eq("id", id)
     .eq("user_id", user.id);
 

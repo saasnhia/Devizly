@@ -60,7 +60,7 @@ const STEPS: StepConfig[] = [
   {
     icon: Calendar,
     title: "Votre Calendly",
-    desc: "Vos clients prennent RDV directement depuis vos devis partagés",
+    desc: "Vos clients prennent rendez-vous directement depuis vos devis partagés",
     gradient: "from-sky-500 to-blue-600",
   },
   {
@@ -272,10 +272,15 @@ export default function OnboardingWizard() {
       toast.error("La raison sociale est requise");
       return;
     }
+    const siretRaw = siret.trim();
+    const siretClean = siretRaw.replace(/\s/g, "");
+    if (siretClean && !/^\d{14}$/.test(siretClean)) {
+      toast.error("Le SIRET doit contenir exactement 14 chiffres");
+      return;
+    }
     setLoading(true);
     try {
       const supabase = createClient();
-      const siretRaw = siret.trim();
 
       // Anti-abus : SIRET unique cross-comptes (idx_profiles_company_siret_unique)
       if (siretRaw) {
@@ -519,6 +524,8 @@ export default function OnboardingWizard() {
                   value={siret}
                   onChange={(e) => setSiret(e.target.value)}
                   placeholder="N° SIRET (14 chiffres)"
+                  inputMode="numeric"
+                  maxLength={14}
                   className="h-12 text-base px-4"
                 />
                 <Input
@@ -530,7 +537,7 @@ export default function OnboardingWizard() {
                 <Input
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  placeholder="Adresse"
+                  placeholder="Adresse (ex: 12 rue de la Paix)"
                   className="h-12 text-base px-4"
                 />
                 <div className="grid grid-cols-2 gap-3">
@@ -665,6 +672,9 @@ export default function OnboardingWizard() {
                     placeholder="Téléphone (optionnel)"
                     className="h-12 text-base px-4"
                   />
+                  <p className="text-xs text-slate-400 px-1">
+                    Vous pourrez ajouter d&apos;autres clients à tout moment depuis le dashboard.
+                  </p>
                 </div>
               )}
 
@@ -793,8 +803,9 @@ export default function OnboardingWizard() {
                         <ArrowRight className="ml-2 h-5 w-5" />
                       </Button>
                       <p className="text-xs text-center text-amber-600">
-                        Stripe vérifie votre identité (KYC) et verse les
-                        paiements sur votre compte bancaire sous 2-7 jours.
+                        Stripe vérifie votre identité et vos documents, puis
+                        verse les paiements sur votre compte bancaire sous 2 à
+                        7 jours.
                       </p>
                     </div>
                   )}
@@ -847,14 +858,16 @@ export default function OnboardingWizard() {
                 {calendlyUrl.trim() ? "Enregistrer" : "Continuer sans Calendly"}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button
-                variant="ghost"
-                className="w-full text-muted-foreground"
-                onClick={() => goToStep(6)}
-              >
-                <SkipForward className="mr-1 h-4 w-4" />
-                Passer
-              </Button>
+              {calendlyUrl.trim() && (
+                <Button
+                  variant="ghost"
+                  className="w-full text-muted-foreground"
+                  onClick={() => goToStep(6)}
+                >
+                  <SkipForward className="mr-1 h-4 w-4" />
+                  Passer
+                </Button>
+              )}
             </div>
           )}
 
@@ -915,7 +928,7 @@ export default function OnboardingWizard() {
                   <div
                     className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold ${
                       i < step - 1
-                        ? "bg-indigo-600 text-white"
+                        ? "bg-emerald-500 text-white"
                         : i === step - 1
                           ? `bg-gradient-to-br ${s.gradient} text-white`
                           : "bg-slate-200 text-slate-500"

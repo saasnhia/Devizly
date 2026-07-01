@@ -33,27 +33,36 @@ export async function GET(request: Request) {
     all: searchParams.toString(),
   });
 
+  // Helper: same error redirect everywhere, but honors the wizard flow so
+  // users mid-onboarding land back on step 4 instead of /parametres (which
+  // would just bounce them to /wizard anyway via the onboarding guard,
+  // losing the `reason` param along the way).
+  const errorRedirect = (reason: string) =>
+    NextResponse.redirect(
+      fromWizard
+        ? `${appUrl}/wizard?step=4&stripe=error&reason=${encodeURIComponent(reason)}`
+        : `${appUrl}/parametres?stripe=error&reason=${encodeURIComponent(reason)}`
+    );
+
   if (errorParam) {
     console.error("[Stripe Callback] Stripe returned error:", errorParam, errorDesc);
-    return NextResponse.redirect(
-      `${appUrl}/parametres?stripe=error&reason=${encodeURIComponent(errorParam)}`
-    );
+    return errorRedirect(errorParam);
   }
 
   if (!code) {
     console.error("[Stripe Callback] No code in params");
-    return NextResponse.redirect(`${appUrl}/parametres?stripe=error&reason=no_code`);
+    return errorRedirect("no_code");
   }
 
   if (!state) {
     console.error("[Stripe Callback] No state (userId) in params");
-    return NextResponse.redirect(`${appUrl}/parametres?stripe=error&reason=no_state`);
+    return errorRedirect("no_state");
   }
 
   const secretKey = process.env.STRIPE_SECRET_KEY;
   if (!secretKey) {
     console.error("[Stripe Callback] STRIPE_SECRET_KEY not set");
-    return NextResponse.redirect(`${appUrl}/parametres?stripe=error&reason=no_secret_key`);
+    return errorRedirect("no_secret_key");
   }
 
   try {
@@ -80,9 +89,7 @@ export async function GET(request: Request) {
     });
 
     if (tokenData.error || !tokenData.stripe_user_id) {
-      return NextResponse.redirect(
-        `${appUrl}/parametres?stripe=error&reason=${encodeURIComponent(tokenData.error || "no_user_id")}`
-      );
+      return errorRedirect(tokenData.error || "no_user_id");
     }
 
     const accountId = tokenData.stripe_user_id as string;
@@ -118,8 +125,6 @@ export async function GET(request: Request) {
     );
   } catch (err) {
     console.error("[Stripe Callback] Exception:", err);
-    return NextResponse.redirect(
-      `${appUrl}${fromWizard ? "/wizard?step=4" : "/parametres?stripe=error&reason=exception"}`
-    );
+    return errorRedirect("exception");
   }
 }

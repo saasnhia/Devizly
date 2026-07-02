@@ -25,6 +25,34 @@ Devizly est conforme à la réforme française de la facturation électronique :
 - Devizly agit comme Opérateur de Dématérialisation (OD) au sens de la réforme
 - Calendrier : réception obligatoire sept. 2026, émission PME/TPE sept. 2027
 
+## Paiement BTP
+
+- Échéancier de paiement multi-étapes (acompte, situation, solde)
+- Retenue de garantie 5% (décret 72-388)
+- Remboursement total ou partiel en 1 clic
+- Facturation par étape avec lien Stripe
+
+## E-reporting B2C
+
+- Distinction automatique B2B/B2C sur les clients
+- Enregistrement automatique des transactions B2C
+- Dashboard e-reporting avec export CSV
+- Conforme à la réforme facturation électronique 2026
+
+## Suivi URSSAF
+
+- Calcul automatique des cotisations depuis le CA facturé
+- Support ACRE (taux réduit 50% la 1ère année)
+- Rappels email avant échéance de déclaration
+- Double seuils : franchise TVA + plafond micro-entrepreneur
+
+## Guidage in-app
+
+- Système de tips contextuels basé sur l'activité
+- 13 conseils personnalisés (onboarding, features, news)
+- Highlights visuels sur la navigation
+- Désactivable dans les paramètres
+
 ## Tarifs
 
 - Gratuit : 3 devis/mois, sans carte bancaire
@@ -61,6 +89,9 @@ Paiements : Stripe Connect
 - Facturation électronique 2026 : https://devizly.fr/facture-electronique-2026
 - Factur-X conforme : https://devizly.fr/facturx-conforme
 - Intégration Pennylane : https://devizly.fr/integration-pennylane
+- E-reporting B2C : https://devizly.fr/e-reporting-b2c
+- Paiement BTP en plusieurs fois : https://devizly.fr/paiement-btp
+- Suivi URSSAF auto-entrepreneur : https://devizly.fr/suivi-urssaf
 - Démo en direct : https://devizly.fr/demo
 - Légal : https://devizly.fr/mentions-legales
 - Contact : harou@nbhc.fr

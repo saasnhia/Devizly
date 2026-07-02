@@ -7,19 +7,19 @@ import { Calendar, Shield, Zap, ArrowRight, FileText, Building } from "lucide-re
 export const metadata: Metadata = {
   title: "Facturation Electronique 2026 : Preparez-vous avec Devizly",
   description:
-    "La reforme de la facturation electronique demarre en septembre 2026. Devizly genere automatiquement vos factures Factur-X conformes (PDF/A-3, valide FNFE-MPE) et les envoie a votre expert-comptable via Pennylane. Pret des maintenant.",
+    "La reforme de la facturation electronique demarre en septembre 2026. Devizly genere automatiquement vos factures Factur-X conformes (PDF/A-3, valide FNFE-MPE), gere l'e-reporting B2C et les envoie a votre expert-comptable via Pennylane. Pret des maintenant.",
   alternates: { canonical: "https://devizly.fr/facture-electronique-2026" },
   openGraph: {
     title: "Facturation Electronique 2026 — Devizly",
     description:
-      "Preparez-vous a la reforme avec Devizly : Factur-X automatique, conformite FNFE-MPE, integration Pennylane.",
+      "Preparez-vous a la reforme avec Devizly : Factur-X automatique, e-reporting B2C, conformite FNFE-MPE, integration Pennylane.",
     url: "https://devizly.fr/facture-electronique-2026",
     images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Devizly — Facturation electronique 2026" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Facturation Electronique 2026 — Devizly",
-    description: "Factur-X automatique + Pennylane. Pret pour la reforme.",
+    description: "Factur-X automatique + e-reporting B2C + Pennylane. Pret pour la reforme.",
     images: ["/og-image.png"],
   },
 };
@@ -193,6 +193,18 @@ export default function FactureElectronique2026Page() {
               </div>
             </div>
           </div>
+        </section>
+
+        {/* E-reporting B2C */}
+        <section>
+          <h2 className="mb-6 text-2xl font-bold">Et vos ventes aux particuliers ?</h2>
+          <p className="text-base leading-relaxed text-slate-300">
+            La facturation electronique ne couvre que les transactions B2B.
+            Si vous facturez aussi des particuliers ou des clients a
+            l&apos;international, une obligation distincte s&apos;applique :
+            l&apos;<Link href="/e-reporting-b2c" className="text-violet-400 hover:underline">e-reporting B2C</Link>.
+            Devizly enregistre automatiquement ces transactions pour vous.
+          </p>
         </section>
 
         {/* Comment Devizly vous prepare */}

@@ -7,19 +7,19 @@ import { FileText, Shield, Check, ArrowRight, Layers, FileCheck } from "lucide-r
 export const metadata: Metadata = {
   title: "Factur-X Conforme : Generez vos factures electroniques en un clic",
   description:
-    "Devizly genere des factures Factur-X BASIC conformes (PDF/A-3 + XML CII) validees FNFE-MPE. Standard obligatoire pour la reforme facturation electronique 2026. Essai gratuit.",
+    "Devizly genere des factures Factur-X BASIC conformes (PDF/A-3 + XML CII) validees FNFE-MPE, avec les 4 nouvelles mentions obligatoires 2026 : categorie d'operation, TVA sur les debits, adresse de livraison, SIREN acheteur. Essai gratuit.",
   alternates: { canonical: "https://devizly.fr/facturx-conforme" },
   openGraph: {
     title: "Factures Factur-X Conformes — Devizly",
     description:
-      "Generez des factures Factur-X BASIC en un clic. PDF/A-3 + XML CII, valide FNFE-MPE.",
+      "Generez des factures Factur-X BASIC en un clic, avec les 4 nouvelles mentions obligatoires 2026. PDF/A-3 + XML CII, valide FNFE-MPE.",
     url: "https://devizly.fr/facturx-conforme",
     images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Devizly — Factur-X conforme" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Factures Factur-X Conformes — Devizly",
-    description: "PDF/A-3 + XML CII. Valide FNFE-MPE. Essai gratuit.",
+    description: "PDF/A-3 + XML CII + 4 nouvelles mentions 2026. Valide FNFE-MPE. Essai gratuit.",
     images: ["/og-image.png"],
   },
 };
@@ -256,6 +256,34 @@ export default function FacturxConformePage() {
               services.fnfe-mpe.org
             </a>.
           </p>
+        </section>
+
+        {/* Les 4 nouvelles mentions obligatoires */}
+        <section>
+          <h2 className="mb-6 text-2xl font-bold">
+            Les 4 nouvelles mentions obligatoires 2026
+          </h2>
+          <p className="mb-4 text-base leading-relaxed text-slate-300">
+            La reforme ajoute 4 mentions obligatoires sur toutes les factures
+            a partir du 1er septembre 2026. Devizly les integre directement
+            dans le XML et le PDF de vos factures Factur-X.
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {[
+              { label: "Categorie de l'operation", desc: "Vente de biens, prestation de services ou operation mixte." },
+              { label: "TVA sur les debits", desc: "Mention specifique si vous avez opte pour ce regime plutot que l'encaissement." },
+              { label: "Adresse de livraison", desc: "Utile pour le BTP : l'adresse du chantier quand elle differe de celle du client." },
+              { label: "SIREN de l'acheteur", desc: "Identifiant de votre client professionnel, derive automatiquement de son SIRET." },
+            ].map((item) => (
+              <div key={item.label} className="flex items-start gap-3 rounded-lg border border-white/10 bg-white/[0.03] p-4">
+                <Check className="mt-0.5 h-5 w-5 shrink-0 text-emerald-400" />
+                <div>
+                  <p className="font-medium">{item.label}</p>
+                  <p className="text-sm text-slate-400">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
 
         {/* FAQ */}

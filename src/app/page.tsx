@@ -5,7 +5,7 @@ import { JsonLd } from "@/components/seo/json-ld";
 export const metadata: Metadata = {
   title: "Logiciel Devis Gratuit en Ligne",
   description:
-    "Cr\u00e9ez vos devis professionnels en 2 minutes avec l\u2019IA. Signature \u00e9lectronique, paiement Stripe, relances automatiques. Essai gratuit \u2014 sans CB.",
+    "Cr\u00e9ez vos devis professionnels en 2 minutes avec l\u2019IA. Signature \u00e9lectronique, paiements Stripe (\u00e9ch\u00e9ancier BTP inclus), factures conformes r\u00e9forme 2026. Essai gratuit \u2014 sans CB.",
   alternates: { canonical: "https://devizly.fr" },
 };
 

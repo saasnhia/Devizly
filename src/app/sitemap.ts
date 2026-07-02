@@ -31,6 +31,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/facture-electronique-2026`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
     { url: `${SITE_URL}/facturx-conforme`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
     { url: `${SITE_URL}/integration-pennylane`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${SITE_URL}/e-reporting-b2c`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+
+    // BTP payments & URSSAF
+    { url: `${SITE_URL}/paiement-btp`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${SITE_URL}/suivi-urssaf`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
 
     // SEO long-tail pages
     { url: `${SITE_URL}/logiciel-devis-artisan`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },

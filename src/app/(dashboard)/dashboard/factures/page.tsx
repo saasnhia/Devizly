@@ -18,6 +18,10 @@ function getStatusBadge(status: string) {
       return <Badge variant="secondary" className="bg-emerald-50 text-emerald-600">Payée</Badge>;
     case "overdue":
       return <Badge variant="secondary" className="bg-red-50 text-red-600">En retard</Badge>;
+    case "refunded":
+      return <Badge variant="secondary" className="bg-slate-100 text-slate-600">Remboursée</Badge>;
+    case "partially_refunded":
+      return <Badge variant="secondary" className="bg-orange-50 text-orange-600">Remb. partiel</Badge>;
     default:
       return <Badge variant="secondary">{status}</Badge>;
   }
@@ -184,6 +188,9 @@ export default async function FacturesPage() {
                       <InvoiceActions
                         invoiceId={inv.id}
                         status={inv.status}
+                        amount={Number(inv.amount)}
+                        currency={inv.currency || "EUR"}
+                        refundedAmount={Number(inv.refunded_amount) || 0}
                         checkoutUrl={inv.stripe_checkout_url}
                         facturxPdfPath={inv.facturx_pdf_path}
                         paStatus={inv.pa_status}

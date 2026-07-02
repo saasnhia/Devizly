@@ -29,7 +29,7 @@ export async function GET(request: Request) {
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
 
-  if (status && ["draft", "sent", "paid", "overdue"].includes(status)) {
+  if (status && ["draft", "sent", "paid", "overdue", "refunded", "partially_refunded"].includes(status)) {
     query = query.eq("status", status);
   }
 

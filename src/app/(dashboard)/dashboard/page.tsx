@@ -121,7 +121,7 @@ function OnboardingDashboard({
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Button asChild className="bg-violet-600 hover:bg-violet-700">
-            <Link href="/devis/nouveau">
+            <Link href="/devis/nouveau" data-tip-target="nouveau-devis">
               <Zap className="mr-2 h-4 w-4" />
               Créer mon premier devis
             </Link>
@@ -447,7 +447,7 @@ export default async function DashboardPage() {
             </a>
           </Button>
           <Button asChild className="bg-violet-600 hover:bg-violet-700">
-            <Link href="/devis/nouveau">
+            <Link href="/devis/nouveau" data-tip-target="nouveau-devis">
               <Plus className="mr-2 h-4 w-4" />
               Nouveau devis
             </Link>

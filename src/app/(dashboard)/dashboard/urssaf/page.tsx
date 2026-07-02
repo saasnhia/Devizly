@@ -261,6 +261,8 @@ export default function UrssafPage() {
       if (data.urssaf_periodicite === "trimestriel") setPeriodeType("trimestrielle");
       else if (data.urssaf_periodicite === "mensuel") setPeriodeType("mensuelle");
     }
+    // Marks the URSSAF page as visited (used by tip_urssaf's condition)
+    supabase.from("profiles").update({ urssaf_visited_at: new Date().toISOString() }).eq("id", currentUser.id).then(() => {});
   }, []);
 
   useEffect(() => { fetchCA(); }, [fetchCA]);

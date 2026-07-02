@@ -16,7 +16,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Save, Loader2, CreditCard, Building, ExternalLink, Upload, Trash2, ImageIcon, Wallet, CheckCircle2, Zap, Globe, Copy, Check, Calendar, FileText, Info } from "lucide-react";
+import { Save, Loader2, CreditCard, Building, ExternalLink, Upload, Trash2, ImageIcon, Wallet, CheckCircle2, Zap, Globe, Copy, Check, Calendar, FileText, Info, Lightbulb } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
 import { CompanyAutocomplete } from "@/components/company-autocomplete";
@@ -63,6 +63,7 @@ export default function ParametresPage() {
   const [pennylaneConnected, setPennylaneConnected] = useState(false);
   const [pennylaneConnectedAt, setPennylaneConnectedAt] = useState<string | null>(null);
   const [pennylaneLoading, setPennylaneLoading] = useState(false);
+  const [tipsEnabled, setTipsEnabled] = useState(true);
   const [profile, setProfile] = useState({
     full_name: "",
     company_name: "",
@@ -92,9 +93,11 @@ export default function ParametresPage() {
       // Load IBAN/BIC from profiles only (never from user_metadata)
       const { data: billingRow } = await supabase
         .from("profiles")
-        .select("iban, bic, company_city, company_postal_code, company_country, pa_provider, pa_connected_at")
+        .select("iban, bic, company_city, company_postal_code, company_country, pa_provider, pa_connected_at, tips_disabled")
         .eq("id", user.id)
         .single();
+
+      setTipsEnabled(billingRow?.tips_disabled !== true);
 
       if (user.user_metadata) {
         setProfile({
@@ -410,6 +413,25 @@ export default function ParametresPage() {
     } catch {
       setAutomations((prev) => ({ ...prev, [field]: !newValue }));
       toast.error("Erreur de sauvegarde");
+    }
+  }
+
+  async function handleTipsToggle() {
+    if (!currentUserId) return;
+    const newValue = !tipsEnabled;
+    setTipsEnabled(newValue);
+
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("profiles")
+      .update({ tips_disabled: !newValue })
+      .eq("id", currentUserId);
+
+    if (error) {
+      setTipsEnabled(!newValue);
+      toast.error("Erreur de sauvegarde");
+    } else {
+      toast.success("Préférence mise à jour");
     }
   }
 
@@ -1418,6 +1440,42 @@ export default function ParametresPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Préférences */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Lightbulb className="h-5 w-5 text-amber-500" />
+            Préférences
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between py-2">
+            <div>
+              <p className="text-sm font-medium">
+                Afficher les conseils et suggestions dans le dashboard
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Bandeaux contextuels qui vous guident selon votre activité (onboarding, nouveautés, conseils).
+              </p>
+            </div>
+            <button
+              role="switch"
+              aria-checked={tipsEnabled}
+              onClick={handleTipsToggle}
+              className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
+                tipsEnabled ? "bg-primary" : "bg-slate-200"
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  tipsEnabled ? "translate-x-6" : "translate-x-1"
+                }`}
+              />
+            </button>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Automations */}
       <Card>

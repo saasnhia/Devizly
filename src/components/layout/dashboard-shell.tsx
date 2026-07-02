@@ -33,6 +33,7 @@ import {
 import type { User } from "@supabase/supabase-js";
 import { NotificationBell } from "@/components/layout/notification-bell";
 import { GlobalSearch } from "@/components/layout/global-search";
+import { TipPopup } from "@/components/tips/tip-popup";
 
 /* ── Navigation structure ─────────────────────────── */
 
@@ -42,6 +43,8 @@ interface NavItem {
   icon: LucideIcon;
   badge?: string;
   badgeColor?: string;
+  /** Matches a Tip's targetSelector for the sidebar highlight effect. */
+  tipTarget?: string;
 }
 
 interface NavSection {
@@ -69,7 +72,7 @@ const sections: NavSection[] = [
     title: "FINANCES",
     items: [
       { href: "/dashboard/factures", label: "Factures", icon: Receipt },
-      { href: "/dashboard/urssaf", label: "URSSAF", icon: Calculator },
+      { href: "/dashboard/urssaf", label: "URSSAF", icon: Calculator, tipTarget: "urssaf" },
       { href: "/dashboard/e-reporting", label: "E-reporting", icon: Globe },
       { href: "/contrats", label: "Contrats", icon: FileSignature },
     ],
@@ -77,7 +80,7 @@ const sections: NavSection[] = [
   {
     title: "CLIENTS",
     items: [
-      { href: "/clients", label: "Clients", icon: Users },
+      { href: "/clients", label: "Clients", icon: Users, tipTarget: "clients" },
       { href: "/timer", label: "Temps", icon: Timer },
       { href: "/lead-forms", label: "Formulaires", icon: FileInput },
       { href: "/leads", label: "Leads", icon: Inbox },
@@ -92,7 +95,7 @@ const sections: NavSection[] = [
 ];
 
 const bottomItems: NavItem[] = [
-  { href: "/parametres", label: "Paramètres", icon: Settings },
+  { href: "/parametres", label: "Paramètres", icon: Settings, tipTarget: "parametres" },
   { href: "/pricing", label: "Tarifs", icon: CreditCard },
 ];
 
@@ -166,6 +169,7 @@ export function DashboardShell({
       <Link
         href={item.href}
         onClick={() => setSidebarOpen(false)}
+        data-tip-target={item.tipTarget}
         className={`flex items-center gap-3 rounded-r-lg py-2 pl-3 pr-2 text-[13px] font-medium transition-all duration-150 ${
           active
             ? "border-l-[3px] border-violet-600 bg-[#F3F0FF] text-[#5B5BD6]"
@@ -292,6 +296,7 @@ export function DashboardShell({
         </header>
 
         <main className="flex-1 overflow-y-auto p-6 pb-20 lg:pb-6">
+          <TipPopup />
           {children}
         </main>
 

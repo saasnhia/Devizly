@@ -28,12 +28,14 @@ import {
   FileText,
   Check,
   Pencil,
+  CreditCard,
 } from "lucide-react";
 import { calculateItemTotal, calculateTotals, formatCurrency } from "@/lib/utils/quote";
 import { CURRENCIES } from "@/lib/currencies";
 import type { Client, QuoteItemDraft } from "@/types";
 import { ClientPicker } from "@/components/client-picker";
 import { TemplatePicker } from "@/components/templates/template-picker";
+import { PaymentScheduleEditor, type ScheduleStepDraft } from "@/components/quotes/payment-schedule-editor";
 import { useTemplate } from "@/app/(dashboard)/templates/actions";
 import { toast } from "sonner";
 import {
@@ -195,6 +197,17 @@ export default function NouveauDevisPage() {
   });
   const [items, setItems] = useState<ItemWithId[]>(() => withIds([{ ...emptyItem }]));
   const [clients, setClients] = useState<Client[]>([]);
+
+  // Échéancier de paiement (BTP)
+  const [scheduleEnabled, setScheduleEnabled] = useState(false);
+  const [schedulePreset, setSchedulePreset] = useState<"2fois" | "3fois_btp" | "custom">("3fois_btp");
+  const [scheduleSteps, setScheduleSteps] = useState<ScheduleStepDraft[]>([
+    { label: "Acompte", percentage: 30 },
+    { label: "Situation intermédiaire", percentage: 40 },
+    { label: "Solde", percentage: 30 },
+  ]);
+  const [retentionEnabled, setRetentionEnabled] = useState(false);
+  const [scheduleLocked, setScheduleLocked] = useState(false);
   const [aiPrompt, setAiPrompt] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -372,8 +385,26 @@ export default function NouveauDevisPage() {
           )
         );
       }
+      setRetentionEnabled(data.retention_guarantee === true);
     }
     loadQuote();
+  }, [editId]);
+
+  // Load existing payment schedule (edit mode only)
+  useEffect(() => {
+    if (!editId) return;
+    async function loadSchedule() {
+      const res = await fetch(`/api/quotes/${editId}/schedule`);
+      if (!res.ok) return;
+      const json = await res.json();
+      const stepsData: { label: string; percentage: number; status: string }[] = json.data || [];
+      if (stepsData.length === 0) return;
+      setScheduleEnabled(true);
+      setSchedulePreset("custom");
+      setScheduleSteps(stepsData.map((s) => ({ label: s.label, percentage: Number(s.percentage) })));
+      setScheduleLocked(stepsData.some((s) => s.status !== "pending" && s.status !== "cancelled"));
+    }
+    loadSchedule();
   }, [editId]);
 
   // Load template if ?template=ID (run once)
@@ -509,6 +540,11 @@ export default function NouveauDevisPage() {
       toast.error("Ajoutez au moins une ligne");
       return;
     }
+    const scheduleSum = Math.round(scheduleSteps.reduce((s, st) => s + Number(st.percentage || 0), 0) * 100) / 100;
+    if (scheduleEnabled && !scheduleLocked && scheduleSum !== 100) {
+      toast.error(`L'échéancier de paiement doit totaliser 100% (actuellement ${scheduleSum}%)`);
+      return;
+    }
 
     setSaving(true);
     const validItems = stripIds(items.filter((i) => i.description.trim()));
@@ -526,6 +562,8 @@ export default function NouveauDevisPage() {
       total_ttc: totals.totalTTC,
       status,
       items: validItems,
+      retention_guarantee: scheduleEnabled && retentionEnabled,
+      retention_percentage: 5,
     };
 
     try {
@@ -541,6 +579,21 @@ export default function NouveauDevisPage() {
         toast.error(result.error || "Erreur de sauvegarde");
         return;
       }
+
+      const quoteId: string | undefined = editId || result.data?.id;
+      if (scheduleEnabled && !scheduleLocked && quoteId) {
+        const scheduleRes = await fetch(`/api/quotes/${quoteId}/schedule`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ steps: scheduleSteps }),
+        });
+        if (!scheduleRes.ok) {
+          const scheduleResult = await scheduleRes.json();
+          toast.error(scheduleResult.error || "Devis sauvegardé, mais l'échéancier n'a pas pu être enregistré");
+          return;
+        }
+      }
+
       toast.success(
         status === "envoyé" ? "Devis envoyé !" : "Devis sauvegardé !"
       );
@@ -839,6 +892,38 @@ export default function NouveauDevisPage() {
               </div>
             </CardContent>
           </Card>
+
+          {scheduleLocked ? (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CreditCard className="h-5 w-5 text-primary" />
+                  Paiement
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Une ou plusieurs étapes de l&apos;échéancier ont déjà été
+                  facturées — il ne peut plus être modifié depuis cette page.
+                  Gérez la facturation par étape depuis le tableau de bord
+                  Factures.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <PaymentScheduleEditor
+              totalTtc={totals.totalTTC}
+              currency={currency}
+              enabled={scheduleEnabled}
+              onEnabledChange={setScheduleEnabled}
+              preset={schedulePreset}
+              onPresetChange={setSchedulePreset}
+              steps={scheduleSteps}
+              onStepsChange={setScheduleSteps}
+              retentionEnabled={retentionEnabled}
+              onRetentionChange={setRetentionEnabled}
+            />
+          )}
         </div>
       </div>
 

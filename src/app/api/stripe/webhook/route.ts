@@ -67,8 +67,25 @@ export async function POST(request: Request) {
             .eq("invoice_number", invoiceNumber)
             .select("id")
             .single();
-          if (invErr) console.error("[Webhook] Invoice update failed:", { invoiceNumber, error: invErr.message });
-          else if (updatedInvoice) recordEReportingTransaction(updatedInvoice.id);
+          if (invErr) {
+            console.error("[Webhook] Invoice update failed:", { invoiceNumber, error: invErr.message });
+          } else if (updatedInvoice) {
+            recordEReportingTransaction(updatedInvoice.id);
+
+            // BTP échéancier: if this invoice was generated for a payment
+            // schedule step ("Facturer cette étape"), mark that step paid.
+            const { error: stepErr } = await supabase
+              .from("payment_schedule")
+              .update({
+                status: "paid",
+                paid_at: new Date().toISOString(),
+                stripe_payment_intent_id: (session.payment_intent as string) || null,
+              })
+              .eq("invoice_id", updatedInvoice.id);
+            if (stepErr) {
+              console.error("[Webhook] Payment schedule step update failed:", { invoiceId: updatedInvoice.id, error: stepErr.message });
+            }
+          }
         }
         break;
       }

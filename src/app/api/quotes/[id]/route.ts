@@ -41,7 +41,7 @@ export async function PUT(
   }
 
   const body = await request.json();
-  const { title, client_id, currency, tva_rate, discount, notes, payment_terms, valid_until, status, items, total_ht, total_ttc } = body;
+  const { title, client_id, currency, tva_rate, discount, notes, payment_terms, valid_until, status, items, total_ht, total_ttc, retention_guarantee, retention_percentage } = body;
 
   const { error: updateError } = await supabase
     .from("quotes")
@@ -57,6 +57,8 @@ export async function PUT(
       status,
       total_ht,
       total_ttc,
+      ...(retention_guarantee !== undefined ? { retention_guarantee } : {}),
+      ...(retention_percentage !== undefined ? { retention_percentage } : {}),
       updated_at: new Date().toISOString(),
     })
     .eq("id", id)
@@ -84,8 +86,17 @@ export async function PUT(
   }
 
   // Automation: auto-generate invoice when status changes to "signé" (non-blocking)
+  // — skipped when the quote has a payment schedule: it's invoiced step by
+  // step ("Facturer cette étape"), never as one lump-sum invoice.
   if (status === "signé") {
-    tryAutoInvoice("sign", { quoteId: id, userId: user.id });
+    const { count: scheduleCount } = await supabase
+      .from("payment_schedule")
+      .select("id", { count: "exact", head: true })
+      .eq("quote_id", id);
+
+    if (!scheduleCount) {
+      tryAutoInvoice("sign", { quoteId: id, userId: user.id });
+    }
   }
 
   return NextResponse.json({ success: true });

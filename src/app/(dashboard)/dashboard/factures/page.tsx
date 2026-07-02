@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { formatCurrency, formatDate } from "@/lib/utils/quote";
 import { Badge } from "@/components/ui/badge";
 import { InvoiceActions } from "./invoice-actions";
+import { PaymentScheduleList, type ScheduleGroup } from "./payment-schedule-list";
 
 export const metadata = {
   title: "Factures — Worthifast",
@@ -59,6 +60,37 @@ export default async function FacturesPage() {
     return { ...inv, client };
   });
 
+  // Fetch payment schedules (échéanciers BTP), grouped by quote
+  const { data: scheduleRows } = await supabase
+    .from("payment_schedule")
+    .select("*, quotes(title, currency)")
+    .eq("user_id", user.id)
+    .order("position", { ascending: true });
+
+  const scheduleGroupsMap = new Map<string, ScheduleGroup>();
+  for (const row of scheduleRows || []) {
+    const quote = Array.isArray(row.quotes) ? row.quotes[0] : row.quotes;
+    if (!scheduleGroupsMap.has(row.quote_id)) {
+      scheduleGroupsMap.set(row.quote_id, {
+        quoteId: row.quote_id,
+        quoteTitle: quote?.title || "Devis",
+        currency: quote?.currency || "EUR",
+        steps: [],
+      });
+    }
+    scheduleGroupsMap.get(row.quote_id)!.steps.push({
+      id: row.id,
+      label: row.label,
+      percentage: Number(row.percentage),
+      amount: Number(row.amount),
+      status: row.status,
+      due_date: row.due_date,
+      invoice_id: row.invoice_id,
+      position: row.position,
+    });
+  }
+  const scheduleGroups = Array.from(scheduleGroupsMap.values());
+
   // Stats
   const totalInvoiced = allInvoices.reduce(
     (sum, inv) => sum + Number(inv.amount),
@@ -110,6 +142,9 @@ export default async function FacturesPage() {
           </p>
         </div>
       </div>
+
+      {/* Échéanciers de paiement BTP */}
+      {scheduleGroups.length > 0 && <PaymentScheduleList groups={scheduleGroups} />}
 
       {/* Invoice table */}
       {allInvoices.length === 0 ? (

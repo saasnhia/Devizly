@@ -83,6 +83,9 @@ const RECAP_FEATURES = [
   "Signature électronique eIDAS",
   "Briefing quotidien de votre activité",
   "Export PDF professionnel",
+  "Échéancier de paiement multi-étapes (BTP)",
+  "Remboursement en 1 clic",
+  "Retenue de garantie 5%",
 ];
 
 /* ── Composant ─────────────────────────────────────────── */

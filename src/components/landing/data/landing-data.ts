@@ -85,6 +85,9 @@ export const plans: Plan[] = [
       "Templates de relances personnalisés",
       "Multi-clients",
       "Logo personnalisé",
+      "Échéancier BTP multi-étapes",
+      "Remboursements Stripe en 1 clic",
+      "Retenue de garantie 5%",
     ],
     cta: "Profiter de l'offre",
     popular: true,
@@ -153,6 +156,10 @@ export const faqs = [
   {
     q: "Devizly est-il compatible avec mon expert-comptable sur Pennylane ?",
     a: "Oui. Si votre expert-comptable utilise Pennylane, vous pouvez connecter votre compte en un clic dans les paramètres. Vos factures Factur-X seront envoyées automatiquement — plus besoin de transmettre vos documents manuellement. Les écritures comptables sont générées automatiquement côté Pennylane.",
+  },
+  {
+    q: "Devizly gère-t-il les paiements BTP en plusieurs fois ?",
+    a: "Oui ! Créez un échéancier directement sur vos devis : acompte à la signature, situation intermédiaire, solde à réception. Chaque étape génère sa propre facture et son lien de paiement Stripe. Vous pouvez aussi activer la retenue de garantie de 5% conformément au décret n°72-388.",
   },
 ];
 

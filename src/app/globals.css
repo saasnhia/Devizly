@@ -334,8 +334,18 @@ html.lenis, html.lenis body {
   0%, 100% { transform: translateZ(110px) translateY(0); }
   50%      { transform: translateZ(110px) translateY(10px); }
 }
+@keyframes float-card-c {
+  0%, 100% { transform: translateZ(100px) translateY(0); }
+  50%      { transform: translateZ(100px) translateY(9px); }
+}
+@keyframes float-card-d {
+  0%, 100% { transform: translateZ(120px) translateY(0); }
+  50%      { transform: translateZ(120px) translateY(-7px); }
+}
 .float-card-a { animation: float-card-a 7s ease-in-out infinite; }
 .float-card-b { animation: float-card-b 8s ease-in-out 1s infinite; }
+.float-card-c { animation: float-card-c 7.5s ease-in-out 0.5s infinite; }
+.float-card-d { animation: float-card-d 8.5s ease-in-out 1.5s infinite; }
 
 /* ═══ Blink cursor (terminal) ═══ */
 @keyframes blink {
@@ -393,6 +403,8 @@ html.lenis, html.lenis body {
   .quote-stage,
   .float-card-a,
   .float-card-b,
+  .float-card-c,
+  .float-card-d,
   .blink-cursor,
   .sig-draw-loop,
   .pulse-dot,
@@ -421,7 +433,9 @@ html.lenis, html.lenis body {
     transform-style: flat !important;
   }
   .float-card-a,
-  .float-card-b {
+  .float-card-b,
+  .float-card-c,
+  .float-card-d {
     display: none !important;
   }
 }

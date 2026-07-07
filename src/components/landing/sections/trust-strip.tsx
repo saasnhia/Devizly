@@ -10,6 +10,8 @@ const items = [
   { label: "RGPD", italic: false },
   { label: "CGI 293B", italic: true },
   { label: "DGFiP", italic: false },
+  { label: "Séquestre", italic: true },
+  { label: "Escrow", italic: true },
 ];
 
 export function TrustStrip() {

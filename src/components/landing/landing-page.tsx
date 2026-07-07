@@ -7,6 +7,7 @@ import { EditorialNav } from "./sections/editorial-nav";
 import { EditorialHero } from "./sections/editorial-hero";
 import { TrustStrip } from "./sections/trust-strip";
 import { FlowSteps } from "./sections/flow-steps";
+import { TreasurySection } from "./sections/treasury-section";
 import { MetricsBanner } from "./sections/metrics-banner";
 import { EditorialPricing } from "./sections/editorial-pricing";
 import { FaqSection } from "./sections/faq-section";
@@ -33,6 +34,7 @@ function LandingPageInner() {
         <EditorialHero segment={segment || undefined} />
         <TrustStrip />
         <FlowSteps />
+        <TreasurySection />
         <MetricsBanner />
         <EditorialPricing />
         <FaqSection />

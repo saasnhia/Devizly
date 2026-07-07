@@ -123,43 +123,65 @@ function QuoteDocument() {
 }
 
 /* ══════════════════════════════════════════════
-   Float cards
+   Float badges — 4 corners, BTP payment features
    ══════════════════════════════════════════════ */
 
-function FloatCardSignature() {
-  return (
-    <div
-      className="float-card-a absolute top-[4%] left-[-6%] z-10 hidden rounded-xl border border-white/10 bg-[#131318]/90 px-4 py-3 shadow-xl backdrop-blur-md md:block"
-    >
-      <div className="flex items-center gap-2.5">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-500/15">
-          <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4 text-green-400">
-            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-          </svg>
-        </div>
-        <div>
-          <p className="text-xs font-semibold text-white">Signature re&ccedil;ue</p>
-          <p className="text-[10px] text-slate-400">il y a 12 secondes</p>
-        </div>
-      </div>
-    </div>
-  );
+interface HeroBadge {
+  corner: "float-card-a" | "float-card-b" | "float-card-c" | "float-card-d";
+  position: string;
+  iconBg: string;
+  emoji: string;
+  title: string;
+  subtitle: string;
 }
 
-function FloatCardPayment() {
+const HERO_BADGES: HeroBadge[] = [
+  {
+    corner: "float-card-a",
+    position: "top-[4%] left-[-6%]",
+    iconBg: "bg-emerald-500/15",
+    emoji: "\u{1F512}",
+    title: "Séquestre sécurisé",
+    subtitle: "Fonds bloqués jusqu'à livraison",
+  },
+  {
+    corner: "float-card-c",
+    position: "top-[4%] right-[-8%]",
+    iconBg: "bg-violet-500/15",
+    emoji: "\u{1F4C5}",
+    title: "Paiement en 2-3 fois",
+    subtitle: "Échéancier BTP personnalisable",
+  },
+  {
+    corner: "float-card-d",
+    position: "bottom-[-4%] left-[-6%]",
+    iconBg: "bg-amber-500/15",
+    emoji: "\u{1F6E1}️",
+    title: "Retenue garantie 5%",
+    subtitle: "Décret 72-388",
+  },
+  {
+    corner: "float-card-b",
+    position: "bottom-[-4%] right-[-8%]",
+    iconBg: "bg-slate-500/15",
+    emoji: "↩️",
+    title: "Remboursement 1 clic",
+    subtitle: "Chantier annulé = remboursé",
+  },
+];
+
+function FloatBadge({ corner, position, iconBg, emoji, title, subtitle }: HeroBadge) {
   return (
     <div
-      className="float-card-b absolute bottom-[8%] right-[-8%] z-10 hidden rounded-xl border border-white/10 bg-[#131318]/90 px-4 py-3 shadow-xl backdrop-blur-md md:block"
+      className={`${corner} absolute ${position} z-10 hidden rounded-xl border border-white/10 bg-[#131318]/90 px-4 py-3 shadow-xl backdrop-blur-md transition-transform duration-200 hover:-translate-y-0.5 md:block`}
     >
       <div className="flex items-center gap-2.5">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#635BFF]/15">
-          <svg viewBox="0 0 24 24" className="h-4 w-4 text-[#635BFF]" fill="currentColor">
-            <path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-7.076-2.19l-.888 5.534C5.016 22.96 7.97 24 11.33 24c2.6 0 4.719-.64 6.226-1.876 1.636-1.322 2.487-3.268 2.487-5.672 0-4.123-2.508-5.804-6.067-7.302z" />
-          </svg>
+        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-base ${iconBg}`}>
+          <span aria-hidden="true">{emoji}</span>
         </div>
         <div>
-          <p className="text-xs font-semibold text-white">Acompte Stripe</p>
-          <p className="text-sm font-bold text-[#818cf8]">4&nbsp;978,80&nbsp;&euro;</p>
+          <p className="text-xs font-semibold text-white">{title}</p>
+          <p className="text-[10px] text-slate-400">{subtitle}</p>
         </div>
       </div>
     </div>
@@ -313,8 +335,9 @@ export function EditorialHero({ segment }: { segment?: string }) {
         >
           <div ref={stageRef} className="quote-stage relative">
             <QuoteDocument />
-            <FloatCardSignature />
-            <FloatCardPayment />
+            {HERO_BADGES.map((badge) => (
+              <FloatBadge key={badge.title} {...badge} />
+            ))}
           </div>
         </div>
       </div>

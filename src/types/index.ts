@@ -77,6 +77,7 @@ export interface Quote {
   version: number;
   parent_quote_id: string | null;
   archived_at: string | null;
+  escrow_enabled: boolean;
   created_at: string;
   updated_at: string;
 }

@@ -9,6 +9,31 @@ export const metadata = {
   title: "Factures — Worthifast",
 };
 
+function getEscrowBadge(escrowStatus: string | null) {
+  switch (escrowStatus) {
+    case "held":
+      return (
+        <Badge variant="secondary" className="bg-amber-50 text-amber-700">
+          💰 Fonds en séquestre
+        </Badge>
+      );
+    case "released":
+      return (
+        <Badge variant="secondary" className="bg-emerald-50 text-emerald-600">
+          ✅ Fonds libérés
+        </Badge>
+      );
+    case "disputed":
+      return (
+        <Badge variant="secondary" className="bg-red-50 text-red-600">
+          ⚠️ Litige signalé
+        </Badge>
+      );
+    default:
+      return null;
+  }
+}
+
 function getStatusBadge(status: string) {
   switch (status) {
     case "draft":
@@ -211,7 +236,10 @@ export default async function FacturesPage() {
                       {formatCurrency(Number(inv.amount), inv.currency || "EUR")}
                     </td>
                     <td className="px-4 py-3 text-center">
-                      {getStatusBadge(inv.status)}
+                      <div className="flex flex-col items-center gap-1">
+                        {getStatusBadge(inv.status)}
+                        {getEscrowBadge(inv.escrow_status)}
+                      </div>
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">
                       {inv.due_date ? formatDate(inv.due_date) : "—"}
@@ -230,6 +258,8 @@ export default async function FacturesPage() {
                         facturxPdfPath={inv.facturx_pdf_path}
                         paStatus={inv.pa_status}
                         pennylaneConnected={pennylaneConnected}
+                        escrowStatus={inv.escrow_status}
+                        escrowReleasedAt={inv.escrow_released_at}
                       />
                     </td>
                   </tr>

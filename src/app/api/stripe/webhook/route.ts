@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
 import { createServerClient } from "@supabase/ssr";
 import { tryAutoInvoice } from "@/lib/invoices/auto-invoice";
+import { createEscrowInvoice } from "@/lib/invoices/escrow";
 import { recordEReportingTransaction } from "@/lib/e-reporting/record-transaction";
 import { createNotification } from "@/lib/notifications/create";
 import { resend } from "@/lib/resend";
@@ -97,7 +98,7 @@ export async function POST(request: Request) {
           // Fetch user_id before update (needed for auto-invoice)
           const { data: quoteData } = await supabase
             .from("quotes")
-            .select("user_id")
+            .select("user_id, client_id, escrow_enabled")
             .eq("id", quoteId)
             .single();
 
@@ -116,6 +117,34 @@ export async function POST(request: Request) {
             })
             .eq("id", quoteId);
           if (quoteErr) console.error("[Webhook] Quote payment update failed:", { quoteId, error: quoteErr.message });
+
+          // Séquestre : force-crée la facture qui porte l'état escrow, avant
+          // l'automation classique (fire-and-forget) plus bas — celle-ci
+          // retrouvera cette facture via son anti-doublon et ne la dupliquera pas.
+          if (quoteData?.escrow_enabled && quoteData.user_id && session.payment_intent) {
+            try {
+              const pi = await getStripe().paymentIntents.retrieve(
+                session.payment_intent as string,
+                { expand: ["latest_charge"] }
+              );
+              const chargeId =
+                typeof pi.latest_charge === "string"
+                  ? pi.latest_charge
+                  : pi.latest_charge?.id || null;
+
+              await createEscrowInvoice({
+                quoteId,
+                userId: quoteData.user_id,
+                clientId: quoteData.client_id || null,
+                paymentIntentId: session.payment_intent as string,
+                chargeId,
+                amount: session.amount_total ? session.amount_total / 100 : 0,
+                currency: (session.currency || "eur").toUpperCase(),
+              });
+            } catch (escrowErr) {
+              console.error("[Webhook] Escrow invoice creation failed:", { quoteId, error: escrowErr });
+            }
+          }
 
           // Automation: auto-generate paid invoice receipt (non-blocking)
           if (quoteData?.user_id) {

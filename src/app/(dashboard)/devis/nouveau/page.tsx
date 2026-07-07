@@ -29,6 +29,7 @@ import {
   Check,
   Pencil,
   CreditCard,
+  Lock,
 } from "lucide-react";
 import { calculateItemTotal, calculateTotals, formatCurrency } from "@/lib/utils/quote";
 import { CURRENCIES } from "@/lib/currencies";
@@ -208,6 +209,10 @@ export default function NouveauDevisPage() {
   ]);
   const [retentionEnabled, setRetentionEnabled] = useState(false);
   const [scheduleLocked, setScheduleLocked] = useState(false);
+
+  // Séquestre de paiement (escrow)
+  const [escrowEnabled, setEscrowEnabled] = useState(false);
+  const [hasStripeConnect, setHasStripeConnect] = useState(false);
   const [aiPrompt, setAiPrompt] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -247,6 +252,25 @@ export default function NouveauDevisPage() {
     }
     loadDefaults();
   }, [editId]);
+
+  // Séquestre : le toggle n'est utilisable que si Stripe Connect est actif
+  // (impossible de libérer les fonds sans compte destination).
+  useEffect(() => {
+    async function loadConnectStatus() {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from("profiles")
+        .select("stripe_account_id, stripe_connect_status")
+        .eq("id", user.id)
+        .single();
+      setHasStripeConnect(
+        !!data?.stripe_account_id && data.stripe_connect_status === "connected"
+      );
+    }
+    loadConnectStatus();
+  }, []);
 
   // Auto-save silently as draft (edit mode only)
   const autoSave = useCallback(async () => {
@@ -386,6 +410,7 @@ export default function NouveauDevisPage() {
         );
       }
       setRetentionEnabled(data.retention_guarantee === true);
+      setEscrowEnabled(data.escrow_enabled === true);
     }
     loadQuote();
   }, [editId]);
@@ -564,6 +589,7 @@ export default function NouveauDevisPage() {
       items: validItems,
       retention_guarantee: scheduleEnabled && retentionEnabled,
       retention_percentage: 5,
+      escrow_enabled: hasStripeConnect && escrowEnabled,
     };
 
     try {
@@ -924,6 +950,49 @@ export default function NouveauDevisPage() {
               onRetentionChange={setRetentionEnabled}
             />
           )}
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Lock className="h-5 w-5 text-primary" />
+                Protection du paiement
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <label className={`flex items-center justify-between ${hasStripeConnect ? "cursor-pointer" : "cursor-not-allowed opacity-60"}`}>
+                <div>
+                  <span className="text-sm font-medium">Activer le séquestre</span>
+                  <p className="text-xs text-muted-foreground">
+                    Le paiement de votre client est sécurisé : les fonds sont
+                    bloqués jusqu&apos;à ce que vous confirmiez la livraison
+                    des travaux. Protection contre les impayés et les litiges.
+                  </p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={escrowEnabled}
+                  disabled={!hasStripeConnect}
+                  onChange={(e) => setEscrowEnabled(e.target.checked)}
+                  className="h-4 w-4 shrink-0 rounded border-gray-300 accent-primary"
+                />
+              </label>
+
+              {!hasStripeConnect && (
+                <p className="text-xs text-amber-600">
+                  Connectez Stripe Connect dans vos{" "}
+                  <a href="/parametres" className="underline">paramètres</a>{" "}
+                  pour activer le séquestre.
+                </p>
+              )}
+
+              {hasStripeConnect && escrowEnabled && (
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
+                  <Lock className="h-3 w-3" />
+                  Paiement sécurisé
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
 

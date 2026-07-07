@@ -251,9 +251,16 @@ export default function PublicQuotePage({
             <FileText className="h-6 w-6 text-primary" />
             <span className="text-xl font-bold">Devizly</span>
           </div>
-          <Badge variant="secondary" className={getStatusColor(quote.status)}>
-            {getStatusLabel(quote.status)}
-          </Badge>
+          <div className="flex items-center gap-2">
+            {quote.escrow_enabled && (
+              <Badge variant="secondary" className="bg-emerald-50 text-emerald-700">
+                🔒 Paiement sécurisé
+              </Badge>
+            )}
+            <Badge variant="secondary" className={getStatusColor(quote.status)}>
+              {getStatusLabel(quote.status)}
+            </Badge>
+          </div>
         </div>
 
         {/* Quote Card */}
@@ -539,6 +546,19 @@ export default function PublicQuotePage({
                         </p>
                       </div>
                     )
+                  )}
+
+                  {/* Escrow explanation */}
+                  {quote.escrow_enabled && (
+                    <div className="rounded-xl border border-emerald-500/30 bg-emerald-50 p-4">
+                      <p className="text-sm font-medium text-emerald-800">
+                        🔒 Votre paiement est protégé
+                      </p>
+                      <p className="text-xs text-emerald-700 mt-1">
+                        Les fonds sont bloqués jusqu&apos;à ce que le
+                        prestataire confirme la livraison des travaux.
+                      </p>
+                    </div>
                   )}
 
                   {/* Full payment — only if Stripe is configured */}

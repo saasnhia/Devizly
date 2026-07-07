@@ -86,6 +86,7 @@ const RECAP_FEATURES = [
   "Échéancier de paiement multi-étapes (BTP)",
   "Remboursement en 1 clic",
   "Retenue de garantie 5%",
+  "Séquestre de paiement sécurisé",
 ];
 
 /* ── Composant ─────────────────────────────────────────── */

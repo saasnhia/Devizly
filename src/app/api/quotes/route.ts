@@ -53,7 +53,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { title, client_id, currency, tva_rate, discount, notes, payment_terms, valid_until, items, ai_prompt, total_ht, total_ttc, retention_guarantee, retention_percentage } = body;
+  const { title, client_id, currency, tva_rate, discount, notes, payment_terms, valid_until, items, ai_prompt, total_ht, total_ttc, retention_guarantee, retention_percentage, escrow_enabled } = body;
 
   if (!title) {
     return NextResponse.json({ error: "Le titre est requis" }, { status: 400 });
@@ -76,6 +76,7 @@ export async function POST(request: Request) {
       total_ttc: total_ttc ?? 0,
       retention_guarantee: retention_guarantee ?? false,
       retention_percentage: retention_percentage ?? 5,
+      escrow_enabled: escrow_enabled ?? false,
     })
     .select()
     .single();

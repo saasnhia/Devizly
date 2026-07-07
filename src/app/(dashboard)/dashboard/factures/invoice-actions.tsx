@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Send, Copy, ExternalLink, Download, FileText, FileCheck, Loader2, AlertTriangle, Undo2 } from "lucide-react";
+import { Send, Copy, ExternalLink, Download, FileText, FileCheck, Loader2, AlertTriangle, Undo2, ShieldCheck, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
 
 const REFUND_REASONS = [
@@ -37,6 +37,8 @@ interface InvoiceActionsProps {
   facturxPdfPath: string | null;
   paStatus: string | null;
   pennylaneConnected: boolean;
+  escrowStatus: string | null;
+  escrowReleasedAt: string | null;
 }
 
 export function InvoiceActions({
@@ -49,6 +51,8 @@ export function InvoiceActions({
   facturxPdfPath,
   paStatus,
   pennylaneConnected,
+  escrowStatus,
+  escrowReleasedAt,
 }: InvoiceActionsProps) {
   const [sending, setSending] = useState(false);
   const [facturxLoading, setFacturxLoading] = useState(false);
@@ -64,6 +68,11 @@ export function InvoiceActions({
   const [refundAmount, setRefundAmount] = useState(String(remainingAmount));
   const [refundReason, setRefundReason] = useState("");
   const [refundLoading, setRefundLoading] = useState(false);
+
+  const [currentEscrowStatus, setCurrentEscrowStatus] = useState(escrowStatus);
+  const [releaseOpen, setReleaseOpen] = useState(false);
+  const [releaseLoading, setReleaseLoading] = useState(false);
+  const [disputeLoading, setDisputeLoading] = useState(false);
 
   async function handleSend() {
     setSending(true);
@@ -177,6 +186,45 @@ export function InvoiceActions({
       toast.error(err instanceof Error ? err.message : "Erreur lors du remboursement");
     } finally {
       setRefundLoading(false);
+    }
+  }
+
+  async function handleReleaseEscrow() {
+    setReleaseLoading(true);
+    try {
+      const res = await fetch(`/api/invoices/${invoiceId}/release-escrow`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Erreur lors de la libération des fonds");
+      }
+      setCurrentEscrowStatus("released");
+      setReleaseOpen(false);
+      toast.success("Fonds libérés — transfert en cours vers votre compte Stripe");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur lors de la libération des fonds");
+    } finally {
+      setReleaseLoading(false);
+    }
+  }
+
+  async function handleDisputeEscrow() {
+    setDisputeLoading(true);
+    try {
+      const res = await fetch(`/api/invoices/${invoiceId}/dispute-escrow`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Erreur lors du signalement");
+      }
+      setCurrentEscrowStatus("disputed");
+      toast.success("Litige signalé — les fonds restent bloqués");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur lors du signalement");
+    } finally {
+      setDisputeLoading(false);
     }
   }
 
@@ -359,6 +407,87 @@ export function InvoiceActions({
             </div>
           </DialogContent>
         </Dialog>
+      )}
+
+      {currentEscrowStatus === "held" && (
+        <Dialog open={releaseOpen} onOpenChange={setReleaseOpen}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-xs text-emerald-600 hover:text-emerald-700"
+            onClick={() => setReleaseOpen(true)}
+            title="Confirmer la livraison et libérer les fonds"
+          >
+            <ShieldCheck className="mr-1 h-3 w-3" />
+            Libérer
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-xs text-red-500 hover:text-red-600"
+            onClick={handleDisputeEscrow}
+            disabled={disputeLoading}
+            title="Signaler un litige"
+          >
+            {disputeLoading ? (
+              <Loader2 className="h-3 w-3 animate-spin" />
+            ) : (
+              <ShieldAlert className="h-3 w-3" />
+            )}
+          </Button>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirmer la livraison</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                {amount} {currency} seront transférés sur votre compte Stripe.
+              </p>
+              <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
+                <AlertTriangle className="h-4 w-4 shrink-0 text-amber-500 mt-0.5" />
+                <p className="text-xs text-amber-700">
+                  Les fonds seront transférés sur votre compte Stripe sous 2 à
+                  7 jours ouvrés. Cette action est irréversible.
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => setReleaseOpen(false)}
+                  disabled={releaseLoading}
+                >
+                  Annuler
+                </Button>
+                <Button
+                  className="flex-1"
+                  onClick={handleReleaseEscrow}
+                  disabled={releaseLoading}
+                >
+                  {releaseLoading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : null}
+                  Confirmer et libérer
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {currentEscrowStatus === "disputed" && (
+        <span
+          className="inline-flex items-center rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-medium text-red-700"
+          title="Litige signalé — contactez le support pour résoudre"
+        >
+          Litige en cours
+        </span>
+      )}
+
+      {currentEscrowStatus === "released" && escrowReleasedAt && (
+        <span className="inline-flex items-center rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700">
+          Libéré le {new Date(escrowReleasedAt).toLocaleDateString("fr-FR")}
+        </span>
       )}
 
       {checkoutUrl && (

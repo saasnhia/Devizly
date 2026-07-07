@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { getStripe } from "@/lib/stripe";
 import { getSiteUrl } from "@/lib/url";
+import { getNextInvoiceNumber } from "./invoice-number";
 import type Stripe from "stripe";
 
 function createServiceClient() {
@@ -72,16 +73,7 @@ export async function generateInvoice(
   const clientEmail = client?.email || null;
 
   // 2. Generate sequential invoice number: INV-YYYY-NNN (per user)
-  const year = new Date().getFullYear();
-  const { count } = await supabase
-    .from("invoices")
-    .select("id", { count: "exact", head: true })
-    .eq("user_id", userId)
-    .gte("created_at", `${year}-01-01`)
-    .lt("created_at", `${year + 1}-01-01`);
-
-  const seq = (count || 0) + 1;
-  const invoiceNumber = `INV-${year}-${String(seq).padStart(3, "0")}`;
+  const invoiceNumber = await getNextInvoiceNumber(supabase, userId);
 
   // 3. Due date = today + 30 days
   const dueDate = new Date();

@@ -88,6 +88,7 @@ export const plans: Plan[] = [
       "Échéancier BTP multi-étapes",
       "Remboursements Stripe en 1 clic",
       "Retenue de garantie 5%",
+      "Séquestre de paiement (escrow)",
     ],
     cta: "Profiter de l'offre",
     popular: true,
@@ -160,6 +161,10 @@ export const faqs = [
   {
     q: "Devizly gère-t-il les paiements BTP en plusieurs fois ?",
     a: "Oui ! Créez un échéancier directement sur vos devis : acompte à la signature, situation intermédiaire, solde à réception. Chaque étape génère sa propre facture et son lien de paiement Stripe. Vous pouvez aussi activer la retenue de garantie de 5% conformément au décret n°72-388.",
+  },
+  {
+    q: "Comment fonctionne le séquestre de paiement ?",
+    a: "Activez le séquestre sur vos devis : votre client paie, mais les fonds sont bloqués jusqu'à ce que vous confirmiez la livraison. Zéro risque d'impayé, zéro risque pour le client.",
   },
 ];
 

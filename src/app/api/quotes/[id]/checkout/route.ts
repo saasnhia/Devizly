@@ -108,6 +108,13 @@ export async function POST(
       profile?.stripe_account_id &&
       profile.stripe_connect_status === "connected";
 
+    if (quote.escrow_enabled && !hasConnect) {
+      return NextResponse.json(
+        { error: "Le séquestre nécessite un compte Stripe Connect actif" },
+        { status: 400 }
+      );
+    }
+
     const sessionConfig: Stripe.Checkout.SessionCreateParams = {
       payment_method_types: ["card"],
       line_items: lineItems,
@@ -126,6 +133,10 @@ export async function POST(
           ...(isPercentDeposit ? { deposit_percent: String(deposit_percent) } : {}),
           ...(isFixedDeposit ? { deposit_fixed_amount: String(deposit_fixed_amount) } : {}),
         },
+        // Séquestre : la charge reste sur le compte plateforme (pas de
+        // stripeAccount plus bas) — transfer_group permet de tracer le
+        // transfert vers l'artisan lors de la libération des fonds.
+        ...(quote.escrow_enabled ? { transfer_group: `escrow_${quote.id}` } : {}),
       },
     };
 
@@ -133,11 +144,16 @@ export async function POST(
       sessionConfig.customer_email = quote.clients.email;
     }
 
-    const session = hasConnect
-      ? await stripe.checkout.sessions.create(sessionConfig, {
-          stripeAccount: profile!.stripe_account_id!,
-        })
-      : await stripe.checkout.sessions.create(sessionConfig);
+    // Séquestre actif : charge créée sur le compte plateforme (jamais sur le
+    // compte connecté) pour que les fonds restent bloqués chez Devizly
+    // jusqu'à la libération manuelle.
+    const session = quote.escrow_enabled
+      ? await stripe.checkout.sessions.create(sessionConfig)
+      : hasConnect
+        ? await stripe.checkout.sessions.create(sessionConfig, {
+            stripeAccount: profile!.stripe_account_id!,
+          })
+        : await stripe.checkout.sessions.create(sessionConfig);
 
     // Save deposit info
     await supabase
@@ -193,6 +209,13 @@ export async function POST(
   const hasConnect =
     profile?.stripe_account_id && profile.stripe_connect_status === "connected";
 
+  if (quote.escrow_enabled && !hasConnect) {
+    return NextResponse.json(
+      { error: "Le séquestre nécessite un compte Stripe Connect actif" },
+      { status: 400 }
+    );
+  }
+
   const sessionConfig: Stripe.Checkout.SessionCreateParams = {
     payment_method_types: ["card"],
     line_items: lineItems,
@@ -207,6 +230,7 @@ export async function POST(
       metadata: {
         quote_id: quote.id,
       },
+      ...(quote.escrow_enabled ? { transfer_group: `escrow_${quote.id}` } : {}),
     },
   };
 
@@ -215,12 +239,15 @@ export async function POST(
     sessionConfig.customer_email = quote.clients.email;
   }
 
-  // Create session — on connected account if available, otherwise platform
-  const session = hasConnect
-    ? await stripe.checkout.sessions.create(sessionConfig, {
-        stripeAccount: profile!.stripe_account_id!,
-      })
-    : await stripe.checkout.sessions.create(sessionConfig);
+  // Create session — séquestre : toujours sur le compte plateforme (jamais
+  // stripeAccount) pour bloquer les fonds. Sinon, connecté si disponible.
+  const session = quote.escrow_enabled
+    ? await stripe.checkout.sessions.create(sessionConfig)
+    : hasConnect
+      ? await stripe.checkout.sessions.create(sessionConfig, {
+          stripeAccount: profile!.stripe_account_id!,
+        })
+      : await stripe.checkout.sessions.create(sessionConfig);
 
   // Save session ID
   await supabase

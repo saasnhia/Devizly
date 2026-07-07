@@ -41,7 +41,7 @@ export async function PUT(
   }
 
   const body = await request.json();
-  const { title, client_id, currency, tva_rate, discount, notes, payment_terms, valid_until, status, items, total_ht, total_ttc, retention_guarantee, retention_percentage } = body;
+  const { title, client_id, currency, tva_rate, discount, notes, payment_terms, valid_until, status, items, total_ht, total_ttc, retention_guarantee, retention_percentage, escrow_enabled } = body;
 
   const { error: updateError } = await supabase
     .from("quotes")
@@ -59,6 +59,7 @@ export async function PUT(
       total_ttc,
       ...(retention_guarantee !== undefined ? { retention_guarantee } : {}),
       ...(retention_percentage !== undefined ? { retention_percentage } : {}),
+      ...(escrow_enabled !== undefined ? { escrow_enabled } : {}),
       updated_at: new Date().toISOString(),
     })
     .eq("id", id)

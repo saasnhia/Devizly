@@ -409,7 +409,7 @@ export default function StatutAutoEntrepreneurPage() {
           </a>
         </p>
         <p className="mt-2 text-xs text-slate-400">
-          NBHC SAS — Capital 500 &euro; — RCS Chalon-sur-Saône — SIREN 102 637
+          NBHC SAS — RCS Chalon-sur-Saône — SIREN 102 637
           899
         </p>
       </div>

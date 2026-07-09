@@ -26,9 +26,6 @@ export default function MentionsLegalesPage() {
           <strong>Forme juridique :</strong> Société par actions simplifiée (SAS)
         </li>
         <li>
-          <strong>Capital social :</strong> 500,00 €
-        </li>
-        <li>
           <strong>Siège social :</strong> 55 Rue Henri Clément, 71100 Saint-Rémy
         </li>
         <li>
@@ -83,9 +80,9 @@ export default function MentionsLegalesPage() {
 
       <h2>4. Données personnelles</h2>
       <p>
-        Le responsable de traitement au sens du RGPD est NBHC, SAS au capital
-        de 500 €, dont le siège social est situé 55 Rue Henri Clément, 71100
-        Saint-Rémy. Le détail du traitement des données personnelles est décrit
+        Le responsable de traitement au sens du RGPD est NBHC, dont le siège
+        social est situé 55 Rue Henri Clément, 71100 Saint-Rémy. Le détail du
+        traitement des données personnelles est décrit
         dans notre <a href="/confidentialite">Politique de confidentialité</a>.
       </p>
 

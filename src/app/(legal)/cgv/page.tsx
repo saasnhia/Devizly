@@ -120,12 +120,6 @@ export default function CGVPage() {
             </tr>
             <tr className="border-b border-slate-100">
               <td className="bg-slate-50 px-4 py-2.5 font-medium text-slate-700">
-                Capital social
-              </td>
-              <td className="px-4 py-2.5 text-slate-600">500,00 &euro;</td>
-            </tr>
-            <tr className="border-b border-slate-100">
-              <td className="bg-slate-50 px-4 py-2.5 font-medium text-slate-700">
                 Siège social
               </td>
               <td className="px-4 py-2.5 text-slate-600">
@@ -450,7 +444,7 @@ export default function CGVPage() {
           </a>
         </p>
         <p className="mt-2 text-xs text-slate-400">
-          NBHC SAS — Capital 500 &euro; — RCS Chalon-sur-Saône — SIREN 102 637
+          NBHC SAS — RCS Chalon-sur-Saône — SIREN 102 637
           899
         </p>
       </div>

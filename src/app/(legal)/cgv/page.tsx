@@ -204,9 +204,12 @@ export default function CGVPage() {
             </tr>
             <tr className="border-t border-slate-100">
               <td className="px-4 py-3 font-medium text-slate-700">Pro</td>
-              <td className="px-4 py-3 text-slate-600">19 &euro;</td>
               <td className="px-4 py-3 text-slate-600">
-                Devis illimités, relances auto, signature, multi-devises
+                9 &euro; <span className="text-slate-400 line-through">19 &euro;</span>
+              </td>
+              <td className="px-4 py-3 text-slate-600">
+                Devis illimités, contrats, retenue de garantie, séquestre de
+                paiement
               </td>
             </tr>
             <tr className="border-t border-slate-100">
@@ -215,15 +218,18 @@ export default function CGVPage() {
               </td>
               <td className="px-4 py-3 text-slate-600">39 &euro;</td>
               <td className="px-4 py-3 text-slate-600">
-                Illimité, facturation récurrente, leads, support prioritaire
+                Tout Pro, Pennylane, lead forms, équipe, export CSV/FEC
               </td>
             </tr>
           </tbody>
         </table>
       </div>
       <p className="mt-3 text-sm text-slate-500">
-        Les prix s&apos;entendent hors taxes (HT). La TVA applicable sera
-        ajoutée au taux en vigueur.
+        Les prix s&apos;entendent hors taxes (HT). Le tarif de 9 &euro;/mois du
+        plan Pro correspond à l&apos;Offre Fondateur (prix garanti à vie),
+        réservée aux 100 premiers abonnés Pro ; au-delà, le tarif standard de
+        19 &euro;/mois s&apos;applique. La TVA applicable sera ajoutée au taux
+        en vigueur.
       </p>
 
       {/* Section 4 */}

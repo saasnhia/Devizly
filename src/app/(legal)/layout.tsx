@@ -43,6 +43,9 @@ export default function LegalLayout({
             <Link href="/cgu" className="hover:text-foreground">
               CGU
             </Link>
+            <Link href="/statut-auto-entrepreneur" className="hover:text-foreground">
+              Statut auto-entrepreneur
+            </Link>
             <Link href="/confidentialite" className="hover:text-foreground">
               Confidentialité
             </Link>

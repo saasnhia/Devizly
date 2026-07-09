@@ -43,6 +43,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
         </div>
         <div className="mx-auto mt-4 flex max-w-5xl flex-wrap items-center justify-center gap-6 px-4 text-xs text-slate-600 sm:px-6">
           <Link href="/mentions-legales" className="transition-colors hover:text-slate-400">Mentions legales</Link>
+          <Link href="/statut-auto-entrepreneur" className="transition-colors hover:text-slate-400">Statut auto-entrepreneur</Link>
           <Link href="/confidentialite" className="transition-colors hover:text-slate-400">Confidentialite</Link>
         </div>
         <p className="mt-4 text-center text-xs text-slate-600">

@@ -28,6 +28,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
+import Link from "next/link";
 import {
   Calculator,
   Copy,
@@ -38,6 +39,7 @@ import {
   AlertTriangle,
   TrendingUp,
   Info,
+  BookOpen,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { UrssafDeclaration, UrssafActiviteType } from "@/types";
@@ -376,6 +378,33 @@ export default function UrssafPage() {
             D&eacute;clarer sur urssaf.fr
           </a>
         </Button>
+      </div>
+
+      {/* Official resources — statute, obligations, cotisations */}
+      <div className="flex flex-wrap items-start gap-3 rounded-lg border-l-4 border-primary bg-primary/5 p-4">
+        <BookOpen className="h-5 w-5 shrink-0 text-primary mt-0.5" />
+        <div className="flex-1 min-w-[240px]">
+          <p className="text-sm font-medium text-slate-800">
+            Cotisations obligatoires, rôle des cotisations, droit du travail
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Le versement des cotisations sociales est obligatoire pour tout
+            auto-entrepreneur. Retrouvez le détail sur notre page{" "}
+            <Link href="/statut-auto-entrepreneur" className="font-medium text-primary hover:underline">
+              Le statut d&apos;auto-entrepreneur
+            </Link>{" "}
+            ou consultez la ressource officielle de l&apos;URSSAF.
+          </p>
+          <a
+            href="https://www.autoentrepreneur.urssaf.fr/portail/accueil/sinformer-sur-le-statut/lessentiel-du-statut.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+          >
+            L&apos;essentiel du statut — Autoentrepreneur.urssaf.fr
+            <ExternalLink className="h-3.5 w-3.5" />
+          </a>
+        </div>
       </div>
 
       {/* ACRE toggle */}

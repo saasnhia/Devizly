@@ -21,6 +21,7 @@ const legalLinks = [
   { label: "Mentions légales", href: "/mentions-legales" },
   { label: "CGV", href: "/cgv" },
   { label: "CGU", href: "/cgu" },
+  { label: "Statut auto-entrepreneur", href: "/statut-auto-entrepreneur" },
   { label: "Confidentialité", href: "/confidentialite" },
   { label: "Cookies", href: "/cookies" },
 ];

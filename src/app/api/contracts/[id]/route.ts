@@ -77,7 +77,7 @@ export async function PATCH(
     .update(updates)
     .eq("id", id)
     .eq("user_id", user.id)
-    .select("*, clients(name, email)")
+    .select("*, clients(name, email), quotes(number, total_ht)")
     .single();
 
   if (error) {

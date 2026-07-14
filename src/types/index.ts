@@ -275,6 +275,7 @@ export interface Contract {
   user_id: string;
   client_id: string | null;
   template_id: string | null;
+  quote_id: string | null;
   title: string;
   description: string | null;
   content: string | null;
@@ -301,6 +302,7 @@ export interface Contract {
 
 export interface ContractWithClient extends Contract {
   clients: { name: string; email: string | null } | null;
+  quotes: { number: number; total_ht: number } | null;
 }
 
 export interface ContractTemplate {

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useMemo } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { calculateQuoteScore, type QuoteScore } from "@/lib/quote-scoring";
 import {
@@ -32,6 +33,7 @@ import {
   Loader2,
   FileText,
   Send,
+  FileSignature,
 } from "lucide-react";
 import {
   formatCurrency,
@@ -55,6 +57,7 @@ export function QuotePreviewDrawer({
   onOpenChange,
   onDuplicate,
 }: QuotePreviewDrawerProps) {
+  const router = useRouter();
   const [quote, setQuote] = useState<QuoteWithItems | null>(null);
   const [loading, setLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
@@ -63,6 +66,8 @@ export function QuotePreviewDrawer({
   const [emailMessage, setEmailMessage] = useState("");
   const [emailSending, setEmailSending] = useState(false);
   const [clientQuotes, setClientQuotes] = useState<{ status: string; total_ttc: number }[]>([]);
+  const [linkedContractId, setLinkedContractId] = useState<string | null>(null);
+  const [creatingContract, setCreatingContract] = useState(false);
 
   const fetchQuote = useCallback(async () => {
     if (!quoteId) return;
@@ -75,15 +80,22 @@ export function QuotePreviewDrawer({
         if (json.data?.clients?.email) {
           setEmailTo(json.data.clients.email);
         }
+        const supabase = createClient();
         // Fetch client quote history for scoring
         if (json.data?.client_id) {
-          const supabase = createClient();
           const { data: cq } = await supabase
             .from("quotes")
             .select("status, total_ttc")
             .eq("client_id", json.data.client_id);
           setClientQuotes((cq || []) as { status: string; total_ttc: number }[]);
         }
+        // Check whether a contract is already linked to this quote
+        const { data: linkedContract } = await supabase
+          .from("contracts")
+          .select("id")
+          .eq("quote_id", quoteId)
+          .maybeSingle();
+        setLinkedContractId(linkedContract?.id ?? null);
       } else {
         setQuote(null);
       }
@@ -102,8 +114,34 @@ export function QuotePreviewDrawer({
       setQuote(null);
       setShowEmailForm(false);
       setEmailMessage("");
+      setLinkedContractId(null);
     }
   }, [open, quoteId, fetchQuote]);
+
+  async function handleCreateContract() {
+    if (!quoteId) return;
+    setCreatingContract(true);
+    try {
+      const res = await fetch("/api/contracts/from-quote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ quoteId }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        toast.error(json.error || "Erreur lors de la création du contrat");
+        return;
+      }
+      toast.success(
+        json.alreadyExisted ? "Contrat déjà existant" : "Contrat créé depuis le devis"
+      );
+      router.push(`/contrats?open=${json.data.id}`);
+    } catch {
+      toast.error("Erreur de connexion");
+    } finally {
+      setCreatingContract(false);
+    }
+  }
 
   async function handleDownloadPdf() {
     if (!quoteId) return;
@@ -274,7 +312,46 @@ export function QuotePreviewDrawer({
                 <Send className="mr-2 h-4 w-4" />
                 Envoyer par email
               </Button>
+              {linkedContractId ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => router.push(`/contrats?open=${linkedContractId}`)}
+                >
+                  <FileSignature className="mr-2 h-4 w-4" />
+                  Voir le contrat
+                </Button>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCreateContract}
+                  disabled={creatingContract}
+                >
+                  {creatingContract ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <FileSignature className="mr-2 h-4 w-4" />
+                  )}
+                  Créer le contrat
+                </Button>
+              )}
             </div>
+
+            {/* Contract link badge */}
+            {linkedContractId && (
+              <div className="flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-sm">
+                <FileSignature className="h-4 w-4 text-primary" />
+                <span>Contrat associé</span>
+                <button
+                  type="button"
+                  onClick={() => router.push(`/contrats?open=${linkedContractId}`)}
+                  className="ml-auto text-primary underline hover:no-underline"
+                >
+                  Voir →
+                </button>
+              </div>
+            )}
 
             {/* Q6: Email send form */}
             {showEmailForm && (

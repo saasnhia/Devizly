@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,6 +54,7 @@ import {
   ChevronRight,
   Loader2,
   X,
+  FileSignature,
 } from "lucide-react";
 import {
   formatCurrency,
@@ -90,7 +91,9 @@ type ViewTab = "actifs" | "archives";
 
 export default function DevisPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [quotes, setQuotes] = useState<QuoteWithClient[]>([]);
+  const [contractByQuote, setContractByQuote] = useState<Record<string, string>>({});
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<QuoteStatus | "all">("all");
   const [viewTab, setViewTab] = useState<ViewTab>("actifs");
@@ -123,7 +126,7 @@ export default function DevisPage() {
     const { data: { user: currentUser } } = await supabase.auth.getUser();
     if (!currentUser) return;
     const uid = currentUser.id;
-    const [quotesRes, profileRes, remindersRes, clientsRes] = await Promise.all(
+    const [quotesRes, profileRes, remindersRes, clientsRes, contractsRes] = await Promise.all(
       [
         supabase
           .from("quotes")
@@ -137,6 +140,11 @@ export default function DevisPage() {
           .single(),
         supabase.from("quote_reminders").select("quote_id").eq("user_id", uid),
         supabase.from("clients").select("id, name").eq("user_id", uid).order("name"),
+        supabase
+          .from("contracts")
+          .select("id, quote_id")
+          .eq("user_id", uid)
+          .not("quote_id", "is", null),
       ]
     );
     setQuotes((quotesRes.data || []) as QuoteWithClient[]);
@@ -156,12 +164,30 @@ export default function DevisPage() {
     if (clientsRes.data) {
       setClients(clientsRes.data as Client[]);
     }
+    if (contractsRes.data) {
+      const map: Record<string, string> = {};
+      for (const c of contractsRes.data as { id: string; quote_id: string }[]) {
+        map[c.quote_id] = c.id;
+      }
+      setContractByQuote(map);
+    }
     setLoading(false);
   }, []);
 
   useEffect(() => {
     fetchQuotes();
   }, [fetchQuotes]);
+
+  // Deep link from the contrats page ("Depuis devis DEV-XXXX" →
+  // /devis?open=<id>): auto-open the preview drawer, then clean the URL.
+  useEffect(() => {
+    const openId = searchParams.get("open");
+    if (!openId || quotes.length === 0) return;
+    if (quotes.some((q) => q.id === openId)) {
+      openPreview(openId);
+      router.replace("/devis");
+    }
+  }, [searchParams, quotes, router]);
 
   // Filtered + paginated quotes
   const filtered = useMemo(() => {
@@ -471,6 +497,22 @@ export default function DevisPage() {
   function openPreview(quoteId: string) {
     setPreviewQuoteId(quoteId);
     setDrawerOpen(true);
+  }
+
+  async function handleCreateContract(quoteId: string) {
+    const res = await fetch("/api/contracts/from-quote", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ quoteId }),
+    });
+    const json = await res.json();
+    if (!res.ok) {
+      toast.error(json.error || "Erreur lors de la création du contrat");
+      return;
+    }
+    setContractByQuote((prev) => ({ ...prev, [quoteId]: json.data.id }));
+    toast.success(json.alreadyExisted ? "Contrat déjà existant" : "Contrat créé depuis le devis");
+    router.push(`/contrats?open=${json.data.id}`);
   }
 
   function clearFilters() {
@@ -1021,6 +1063,25 @@ export default function DevisPage() {
                                     >
                                       <Receipt className="mr-2 h-4 w-4" />
                                       Générer facture
+                                    </DropdownMenuItem>
+                                  )}
+                                  {contractByQuote[quote.id] ? (
+                                    <DropdownMenuItem
+                                      onClick={() =>
+                                        router.push(
+                                          `/contrats?open=${contractByQuote[quote.id]}`
+                                        )
+                                      }
+                                    >
+                                      <FileSignature className="mr-2 h-4 w-4" />
+                                      Voir le contrat
+                                    </DropdownMenuItem>
+                                  ) : (
+                                    <DropdownMenuItem
+                                      onClick={() => handleCreateContract(quote.id)}
+                                    >
+                                      <FileSignature className="mr-2 h-4 w-4" />
+                                      Créer le contrat
                                     </DropdownMenuItem>
                                   )}
                                   {quote.status === "brouillon" && (

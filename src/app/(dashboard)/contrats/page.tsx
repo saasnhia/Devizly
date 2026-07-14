@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -53,7 +54,10 @@ import {
   resolveVariables,
   type TemplateProfile,
 } from "@/lib/contracts/template-engine";
-import { ContractQuickWizard } from "@/components/contracts/contract-quick-wizard";
+import {
+  ContractQuickWizard,
+  type QuoteOption,
+} from "@/components/contracts/contract-quick-wizard";
 
 // ── Helpers ───────────────────────────────────────────────────
 
@@ -487,9 +491,12 @@ function ContractModal({
 // ── Main Page ─────────────────────────────────────────────────
 
 export default function ContratsPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [contracts, setContracts] = useState<ContractWithClient[]>([]);
   const [templates, setTemplates] = useState<ContractTemplate[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
+  const [quotes, setQuotes] = useState<QuoteOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [plan, setPlan] = useState<string>("free");
   const [companyProfile, setCompanyProfile] = useState<TemplateProfile | null>(
@@ -549,6 +556,13 @@ export default function ContratsPage() {
         const cj = await clientRes.json() as { data: Client[] };
         setClients(cj.data ?? []);
       }
+
+      // Quotes (for the "à partir d'un devis" wizard mode)
+      const { data: quotesData } = await supabase
+        .from("quotes")
+        .select("id, number, title, total_ht, currency, client_id, clients(name)")
+        .order("created_at", { ascending: false });
+      setQuotes((quotesData as unknown as QuoteOption[]) ?? []);
     } catch {
       toast.error("Erreur de chargement");
     } finally {
@@ -559,6 +573,23 @@ export default function ContratsPage() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // Deep link from the devis page ("Voir le contrat" → /contrats?open=<id>):
+  // auto-open the edit modal once contracts are loaded, then clean the URL.
+  useEffect(() => {
+    const openId = searchParams.get("open");
+    if (!openId || contracts.length === 0) return;
+    const target = contracts.find((c) => c.id === openId);
+    if (target) {
+      setEditingContract(target);
+      setModalOpen(true);
+      router.replace("/contrats");
+    }
+  }, [searchParams, contracts, router]);
+
+  const availableQuotes = quotes.filter(
+    (q) => !contracts.some((c) => c.quote_id === q.id)
+  );
 
   // ── Plan gate ──────────────────────────────────────────────
   if (!loading && plan === "free") {
@@ -807,12 +838,26 @@ export default function ContratsPage() {
                           {c.description}
                         </div>
                       )}
+                      {c.quote_id && c.quotes && (
+                        <Link
+                          href={`/devis?open=${c.quote_id}`}
+                          className="mt-1 inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                        >
+                          <FileText className="h-3 w-3" />
+                          Depuis devis DEV-{String(c.quotes.number).padStart(4, "0")}
+                        </Link>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">
                       {c.clients?.name ?? "—"}
                     </td>
                     <td className="px-4 py-3 text-right font-medium">
                       {formatCurrency(Number(c.amount), c.currency)}
+                      {c.quote_id && c.quotes && Number(c.amount) !== Number(c.quotes.total_ht) && (
+                        <div className="text-[10px] font-normal text-amber-600">
+                          Modifié vs devis ({formatCurrency(Number(c.quotes.total_ht))})
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-center text-muted-foreground">
                       {frequencyLabel(c.frequency)}
@@ -988,6 +1033,7 @@ export default function ContratsPage() {
         onOpenChange={setQuickWizardOpen}
         clients={clients}
         templates={templates}
+        quotes={availableQuotes}
         profile={companyProfile}
         onDone={fetchData}
       />

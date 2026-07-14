@@ -19,19 +19,33 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Send, Download, Pencil, Plus, Loader2, Zap } from "lucide-react";
+import { Send, Download, Pencil, Plus, Loader2, Zap, FileText } from "lucide-react";
 import { toast } from "sonner";
 import type { ContractTemplate, Client } from "@/types";
 import {
   resolveVariables,
   type TemplateProfile,
 } from "@/lib/contracts/template-engine";
+import { buildContractFromQuote } from "@/lib/contracts/from-quote";
+import { createClient } from "@/lib/supabase/client";
+import { formatCurrency } from "@/lib/utils/quote";
+
+export interface QuoteOption {
+  id: string;
+  number: number;
+  title: string;
+  total_ht: number;
+  currency: string;
+  client_id: string | null;
+  clients: { name: string } | null;
+}
 
 interface ContractQuickWizardProps {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   templates: ContractTemplate[];
   clients: Client[];
+  quotes: QuoteOption[];
   profile: TemplateProfile | null;
   onDone: () => void;
 }
@@ -41,10 +55,14 @@ export function ContractQuickWizard({
   onOpenChange,
   templates,
   clients,
+  quotes,
   profile,
   onDone,
 }: ContractQuickWizardProps) {
   const [clientsLocal, setClientsLocal] = useState<Client[]>(clients);
+  const [mode, setMode] = useState<"scratch" | "fromQuote">("scratch");
+  const [quoteId, setQuoteId] = useState<string>("");
+  const [quoteOriginalAmount, setQuoteOriginalAmount] = useState<number | null>(null);
   const [templateId, setTemplateId] = useState<string>("");
   const [clientId, setClientId] = useState<string>("");
   const [objet, setObjet] = useState("");
@@ -66,6 +84,9 @@ export function ContractQuickWizard({
   // Reset + pre-select the NBHC template every time the wizard opens.
   useEffect(() => {
     if (!open) return;
+    setMode("scratch");
+    setQuoteId("");
+    setQuoteOriginalAmount(null);
     setClientId("");
     setObjet("");
     setMontant("");
@@ -83,6 +104,47 @@ export function ContractQuickWizard({
       templates[0];
     setTemplateId(defaultTpl?.id ?? "");
   }, [open, templates]);
+
+  function handleModeChange(next: "scratch" | "fromQuote") {
+    setMode(next);
+    setQuoteId("");
+    setQuoteOriginalAmount(null);
+    setClientId("");
+    setObjet("");
+    setMontant("");
+  }
+
+  async function handleSelectQuote(id: string) {
+    setQuoteId(id);
+    const quote = quotes.find((q) => q.id === id);
+    if (!quote) return;
+
+    const supabase = createClient();
+    const { data: items } = await supabase
+      .from("quote_items")
+      .select("description")
+      .eq("quote_id", id);
+
+    const client = clientsLocal.find((c) => c.id === quote.client_id) ?? null;
+    const payload = buildContractFromQuote({
+      quote: {
+        id: quote.id,
+        title: quote.title,
+        total_ht: Number(quote.total_ht),
+        currency: quote.currency || "EUR",
+        client_id: quote.client_id,
+      },
+      items: items || [],
+      client,
+      profile,
+      template: selectedTemplate,
+    });
+
+    setClientId(payload.client_id ?? "");
+    setObjet(payload.description);
+    setMontant(String(payload.amount));
+    setQuoteOriginalAmount(payload.amount);
+  }
 
   const selectedTemplate = templates.find((t) => t.id === templateId) ?? null;
   const selectedClient = clientsLocal.find((c) => c.id === clientId) ?? null;
@@ -142,6 +204,7 @@ export function ContractQuickWizard({
       title: selectedTemplate?.name || "Contrat de prestation",
       client_id: clientId || null,
       template_id: templateId || null,
+      quote_id: mode === "fromQuote" && quoteId ? quoteId : undefined,
       amount: parseFloat(montant) || 0,
       frequency: "monthly",
       start_date: new Date().toISOString().split("T")[0],
@@ -234,6 +297,65 @@ export function ContractQuickWizard({
         <p className="-mt-2 text-xs text-muted-foreground">
           Modèle fourni à titre indicatif — à faire valider par un professionnel du droit.
         </p>
+
+        {/* Mode toggle */}
+        <div className="flex gap-2 rounded-lg bg-slate-100 p-1">
+          <button
+            type="button"
+            onClick={() => handleModeChange("scratch")}
+            className={`flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+              mode === "scratch"
+                ? "bg-white shadow-sm text-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Nouveau contrat
+          </button>
+          <button
+            type="button"
+            onClick={() => handleModeChange("fromQuote")}
+            className={`flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+              mode === "fromQuote"
+                ? "bg-white shadow-sm text-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            À partir d&apos;un devis
+          </button>
+        </div>
+
+        {mode === "fromQuote" && (
+          <div>
+            <Label className="mb-1 flex items-center gap-2 text-xs text-muted-foreground">
+              <FileText className="h-3.5 w-3.5" />
+              Devis source
+            </Label>
+            <Select value={quoteId} onValueChange={handleSelectQuote}>
+              <SelectTrigger>
+                <SelectValue placeholder="Choisir un devis…" />
+              </SelectTrigger>
+              <SelectContent>
+                {quotes.length === 0 ? (
+                  <div className="px-2 py-1.5 text-xs text-muted-foreground">
+                    Aucun devis disponible (déjà tous liés à un contrat)
+                  </div>
+                ) : (
+                  quotes.map((q) => (
+                    <SelectItem key={q.id} value={q.id}>
+                      DEV-{String(q.number).padStart(4, "0")} — {q.clients?.name ?? "Sans client"} —{" "}
+                      {formatCurrency(Number(q.total_ht), q.currency)}
+                    </SelectItem>
+                  ))
+                )}
+              </SelectContent>
+            </Select>
+            {quoteId && (
+              <p className="mt-1 text-xs text-muted-foreground">
+                Client, montant et objet pré-remplis depuis ce devis — ajustez la durée ci-dessous.
+              </p>
+            )}
+          </div>
+        )}
 
         <div className="grid gap-6 lg:grid-cols-2">
           {/* ── Left: inputs ── */}
@@ -353,6 +475,12 @@ export function ContractQuickWizard({
                     onChange={(e) => setDuree(e.target.value)}
                   />
                 </div>
+                {quoteOriginalAmount !== null &&
+                  parseFloat(montant) !== quoteOriginalAmount && (
+                    <p className="text-xs text-amber-600">
+                      Montant modifié par rapport au devis ({formatCurrency(quoteOriginalAmount)})
+                    </p>
+                  )}
               </div>
             </div>
 

@@ -28,7 +28,7 @@ export async function GET() {
 
   const { data, error } = await supabase
     .from("contracts")
-    .select("*, clients(name, email)")
+    .select("*, clients(name, email), quotes(number, total_ht)")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
@@ -68,6 +68,7 @@ export async function POST(request: Request) {
     title?: string;
     client_id?: string | null;
     template_id?: string | null;
+    quote_id?: string | null;
     amount?: number;
     frequency?: string;
     start_date?: string;
@@ -83,6 +84,7 @@ export async function POST(request: Request) {
     title,
     client_id,
     template_id,
+    quote_id,
     amount,
     frequency,
     start_date,
@@ -114,6 +116,19 @@ export async function POST(request: Request) {
     );
   }
 
+  // A quote can only be linked to one contract — verify ownership if provided.
+  if (quote_id) {
+    const { data: quote } = await supabase
+      .from("quotes")
+      .select("id")
+      .eq("id", quote_id)
+      .eq("user_id", user.id)
+      .single();
+    if (!quote) {
+      return NextResponse.json({ error: "Devis introuvable" }, { status: 404 });
+    }
+  }
+
   // Compute next_invoice_date = start_date
   const { data, error } = await supabase
     .from("contracts")
@@ -122,6 +137,7 @@ export async function POST(request: Request) {
       title: title.trim(),
       client_id: client_id || null,
       template_id: template_id || null,
+      quote_id: quote_id || null,
       amount: amount ?? 0,
       currency: currency || "EUR",
       frequency: freq,
@@ -134,10 +150,16 @@ export async function POST(request: Request) {
       document_type: document_type || "recurring",
       status: "draft",
     })
-    .select("*, clients(name, email)")
+    .select("*, clients(name, email), quotes(number, total_ht)")
     .single();
 
   if (error) {
+    if (error.code === "23505") {
+      return NextResponse.json(
+        { error: "Ce devis a déjà un contrat associé" },
+        { status: 409 }
+      );
+    }
     return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 });
   }
 

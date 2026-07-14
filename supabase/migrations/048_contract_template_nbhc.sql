@@ -120,30 +120,39 @@ Pour le Client :
 {{client_nom}}
 {{client_representant}}$content$;
 BEGIN
+  -- Kept as a separate outer IF (touching information_schema only) so the
+  -- inner statement referencing contract_templates directly is never
+  -- planned when the table doesn't exist yet. A single compound
+  -- "EXISTS(...) AND ... AND NOT EXISTS(SELECT FROM contract_templates)"
+  -- condition fails at plan time regardless of AND short-circuiting,
+  -- because Postgres resolves every relation in the expression up front.
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'contract_templates')
-     AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'contract_templates' AND column_name = 'content')
-     AND NOT EXISTS (
-       SELECT 1 FROM contract_templates
-       WHERE is_system = true AND name = 'Prestation d''automatisation IA'
-     ) THEN
-    INSERT INTO contract_templates (
-      id, user_id, name, description, is_system, category,
-      default_amount, default_frequency, default_duration_months, items,
-      content, variables
-    )
-    VALUES (
-      gen_random_uuid(),
-      NULL,
-      'Prestation d''automatisation IA',
-      'Contrat de prestation de services pour la conception et la mise en place de solutions d''automatisation de workflows par intelligence artificielle.',
-      true,
-      'prestation',
-      NULL,
-      'monthly',
-      NULL,
-      '[]',
-      tpl_content,
-      '["prestataire_nom","prestataire_siret","prestataire_adresse","prestataire_representant","client_nom","client_siret","client_adresse","client_representant","date","montant","duree","objet"]'::jsonb
-    );
+     AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'contract_templates' AND column_name = 'content') THEN
+
+    IF NOT EXISTS (
+      SELECT 1 FROM contract_templates
+      WHERE is_system = true AND name = 'Prestation d''automatisation IA'
+    ) THEN
+      INSERT INTO contract_templates (
+        id, user_id, name, description, is_system, category,
+        default_amount, default_frequency, default_duration_months, items,
+        content, variables
+      )
+      VALUES (
+        gen_random_uuid(),
+        NULL,
+        'Prestation d''automatisation IA',
+        'Contrat de prestation de services pour la conception et la mise en place de solutions d''automatisation de workflows par intelligence artificielle.',
+        true,
+        'prestation',
+        NULL,
+        'monthly',
+        NULL,
+        '[]',
+        tpl_content,
+        '["prestataire_nom","prestataire_siret","prestataire_adresse","prestataire_representant","client_nom","client_siret","client_adresse","client_representant","date","montant","duree","objet"]'::jsonb
+      );
+    END IF;
+
   END IF;
 END $$;

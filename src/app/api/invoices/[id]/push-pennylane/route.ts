@@ -97,6 +97,16 @@ export async function POST(
   const pdfBytes = await pdfData.arrayBuffer();
 
   // 5. Push to Pennylane
+  // NOTE: /api/external/v2/e-invoices/imports (with a "type" field) is
+  // DEPRECATED per Pennylane's own docs. The documented replacement is
+  // /api/external/v2/customer_invoices/e_invoices/imports (type is implicit
+  // in the path — Devizly always imports invoices the freelancer issues to
+  // their client, i.e. a "customer" invoice from Pennylane's point of view).
+  // Required token scope is customer_invoices:all (was e_invoices:all).
+  // TODO: confirm with scripts/test-pennylane.mjs against a real token
+  // whether the success response still exposes a `url` field the way the
+  // legacy endpoint did — the docs don't show the response schema, and this
+  // parsing may need adjusting once we see a real payload.
   try {
     const formData = new FormData();
     formData.append(
@@ -104,10 +114,9 @@ export async function POST(
       new Blob([pdfBytes], { type: "application/pdf" }),
       `${invoice.invoice_number}.pdf`
     );
-    formData.append("type", "customer");
 
     const pennylaneRes = await fetch(
-      "https://app.pennylane.com/api/external/v2/e-invoices/imports",
+      "https://app.pennylane.com/api/external/v2/customer_invoices/e_invoices/imports",
       {
         method: "POST",
         headers: { Authorization: `Bearer ${pennylaneToken}` },
@@ -134,16 +143,42 @@ export async function POST(
       );
     }
 
-    const pennylaneData = await pennylaneRes.json();
-    const pennylaneUrl = pennylaneData.url || "";
-    // Extract invoice ID from URL (last numeric segment)
-    const pennylaneId = pennylaneUrl.match(/\/(\d+)$/)?.[1] || pennylaneUrl;
+    // The v2 doc for this endpoint doesn't publish a response schema (the
+    // "Try It" example is rendered client-side and requires an authenticated
+    // session to view). Rather than trust one guessed field name, log the
+    // full raw body and accept several plausible shapes — a RESTful create
+    // typically returns either the created resource's `id` directly, or it
+    // nested under `customer_invoice` / `data`. `send_to_pa` takes an `{id}`
+    // path param, which is the strongest signal we have that `id` is the
+    // field to capture here.
+    const rawBody = await pennylaneRes.text();
+    console.log("[push-pennylane] Success response body:", rawBody);
+
+    let pennylaneData: Record<string, unknown> = {};
+    try {
+      pennylaneData = JSON.parse(rawBody);
+    } catch {
+      console.warn("[push-pennylane] Success response was not valid JSON");
+    }
+
+    const nested =
+      (pennylaneData.customer_invoice as Record<string, unknown> | undefined) ??
+      (pennylaneData.data as Record<string, unknown> | undefined) ??
+      pennylaneData;
+
+    const pennylaneId =
+      (nested.id as string | number | undefined) ??
+      (nested.customer_invoice_id as string | number | undefined) ??
+      (nested.invoice_id as string | number | undefined) ??
+      null;
+
+    const pennylaneUrl = (nested.url as string | undefined) ?? "";
 
     // 6. Update invoice with success
     await dbClient
       .from("invoices")
       .update({
-        pa_invoice_id: pennylaneId,
+        pa_invoice_id: pennylaneId !== null ? String(pennylaneId) : null,
         pa_status: "sent",
         pa_sent_at: new Date().toISOString(),
         pa_error: null,
@@ -158,6 +193,7 @@ export async function POST(
 
     return NextResponse.json({
       success: true,
+      pennylane_id: pennylaneId,
       pennylane_url: pennylaneUrl,
       pa_status: "sent",
     });

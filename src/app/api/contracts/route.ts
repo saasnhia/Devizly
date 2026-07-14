@@ -132,7 +132,7 @@ export async function POST(request: Request) {
       description: description || null,
       content: content || null,
       document_type: document_type || "recurring",
-      status: "active",
+      status: "draft",
     })
     .select("*, clients(name, email)")
     .single();

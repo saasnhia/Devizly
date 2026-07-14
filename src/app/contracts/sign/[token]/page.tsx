@@ -15,6 +15,7 @@ import {
   Calendar,
   Building2,
   Loader2,
+  Download,
 } from "lucide-react";
 
 interface ContractData {
@@ -54,6 +55,7 @@ const FREQUENCY_LABELS: Record<string, string> = {
 
 const DOC_TYPE_LABELS: Record<string, string> = {
   recurring: "Contrat",
+  prestation: "Contrat de prestation",
   cgv: "CGV",
   sla: "SLA",
   nda: "NDA",
@@ -251,15 +253,24 @@ export default function ContractSignPage({
         {/* Already signed */}
         {signed && (
           <Card className="border-green-200 bg-green-50">
-            <CardContent className="flex items-center gap-4 py-6">
-              <CheckCircle className="h-8 w-8 text-green-600" />
-              <div>
-                <p className="font-semibold text-green-800">Contrat signe</p>
-                <p className="text-sm text-green-600">
-                  {contract.signerName && `Par ${contract.signerName}`}
-                  {contract.signedAt && ` le ${formatDate(contract.signedAt)}`}
-                </p>
+            <CardContent className="flex items-center justify-between gap-4 py-6">
+              <div className="flex items-center gap-4">
+                <CheckCircle className="h-8 w-8 text-green-600" />
+                <div>
+                  <p className="font-semibold text-green-800">Contrat signe</p>
+                  <p className="text-sm text-green-600">
+                    {contract.signerName && `Par ${contract.signerName}`}
+                    {contract.signedAt && ` le ${formatDate(contract.signedAt)}`}
+                  </p>
+                </div>
               </div>
+              <Button
+                variant="outline"
+                onClick={() => window.open(`/api/contracts/sign/${token}/pdf`, "_blank")}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Télécharger PDF
+              </Button>
             </CardContent>
           </Card>
         )}

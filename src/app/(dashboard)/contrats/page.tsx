@@ -43,10 +43,17 @@ import {
   FileText,
   Copy,
   Send,
+  Download,
+  Zap,
 } from "lucide-react";
 import type { ContractWithClient, ContractTemplate, Client } from "@/types";
 import { toast } from "sonner";
 import { formatCurrency, formatDate } from "@/lib/utils/quote";
+import {
+  resolveVariables,
+  type TemplateProfile,
+} from "@/lib/contracts/template-engine";
+import { ContractQuickWizard } from "@/components/contracts/contract-quick-wizard";
 
 // ── Helpers ───────────────────────────────────────────────────
 
@@ -140,6 +147,7 @@ function ContractModal({
   contract,
   clients,
   templates,
+  profile,
   onSaved,
 }: {
   open: boolean;
@@ -147,10 +155,17 @@ function ContractModal({
   contract: ContractWithClient | null;
   clients: Client[];
   templates: ContractTemplate[];
+  profile: TemplateProfile | null;
   onSaved: () => void;
 }) {
   const [form, setForm] = useState<ContractFormData>(defaultFormData);
   const [saving, setSaving] = useState(false);
+  // Raw {{variable}} template body — kept separate from `form.content` so
+  // switching the selected client can re-resolve it without losing the
+  // original template text.
+  const [rawTemplateContent, setRawTemplateContent] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
     if (contract) {
@@ -166,20 +181,46 @@ function ContractModal({
         document_type: contract.document_type ?? "recurring",
         content: contract.content ?? "",
       });
+      setRawTemplateContent(null);
     } else {
       setForm(defaultFormData);
+      setRawTemplateContent(null);
     }
   }, [contract, open]);
 
   function applyTemplate(templateId: string) {
     const tpl = templates.find((t) => t.id === templateId);
     if (!tpl) return;
+    setRawTemplateContent(tpl.content ?? null);
+
+    const selectedClient = clients.find((c) => c.id === form.client_id) ?? null;
+    const resolvedContent = tpl.content
+      ? resolveVariables(tpl.content, { profile, client: selectedClient })
+      : "";
+
     setForm((prev) => ({
       ...prev,
       title: tpl.name,
       description: tpl.description ?? "",
       amount: tpl.default_amount !== null ? String(tpl.default_amount) : "",
       frequency: tpl.default_frequency,
+      document_type: tpl.category === "prestation" ? "prestation" : prev.document_type,
+      content: resolvedContent || prev.content,
+    }));
+  }
+
+  // Re-resolve the template body whenever the selected client changes, so
+  // {{client_nom}}, {{client_siret}}, etc. stay in sync with the picker.
+  function handleClientChange(clientId: string) {
+    setForm((prev) => ({ ...prev, client_id: clientId }));
+    if (!rawTemplateContent) return;
+    const selectedClient = clients.find((c) => c.id === clientId) ?? null;
+    setForm((prev) => ({
+      ...prev,
+      content: resolveVariables(rawTemplateContent, {
+        profile,
+        client: selectedClient,
+      }),
     }));
   }
 
@@ -257,6 +298,12 @@ function ContractModal({
                 ))}
               </SelectContent>
             </Select>
+            {rawTemplateContent && (
+              <p className="mt-2 text-xs text-muted-foreground">
+                Ce modèle est fourni à titre indicatif. Faites-le valider par
+                un professionnel du droit avant tout usage commercial.
+              </p>
+            )}
           </div>
         )}
 
@@ -278,9 +325,7 @@ function ContractModal({
             <Label htmlFor="client_id">Client</Label>
             <Select
               value={form.client_id}
-              onValueChange={(v) =>
-                setForm((p) => ({ ...p, client_id: v === "none" ? "" : v }))
-              }
+              onValueChange={(v) => handleClientChange(v === "none" ? "" : v)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Sélectionner un client…" />
@@ -383,6 +428,7 @@ function ContractModal({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="recurring">Contrat recurrent</SelectItem>
+                <SelectItem value="prestation">Prestation de services</SelectItem>
                 <SelectItem value="cgv">CGV</SelectItem>
                 <SelectItem value="sla">SLA</SelectItem>
                 <SelectItem value="nda">NDA</SelectItem>
@@ -446,7 +492,11 @@ export default function ContratsPage() {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [plan, setPlan] = useState<string>("free");
+  const [companyProfile, setCompanyProfile] = useState<TemplateProfile | null>(
+    null
+  );
   const [modalOpen, setModalOpen] = useState(false);
+  const [quickWizardOpen, setQuickWizardOpen] = useState(false);
   const [editingContract, setEditingContract] =
     useState<ContractWithClient | null>(null);
 
@@ -455,13 +505,25 @@ export default function ContratsPage() {
     try {
       const supabase = createClient();
 
-      // Get plan
+      // Get plan + company info (for template variable resolution)
       const { data: profile } = await supabase
         .from("profiles")
-        .select("subscription_status")
+        .select(
+          "subscription_status, company_name, company_siret, company_address, company_postal_code, company_city, full_name"
+        )
         .single();
       if (profile?.subscription_status) {
         setPlan(profile.subscription_status);
+      }
+      if (profile) {
+        setCompanyProfile({
+          company_name: profile.company_name,
+          company_siret: profile.company_siret,
+          company_address: profile.company_address,
+          company_postal_code: profile.company_postal_code,
+          company_city: profile.company_city,
+          full_name: profile.full_name,
+        });
       }
       if (!profile || profile.subscription_status === "free") {
         return;
@@ -600,6 +662,10 @@ export default function ContratsPage() {
     }
   }
 
+  function handleDownloadPdf(c: ContractWithClient) {
+    window.open(`/api/contracts/${c.id}/pdf`, "_blank");
+  }
+
   async function handleUseTemplate(tpl: ContractTemplate) {
     setEditingContract(null);
     // Pre-fill via template picker in modal; just open modal
@@ -632,10 +698,20 @@ export default function ContratsPage() {
             Gérez vos contrats récurrents et votre revenu mensuel garanti.
           </p>
         </div>
-        <Button onClick={handleNew}>
-          <Plus className="mr-2 h-4 w-4" />
-          Nouveau contrat
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            className="border-primary/40 text-primary hover:bg-primary/5"
+            onClick={() => setQuickWizardOpen(true)}
+          >
+            <Zap className="mr-2 h-4 w-4" />
+            Contrat rapide
+          </Button>
+          <Button onClick={handleNew}>
+            <Plus className="mr-2 h-4 w-4" />
+            Nouveau contrat
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -761,10 +837,22 @@ export default function ContratsPage() {
                             <Pencil className="mr-2 h-4 w-4" />
                             Modifier
                           </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDownloadPdf(c)}>
+                            <Download className="mr-2 h-4 w-4" />
+                            Télécharger PDF
+                          </DropdownMenuItem>
                           {(c.status === "draft" || c.status === "active") && c.clients?.email && (
                             <DropdownMenuItem onClick={() => handleSendForSignature(c)}>
                               <Send className="mr-2 h-4 w-4" />
                               Envoyer pour signature
+                            </DropdownMenuItem>
+                          )}
+                          {c.status === "draft" && (
+                            <DropdownMenuItem
+                              onClick={() => handleStatusChange(c, "active")}
+                            >
+                              <PlayCircle className="mr-2 h-4 w-4" />
+                              Activer sans signature
                             </DropdownMenuItem>
                           )}
                           {c.status === "active" && (
@@ -792,7 +880,8 @@ export default function ContratsPage() {
                               Terminer le contrat
                             </DropdownMenuItem>
                           )}
-                          {c.status === "draft" && (
+                          {(c.status === "draft" ||
+                            c.status === "pending_signature") && (
                             <>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
@@ -890,7 +979,17 @@ export default function ContratsPage() {
         contract={editingContract}
         clients={clients}
         templates={templates}
+        profile={companyProfile}
         onSaved={fetchData}
+      />
+
+      <ContractQuickWizard
+        open={quickWizardOpen}
+        onOpenChange={setQuickWizardOpen}
+        clients={clients}
+        templates={templates}
+        profile={companyProfile}
+        onDone={fetchData}
       />
     </div>
   );

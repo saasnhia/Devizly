@@ -114,9 +114,13 @@ export async function DELETE(
     return NextResponse.json({ error: "Contrat introuvable" }, { status: 404 });
   }
 
-  if (existing.status !== "draft") {
+  const deletableStatuses = ["draft", "pending_signature"];
+  if (!deletableStatuses.includes(existing.status)) {
     return NextResponse.json(
-      { error: "Seuls les contrats en brouillon peuvent être supprimés" },
+      {
+        error:
+          "Seuls les contrats en brouillon ou en attente de signature peuvent être supprimés",
+      },
       { status: 400 }
     );
   }

@@ -309,10 +309,13 @@ export interface ContractTemplate {
   name: string;
   description: string | null;
   is_system: boolean;
+  category: string | null;
   default_amount: number | null;
   default_frequency: string;
   default_duration_months: number | null;
   items: { description: string; quantity: number; unit_price: number }[];
+  content: string | null;
+  variables: string[];
   created_at: string;
 }
 

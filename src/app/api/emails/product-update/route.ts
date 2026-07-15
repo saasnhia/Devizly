@@ -10,17 +10,30 @@ import { getSiteUrl } from "@/lib/url";
  * NOT a recurring cron — triggered manually once via curl.
  * Protected by CRON_SECRET header.
  *
- * Targets: profiles where marketing_emails_opt_out IS NOT TRUE.
+ * Targets: profiles where marketing_emails_opt_out IS NOT TRUE AND
+ * last_product_update_at IS NULL — the latter excludes anyone already
+ * sent (both modes apply this filter so dry-run counts stay accurate).
  *
  * Modes:
  *   - dry-run (default, or ?dry=true): counts recipients and lists their
  *     emails, sends nothing.
- *   - real send (?send=true): sends to every recipient, updates
- *     last_product_update_at on success, and continues past individual
- *     Resend failures (collected in failed[]).
+ *   - real send (?send=true): sends to every recipient (throttled to
+ *     stay under Resend's 10 req/s cap), updates last_product_update_at
+ *     immediately after each success, and continues past individual
+ *     failures (collected in failed[]) — except a daily-quota error,
+ *     which stops the loop cleanly (see stoppedReason).
+ *
+ * Optional ?limit=N caps how many sends are attempted in this run, to
+ * send in batches when the daily Resend quota is tight.
  */
 
 const FROM_EMAIL = "Devizly <noreply@devizly.fr>";
+const SEND_DELAY_MS = 250; // Resend caps at 10 req/s — 4/s leaves margin
+const QUOTA_ERROR_MARKER = "daily email sending quota";
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 function createServiceClient() {
   return createServerClient(
@@ -39,17 +52,19 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const send = searchParams.get("send") === "true";
   const mode = send ? "send" : "dry-run";
+  const limitParam = searchParams.get("limit");
+  const limit = limitParam ? parseInt(limitParam, 10) : null;
 
   const supabase = createServiceClient();
   const appUrl = getSiteUrl();
   const dashboardUrl = `${appUrl}/dashboard`;
   const pricingUrl = `${appUrl}/pricing`;
-  const now = new Date();
 
   const { data: profiles, error } = await supabase
     .from("profiles")
     .select("id, full_name")
-    .or("marketing_emails_opt_out.is.null,marketing_emails_opt_out.eq.false");
+    .or("marketing_emails_opt_out.is.null,marketing_emails_opt_out.eq.false")
+    .is("last_product_update_at", null);
 
   if (error) {
     console.error("[ProductUpdate] Query failed:", error);
@@ -97,10 +112,15 @@ export async function GET(request: Request) {
     });
   }
 
+  const batch =
+    limit !== null && limit >= 0 ? resolved.slice(0, limit) : resolved;
+
   const sent: string[] = [];
   const failed: { email: string; error: string }[] = [];
+  let stoppedReason: string | null = null;
 
-  for (const r of resolved) {
+  for (let i = 0; i < batch.length; i++) {
+    const r = batch[i];
     const unsubscribeUrl = `${appUrl}/api/emails/unsubscribe?token=${signUnsubscribeToken(r.id)}`;
 
     const { subject, html } = productUpdateEmail({
@@ -124,17 +144,32 @@ export async function GET(request: Request) {
     if (sendError) {
       console.error(`[ProductUpdate] Send failed for ${r.email}:`, sendError);
       failed.push({ email: r.email, error: sendError.message });
+
+      if (sendError.message.includes(QUOTA_ERROR_MARKER)) {
+        stoppedReason = "quota_exceeded";
+        console.error(
+          `[ProductUpdate] Daily quota hit — stopping. ${batch.length - i - 1} remaining unattempted.`
+        );
+        break;
+      }
+
+      await sleep(SEND_DELAY_MS);
       continue;
     }
 
     await supabase
       .from("profiles")
-      .update({ last_product_update_at: now.toISOString() })
+      .update({ last_product_update_at: new Date().toISOString() })
       .eq("id", r.id);
 
     sent.push(r.email);
     console.log(`[ProductUpdate] Sent → ${r.email}`);
+
+    await sleep(SEND_DELAY_MS);
   }
+
+  const attempted = sent.length + failed.length;
+  const remaining = batch.length - attempted;
 
   return NextResponse.json({
     mode,
@@ -142,5 +177,8 @@ export async function GET(request: Request) {
     recipients: resolved.map((r) => r.email),
     sent,
     failed,
+    ...(stoppedReason
+      ? { stoppedReason, remaining }
+      : {}),
   });
 }

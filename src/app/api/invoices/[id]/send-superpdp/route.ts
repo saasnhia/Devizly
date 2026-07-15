@@ -1,12 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
-import {
-  submitInvoice,
-  checkDirectoryEntry,
-  SuperPdpError,
-} from "@/lib/superpdp/client";
+import { submitInvoice, SuperPdpError } from "@/lib/superpdp/client";
 import { loadConnection, getValidAccessToken } from "@/lib/superpdp/connection";
+import { getClientDirectoryStatus } from "@/lib/superpdp/directory";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -56,10 +53,10 @@ export async function POST(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // 1. Fetch invoice + client (for the directory pre-check)
+  // 1. Fetch invoice + client (for the B2C gate + directory check)
   const { data: invoice, error: invoiceError } = await dbClient
     .from("invoices")
-    .select("*, clients(name, siret)")
+    .select("*, clients(name, siret, client_type)")
     .eq("id", invoiceId)
     .eq("user_id", user.id)
     .single();
@@ -68,7 +65,25 @@ export async function POST(
     return NextResponse.json({ error: "Facture introuvable" }, { status: 404 });
   }
 
-  // 2. Check Factur-X exists
+  const clientRecord = Array.isArray(invoice.clients) ? invoice.clients[0] : invoice.clients;
+
+  // 2. B2C clients are out of scope for e-invoicing entirely — the
+  // reform's B2B obligation doesn't apply to individuals. No SUPER PDP
+  // attempt, no directory check; the UI should already hide this button
+  // for B2C clients, this is the server-side backstop.
+  //
+  // TODO (not this obligation cycle — B2C e-reporting is Sept 2027, and
+  // SUPER PDP's /v1.beta/b2c_transactions + /v1.beta/b2c_payments require
+  // daily-granularity batching tied to the company's VAT declaration
+  // calendar, which needs real design work): B2C invoices already feed
+  // `e_reporting_data` at payment time for the manual CSV export. Once
+  // ready, that same capture point should also push to SUPER PDP's B2C
+  // e-reporting endpoints instead of/alongside the CSV export.
+  if (clientRecord?.client_type === "b2c") {
+    return NextResponse.json({ success: true, routable: false, reason: "b2c_not_applicable" });
+  }
+
+  // 3. Check Factur-X exists
   if (!invoice.facturx_pdf_path) {
     return NextResponse.json(
       { error: "Factur-X non généré. Veuillez d'abord générer la facture Factur-X." },
@@ -76,7 +91,7 @@ export async function POST(
     );
   }
 
-  // 3. Already transmitted? Idempotent — surface the existing transmission
+  // 4. Already transmitted? Idempotent — surface the existing transmission
   // instead of sending a duplicate (mirrors the app's other PA integration).
   const { data: existingTransmission } = await dbClient
     .from("superpdp_transmissions")
@@ -92,7 +107,7 @@ export async function POST(
     });
   }
 
-  // 4. This user's own SUPER PDP connection (multi-tenant: one per user,
+  // 5. This user's own SUPER PDP connection (multi-tenant: one per user,
   // established via the authorization_code flow in /api/superpdp/connect).
   const connection = await loadConnection(dbClient, user.id);
   if (!connection) {
@@ -102,14 +117,14 @@ export async function POST(
     );
   }
 
-  // 5. Fetch profile (informational SIREN sanity check only — see below)
+  // 6. Fetch profile (informational SIREN sanity check only — see below)
   const { data: profile } = await dbClient
     .from("profiles")
     .select("company_siret")
     .eq("id", user.id)
     .single();
 
-  // 6. Download Factur-X PDF from Supabase Storage (same source as generation)
+  // 7. Download Factur-X PDF from Supabase Storage (same source as generation)
   const { data: pdfData, error: downloadError } = await dbClient.storage
     .from("invoices")
     .download(invoice.facturx_pdf_path);
@@ -141,31 +156,15 @@ export async function POST(
       }
     }
 
-    // Pre-check: is the client reachable on the PA network? Soft check —
-    // a missing/foreign client SIREN doesn't block the attempt, but a known
-    // French SIREN absent from the directory gets a clear message upfront
-    // rather than the platform's cryptic rejection.
-    const clientRecord = Array.isArray(invoice.clients) ? invoice.clients[0] : invoice.clients;
-    const clientSiren = cleanSiren(clientRecord?.siret).slice(0, 9);
-    if (clientSiren.length === 9) {
-      try {
-        const directory = await checkDirectoryEntry(token, clientSiren);
-        if (!directory.data || directory.data.length === 0) {
-          return NextResponse.json(
-            {
-              error:
-                "Le client n'est pas inscrit à l'annuaire des Plateformes Agréées — il ne peut pas encore recevoir de facture électronique. Il doit se raccorder à une PA/PDP.",
-            },
-            { status: 400 }
-          );
-        }
-      } catch (precheckErr) {
-        // Directory lookup failing shouldn't block the send attempt itself.
-        console.warn(
-          "[send-superpdp] Directory pre-check failed, proceeding anyway:",
-          precheckErr instanceof Error ? precheckErr.message : precheckErr
-        );
-      }
+    // Directory routing check (cached, TTL 14 days — see
+    // src/lib/superpdp/directory.ts). In July 2026, almost no French
+    // company is registered yet (reception obligation starts 1 Sept
+    // 2026), so this is NOT a hard block: an unregistered client just
+    // means "not routable via SUPER PDP today", surfaced to the UI so it
+    // can fall back to the existing email flow instead of erroring.
+    const directoryStatus = await getClientDirectoryStatus(dbClient, token, invoice.client_id);
+    if (directoryStatus.registered !== true) {
+      return NextResponse.json({ success: true, routable: false, reason: "not_in_directory" });
     }
 
     // Send the Factur-X PDF as-is — SUPER PDP is a transport/PA layer,

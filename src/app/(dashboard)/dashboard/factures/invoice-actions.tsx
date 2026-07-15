@@ -41,6 +41,8 @@ interface InvoiceActionsProps {
   superpdpStatus: string | null;
   superpdpLifecycleCode: string | null;
   superpdpError: string | null;
+  clientType: string | null;
+  directoryRegistered: boolean | null;
   escrowStatus: string | null;
   escrowReleasedAt: string | null;
 }
@@ -58,6 +60,8 @@ export function InvoiceActions({
   superpdpStatus,
   superpdpLifecycleCode,
   superpdpError,
+  clientType,
+  directoryRegistered,
   escrowStatus,
   escrowReleasedAt,
 }: InvoiceActionsProps) {
@@ -172,6 +176,15 @@ export function InvoiceActions({
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.error || data.detail || "Erreur SUPER PDP");
+      }
+      if (data.routable === false) {
+        // Not an error — the client's directory status just changed (or
+        // the 14-day cache was stale) between page load and click. Not a
+        // hard failure, just nothing to send yet.
+        toast.info(
+          "Ce client n'est plus détecté comme raccordé à une plateforme agréée — envoyez par email en attendant."
+        );
+        return;
       }
       setCurrentSuperpdpStatus("sent");
       setCurrentSuperpdpError(null);
@@ -366,39 +379,58 @@ export function InvoiceActions({
         </span>
       )}
 
-      {hasFacturx && currentSuperpdpStatus !== "sent" && (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-7 px-2 text-xs"
-          onClick={handleSuperpdp}
-          disabled={superpdpLoading}
-          title={
-            currentSuperpdpStatus === "error"
-              ? `Réessayer SUPER PDP${currentSuperpdpError ? ` — ${currentSuperpdpError}` : ""}`
-              : "Transmettre la facture via SUPER PDP"
-          }
-        >
-          {superpdpLoading ? (
-            <>
-              <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-              ...
-            </>
-          ) : currentSuperpdpStatus === "error" ? (
-            <>
-              <AlertTriangle className="mr-1 h-3 w-3 text-red-500" />
-              SUPER PDP
-            </>
-          ) : (
-            <>
-              <Send className="mr-1 h-3 w-3 text-emerald-500" />
-              SUPER PDP
-            </>
-          )}
-        </Button>
+      {/* B2C: e-invoicing doesn't apply to individuals — no SUPER PDP UI
+          at all, email stays the only send path. */}
+      {hasFacturx && clientType !== "b2c" && currentSuperpdpStatus !== "sent" && (
+        directoryRegistered === true ? (
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-xs"
+              onClick={handleSuperpdp}
+              disabled={superpdpLoading}
+              title={
+                currentSuperpdpStatus === "error"
+                  ? `Réessayer SUPER PDP${currentSuperpdpError ? ` — ${currentSuperpdpError}` : ""}`
+                  : "Transmettre la facture via SUPER PDP"
+              }
+            >
+              {superpdpLoading ? (
+                <>
+                  <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                  ...
+                </>
+              ) : currentSuperpdpStatus === "error" ? (
+                <>
+                  <AlertTriangle className="mr-1 h-3 w-3 text-red-500" />
+                  SUPER PDP
+                </>
+              ) : (
+                <>
+                  <Send className="mr-1 h-3 w-3 text-emerald-500" />
+                  SUPER PDP
+                </>
+              )}
+            </Button>
+            <span
+              className="inline-flex items-center rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700"
+              title="Client raccordé à une plateforme agréée"
+            >
+              ✅ Raccordé
+            </span>
+          </div>
+        ) : (
+          <span
+            className="inline-flex items-center rounded-full bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700"
+            title="Ce client n'est pas encore raccordé à une plateforme agréée. Envoyez la facture par email en attendant — la réception électronique devient obligatoire le 1er septembre 2026."
+          >
+            PA non raccordé
+          </span>
+        )
       )}
 
-      {hasFacturx && currentSuperpdpStatus === "sent" && (
+      {hasFacturx && clientType !== "b2c" && currentSuperpdpStatus === "sent" && (
         <div className="flex items-center gap-1">
           <span
             className="inline-flex items-center rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700"

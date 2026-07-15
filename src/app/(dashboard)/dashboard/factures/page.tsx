@@ -73,7 +73,7 @@ export default async function FacturesPage() {
   // Fetch invoices with client info
   const { data: invoices, error: invoicesError } = await supabase
     .from("invoices")
-    .select("*, clients(name, email)")
+    .select("*, clients(name, email, client_type, directory_registered)")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
@@ -303,6 +303,8 @@ export default async function FacturesPage() {
                         superpdpStatus={inv.superpdp_status}
                         superpdpLifecycleCode={inv.superpdp_lifecycle_code}
                         superpdpError={inv.superpdp_error}
+                        clientType={inv.client?.client_type ?? null}
+                        directoryRegistered={inv.client?.directory_registered ?? null}
                         escrowStatus={inv.escrow_status}
                         escrowReleasedAt={inv.escrow_released_at}
                       />

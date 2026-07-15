@@ -212,7 +212,7 @@ export default function CGVPage() {
               </td>
               <td className="px-4 py-3 text-slate-600">39 &euro;</td>
               <td className="px-4 py-3 text-slate-600">
-                Tout Pro, Pennylane, lead forms, équipe, export CSV/FEC
+                Tout Pro, SUPER PDP, lead forms, équipe, export CSV/FEC
               </td>
             </tr>
           </tbody>

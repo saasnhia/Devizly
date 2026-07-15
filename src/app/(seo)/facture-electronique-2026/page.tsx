@@ -5,21 +5,21 @@ import { CTABanner } from "@/components/seo/cta-banner";
 import { Calendar, Shield, Zap, ArrowRight, FileText, Building } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Facturation Electronique 2026 : Preparez-vous avec Devizly",
+  title: "Facturation Électronique 2026 : Préparez-vous avec Devizly",
   description:
-    "La reforme de la facturation electronique demarre en septembre 2026. Devizly genere automatiquement vos factures Factur-X conformes (PDF/A-3, valide FNFE-MPE), gere l'e-reporting B2C et les envoie a votre expert-comptable via Pennylane. Pret des maintenant.",
+    "La réforme de la facturation électronique démarre en septembre 2026. Devizly génère automatiquement vos factures Factur-X conformes (PDF/A-3, validé FNFE-MPE), gère l'e-reporting B2C et se connecte à SUPER PDP, Plateforme Agréée immatriculée DGFiP. Prêt dès maintenant.",
   alternates: { canonical: "https://devizly.fr/facture-electronique-2026" },
   openGraph: {
-    title: "Facturation Electronique 2026 — Devizly",
+    title: "Facturation Électronique 2026 — Devizly",
     description:
-      "Preparez-vous a la reforme avec Devizly : Factur-X automatique, e-reporting B2C, conformite FNFE-MPE, integration Pennylane.",
+      "Préparez-vous à la réforme avec Devizly : Factur-X automatique, e-reporting B2C, conformité FNFE-MPE, transmission via SUPER PDP.",
     url: "https://devizly.fr/facture-electronique-2026",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Devizly — Facturation electronique 2026" }],
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Devizly — Facturation électronique 2026" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Facturation Electronique 2026 — Devizly",
-    description: "Factur-X automatique + e-reporting B2C + Pennylane. Pret pour la reforme.",
+    title: "Facturation Électronique 2026 — Devizly",
+    description: "Factur-X automatique + e-reporting B2C + SUPER PDP. Prêt pour la réforme.",
     images: ["/og-image.png"],
   },
 };
@@ -30,34 +30,34 @@ const faqSchema = {
   mainEntity: [
     {
       "@type": "Question",
-      name: "Quand la facturation electronique devient-elle obligatoire ?",
+      name: "Quand la facturation électronique devient-elle obligatoire ?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "A partir du 1er septembre 2026, toutes les entreprises assujetties a la TVA devront etre capables de recevoir des factures electroniques. Les grandes entreprises et ETI devront emettre des ce date. Les PME et micro-entreprises auront jusqu'a septembre 2027 pour emettre.",
+        text: "À partir du 1er septembre 2026, toutes les entreprises assujetties à la TVA devront être capables de recevoir des factures électroniques. Les grandes entreprises et ETI devront émettre dès cette date. Les PME et micro-entreprises auront jusqu'à septembre 2027 pour émettre.",
       },
     },
     {
       "@type": "Question",
-      name: "Qu'est-ce qu'une Plateforme Agreee (PA) ?",
+      name: "Qu'est-ce qu'une Plateforme Agréée (PA) ?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Une Plateforme Agreee est un intermediaire immatricule par la DGFiP qui assure la transmission des factures electroniques entre les entreprises et l'administration fiscale. Pennylane est une PA. Devizly agit comme Operateur de Dematerialisation (OD) et transmet vos factures a votre PA.",
+        text: "Une Plateforme Agréée est un intermédiaire immatriculé par la DGFiP qui assure la transmission des factures électroniques entre les entreprises et l'administration fiscale. SUPER PDP est une Plateforme Agréée immatriculée DGFiP. Devizly y est directement connecté : depuis le tableau de bord, vous transmettez vos factures Factur-X en un clic.",
       },
     },
     {
       "@type": "Question",
-      name: "Devizly est-il pret pour la reforme 2026 ?",
+      name: "Devizly est-il prêt pour la réforme 2026 ?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Oui. Devizly genere des factures au format Factur-X BASIC (PDF/A-3 avec XML CII embarque), validees par le validateur officiel FNFE-MPE. Vos factures peuvent etre envoyees automatiquement a Pennylane, Plateforme Agreee immatriculee DGFiP.",
+        text: "Oui. Devizly génère des factures au format Factur-X BASIC (PDF/A-3 avec XML CII embarqué), validées par le validateur officiel FNFE-MPE. Une fois votre entreprise connectée à SUPER PDP, Plateforme Agréée immatriculée DGFiP, vous transmettez vos factures en un clic depuis le tableau de bord.",
       },
     },
     {
       "@type": "Question",
-      name: "Dois-je changer de logiciel pour etre conforme ?",
+      name: "Dois-je changer de logiciel pour être conforme ?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Non. Si vous utilisez deja Devizly pour vos devis et factures, vous etes automatiquement conforme. La generation Factur-X est integree — il suffit de cliquer sur un bouton dans le tableau de bord pour generer et envoyer vos factures conformes.",
+        text: "Non. Si vous utilisez déjà Devizly pour vos devis et factures, vous êtes automatiquement conforme. La génération Factur-X est intégrée — il suffit de cliquer sur un bouton dans le tableau de bord pour générer et envoyer vos factures conformes.",
       },
     },
   ],
@@ -66,11 +66,11 @@ const faqSchema = {
 const softwareSchema = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  name: "Devizly — Facturation electronique Factur-X",
+  name: "Devizly — Facturation électronique Factur-X",
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
   offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
-  description: "Logiciel de facturation electronique Factur-X pour freelances et artisans. Conforme reforme 2026.",
+  description: "Logiciel de facturation électronique Factur-X pour freelances et artisans. Conforme réforme 2026.",
   url: "https://devizly.fr/facture-electronique-2026",
 };
 
@@ -88,13 +88,13 @@ export default function FactureElectronique2026Page() {
             <span className="text-sm font-medium text-violet-300">Septembre 2026</span>
           </div>
           <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl">
-            Facturation electronique 2026 :<br className="hidden sm:block" />
-            <span className="text-violet-400"> preparez-vous avec Devizly</span>
+            Facturation électronique 2026 :<br className="hidden sm:block" />
+            <span className="text-violet-400"> préparez-vous avec Devizly</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-400">
-            La reforme entre en vigueur en septembre 2026. Toutes les entreprises
-            devront recevoir — puis emettre — leurs factures au format electronique
-            structure. Devizly vous y prepare des maintenant, sans effort supplementaire.
+            La réforme entre en vigueur en septembre 2026. Toutes les entreprises
+            devront recevoir — puis émettre — leurs factures au format électronique
+            structuré. Devizly vous y prépare dès maintenant, sans effort supplémentaire.
           </p>
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link
@@ -113,9 +113,9 @@ export default function FactureElectronique2026Page() {
           </div>
         </header>
 
-        {/* Calendrier de la reforme */}
+        {/* Calendrier de la réforme */}
         <section>
-          <h2 className="mb-8 text-2xl font-bold">Le calendrier de la reforme</h2>
+          <h2 className="mb-8 text-2xl font-bold">Le calendrier de la réforme</h2>
           <div className="grid gap-6 sm:grid-cols-2">
             <div className="rounded-xl border border-white/10 bg-white/[0.03] p-6">
               <div className="mb-3 flex items-center gap-2">
@@ -123,12 +123,12 @@ export default function FactureElectronique2026Page() {
                   1er sept. 2026
                 </span>
               </div>
-              <h3 className="mb-2 text-lg font-semibold">Reception obligatoire</h3>
+              <h3 className="mb-2 text-lg font-semibold">Réception obligatoire</h3>
               <p className="text-sm leading-relaxed text-slate-400">
-                Toutes les entreprises assujetties a la TVA — y compris les TPE,
-                micro-entrepreneurs et auto-entrepreneurs — devront etre capables
-                de recevoir des factures electroniques au format structure. Les
-                grandes entreprises et ETI devront aussi emettre des cette date.
+                Toutes les entreprises assujetties à la TVA — y compris les TPE,
+                micro-entrepreneurs et auto-entrepreneurs — devront être capables
+                de recevoir des factures électroniques au format structuré. Les
+                grandes entreprises et ETI devront aussi émettre dès cette date.
               </p>
             </div>
             <div className="rounded-xl border border-white/10 bg-white/[0.03] p-6">
@@ -137,58 +137,66 @@ export default function FactureElectronique2026Page() {
                   1er sept. 2027
                 </span>
               </div>
-              <h3 className="mb-2 text-lg font-semibold">Emission obligatoire PME</h3>
+              <h3 className="mb-2 text-lg font-semibold">Émission obligatoire PME</h3>
               <p className="text-sm leading-relaxed text-slate-400">
-                Les PME, TPE et micro-entreprises devront emettre leurs factures
-                au format electronique structure (Factur-X, UBL ou CII). C'est
-                cette echeance qui concerne la majorite des utilisateurs Devizly :
+                Les PME, TPE et micro-entreprises devront émettre leurs factures
+                au format électronique structuré (Factur-X, UBL ou CII). C'est
+                cette échéance qui concerne la majorité des utilisateurs Devizly :
                 artisans, freelances, consultants, prestataires de services.
               </p>
             </div>
           </div>
+          <p className="mt-6 text-sm text-slate-400">
+            Devizly est un outil d&apos;<strong>émission</strong> de factures :
+            il vous prépare à l&apos;échéance de septembre 2027. L&apos;obligation
+            de <strong>réception</strong> (1er septembre 2026) passe par votre
+            propre Plateforme Agréée ou votre expert-comptable — Devizly ne
+            couvre pas la réception de vos factures fournisseurs.
+          </p>
         </section>
 
-        {/* Qui est concerne */}
+        {/* Qui est concerné */}
         <section>
-          <h2 className="mb-6 text-2xl font-bold">Qui est concerne ?</h2>
+          <h2 className="mb-6 text-2xl font-bold">Qui est concerné ?</h2>
           <p className="mb-4 text-base leading-relaxed text-slate-300">
-            Toutes les entreprises etablies en France et assujetties a la TVA
-            sont concernees. Cela inclut les micro-entrepreneurs, meme ceux
+            Toutes les entreprises établies en France et assujetties à la TVA
+            sont concernées. Cela inclut les micro-entrepreneurs, même ceux
             en franchise de TVA (article 293 B du CGI). La seule exception
             concerne les entreprises non assujetties (certaines associations,
-            collectivites publiques).
+            collectivités publiques).
           </p>
           <p className="text-base leading-relaxed text-slate-300">
-            Concretement, si vous emettez des factures aujourd'hui — que ce
-            soit en tant que plombier, developpeur web, graphiste ou consultant
-            — vous devrez passer au format electronique. C'est exactement ce
+            Concrètement, si vous émettez des factures aujourd'hui — que ce
+            soit en tant que plombier, développeur web, graphiste ou consultant
+            — vous devrez passer au format électronique. C'est exactement ce
             que Devizly automatise pour vous.
           </p>
         </section>
 
-        {/* Le role des PA */}
+        {/* Le rôle des PA */}
         <section>
           <h2 className="mb-6 text-2xl font-bold">
-            Le role des Plateformes Agreees
+            Le rôle des Plateformes Agréées
           </h2>
           <p className="mb-4 text-base leading-relaxed text-slate-300">
-            La reforme impose de transiter par une <strong>Plateforme Agreee
-            (PA)</strong> immatriculee par la DGFiP. C'est cette plateforme
-            qui assure la transmission legale de vos factures a l'administration
-            fiscale et a vos clients.
+            La réforme impose de transiter par une <strong>Plateforme Agréée
+            (PA)</strong> immatriculée par la DGFiP. C'est cette plateforme
+            qui assure la transmission légale de vos factures à l'administration
+            fiscale et à vos clients.
           </p>
           <div className="rounded-xl border border-white/10 bg-white/[0.03] p-6">
             <div className="flex items-start gap-4">
               <Building className="mt-1 h-6 w-6 shrink-0 text-violet-400" />
               <div>
-                <h3 className="mb-2 font-semibold">Devizly + Pennylane</h3>
+                <h3 className="mb-2 font-semibold">Devizly + SUPER PDP</h3>
                 <p className="text-sm leading-relaxed text-slate-400">
-                  Devizly agit comme <strong>Operateur de Dematerialisation
-                  (OD)</strong> : il genere vos factures au format Factur-X et
-                  les transmet a votre Plateforme Agreee. Nous avons choisi
-                  <strong> Pennylane</strong> — PA immatriculee DGFiP, utilisee
-                  par des milliers d'experts-comptables en France. La connexion
-                  se fait en un clic dans vos parametres.
+                  Devizly génère vos factures au format Factur-X et les
+                  transmet via <strong>SUPER PDP</strong>, une Plateforme
+                  Agréée immatriculée par la DGFiP. Connectez votre entreprise
+                  depuis vos paramètres — aucun identifiant ne transite par
+                  Devizly, l&apos;autorisation se fait directement chez SUPER
+                  PDP. Depuis le tableau de bord Factures, transmettez ensuite
+                  chaque facture Factur-X en un clic.
                 </p>
               </div>
             </div>
@@ -199,22 +207,22 @@ export default function FactureElectronique2026Page() {
         <section>
           <h2 className="mb-6 text-2xl font-bold">Et vos ventes aux particuliers ?</h2>
           <p className="text-base leading-relaxed text-slate-300">
-            La facturation electronique ne couvre que les transactions B2B.
-            Si vous facturez aussi des particuliers ou des clients a
+            La facturation électronique ne couvre que les transactions B2B.
+            Si vous facturez aussi des particuliers ou des clients à
             l&apos;international, une obligation distincte s&apos;applique :
             l&apos;<Link href="/e-reporting-b2c" className="text-violet-400 hover:underline">e-reporting B2C</Link>.
             Devizly enregistre automatiquement ces transactions pour vous.
           </p>
         </section>
 
-        {/* Comment Devizly vous prepare */}
+        {/* Comment Devizly vous prépare */}
         <section>
-          <h2 className="mb-6 text-2xl font-bold">Comment Devizly vous prepare</h2>
+          <h2 className="mb-6 text-2xl font-bold">Comment Devizly vous prépare</h2>
           <div className="grid gap-6 sm:grid-cols-3">
             {[
-              { num: "01", title: "Creez vos devis comme d'habitude", desc: "Rien ne change dans votre workflow. L'IA genere le devis, votre client signe et paie. La facture est creee automatiquement." },
-              { num: "02", title: "Generez le Factur-X en un clic", desc: "Depuis le tableau de bord, cliquez sur le bouton FX. Devizly genere un PDF/A-3 avec le XML CII embarque, valide par le validateur officiel FNFE-MPE." },
-              { num: "03", title: "Envoyez a Pennylane", desc: "Si votre compte Pennylane est connecte, la facture est transmise en un clic. Votre expert-comptable recoit la facture et les ecritures comptables sont generees automatiquement." },
+              { num: "01", title: "Créez vos devis comme d'habitude", desc: "Rien ne change dans votre workflow. L'IA génère le devis, votre client signe et paie. La facture est créée automatiquement." },
+              { num: "02", title: "Générez le Factur-X en un clic", desc: "Depuis le tableau de bord, cliquez sur le bouton FX. Devizly génère un PDF/A-3 avec le XML CII embarqué, validé par le validateur officiel FNFE-MPE." },
+              { num: "03", title: "Transmission via SUPER PDP", desc: "Une fois votre entreprise connectée à SUPER PDP depuis vos paramètres, transmettez vos factures Factur-X à votre client en un clic depuis le tableau de bord. Devizly vérifie automatiquement si le client est raccordé à une plateforme agréée : si oui, la facture part par le circuit électronique ; sinon, vous l'envoyez par email comme aujourd'hui." },
             ].map((step) => (
               <div key={step.num} className="rounded-xl border border-white/10 bg-white/[0.03] p-5">
                 <span className="mb-3 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/15 text-sm font-bold text-violet-400">{step.num}</span>
@@ -233,17 +241,17 @@ export default function FactureElectronique2026Page() {
               {
                 icon: FileText,
                 title: "Factur-X automatique",
-                desc: "Generation Factur-X BASIC conforme, validee FNFE-MPE. Pas de configuration, pas de plugin a installer.",
+                desc: "Génération Factur-X BASIC conforme, validée FNFE-MPE. Pas de configuration, pas de plugin à installer.",
               },
               {
                 icon: Shield,
-                title: "Conformite garantie",
-                desc: "PDF/A-3 avec XML CII embarque. Profil BASIC conforme EN 16931. Validable a tout moment sur le site FNFE-MPE.",
+                title: "Conformité garantie",
+                desc: "PDF/A-3 avec XML CII embarqué. Profil BASIC conforme EN 16931. Validable à tout moment sur le site FNFE-MPE.",
               },
               {
                 icon: Zap,
-                title: "Integration Pennylane",
-                desc: "Connectez votre token en 30 secondes. Vos factures arrivent directement dans le dashboard de votre comptable.",
+                title: "Transmission via SUPER PDP",
+                desc: "Connectez votre entreprise depuis vos paramètres. Envoyez ensuite vos factures Factur-X en un clic vers votre Plateforme Agréée immatriculée DGFiP.",
               },
             ].map((item) => (
               <div
@@ -260,7 +268,7 @@ export default function FactureElectronique2026Page() {
 
         {/* FAQ */}
         <section>
-          <h2 className="mb-8 text-2xl font-bold">Questions frequentes</h2>
+          <h2 className="mb-8 text-2xl font-bold">Questions fréquentes</h2>
           <div className="space-y-0">
             {(faqSchema.mainEntity as Array<{ "@type": string; name: string; acceptedAnswer: { text: string } }>).map((faq) => (
               <details

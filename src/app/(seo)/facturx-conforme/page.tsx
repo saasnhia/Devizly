@@ -5,21 +5,21 @@ import { CTABanner } from "@/components/seo/cta-banner";
 import { FileText, Shield, Check, ArrowRight, Layers, FileCheck } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Factur-X Conforme : Generez vos factures electroniques en un clic",
+  title: "Factur-X Conforme : Générez vos factures électroniques en un clic",
   description:
-    "Devizly genere des factures Factur-X BASIC conformes (PDF/A-3 + XML CII) validees FNFE-MPE, avec les 4 nouvelles mentions obligatoires 2026 : categorie d'operation, TVA sur les debits, adresse de livraison, SIREN acheteur. Essai gratuit.",
+    "Devizly génère des factures Factur-X BASIC conformes (PDF/A-3 + XML CII) validées FNFE-MPE, avec les 4 nouvelles mentions obligatoires 2026 : catégorie d'opération, TVA sur les débits, adresse de livraison, SIREN acheteur. Essai gratuit.",
   alternates: { canonical: "https://devizly.fr/facturx-conforme" },
   openGraph: {
     title: "Factures Factur-X Conformes — Devizly",
     description:
-      "Generez des factures Factur-X BASIC en un clic, avec les 4 nouvelles mentions obligatoires 2026. PDF/A-3 + XML CII, valide FNFE-MPE.",
+      "Générez des factures Factur-X BASIC en un clic, avec les 4 nouvelles mentions obligatoires 2026. PDF/A-3 + XML CII, validé FNFE-MPE.",
     url: "https://devizly.fr/facturx-conforme",
     images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Devizly — Factur-X conforme" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Factures Factur-X Conformes — Devizly",
-    description: "PDF/A-3 + XML CII + 4 nouvelles mentions 2026. Valide FNFE-MPE. Essai gratuit.",
+    description: "PDF/A-3 + XML CII + 4 nouvelles mentions 2026. Validé FNFE-MPE. Essai gratuit.",
     images: ["/og-image.png"],
   },
 };
@@ -33,7 +33,7 @@ const faqSchema = {
       name: "Qu'est-ce que Factur-X ?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Factur-X est le standard franco-allemand de facturation electronique. C'est un fichier PDF/A-3 qui contient a la fois la facture lisible par un humain (le PDF) et les donnees structurees lisibles par un logiciel (un fichier XML au format CII embarque dans le PDF). Ce double format permet le traitement automatique par les logiciels comptables tout en restant lisible par vos clients.",
+        text: "Factur-X est le standard franco-allemand de facturation électronique. C'est un fichier PDF/A-3 qui contient à la fois la facture lisible par un humain (le PDF) et les données structurées lisibles par un logiciel (un fichier XML au format CII embarqué dans le PDF). Ce double format permet le traitement automatique par les logiciels comptables tout en restant lisible par vos clients.",
       },
     },
     {
@@ -41,7 +41,7 @@ const faqSchema = {
       name: "Quel profil Factur-X utilise Devizly ?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Devizly genere des factures au profil BASIC, qui est le profil recommande pour les TPE, PME et micro-entrepreneurs. Le profil BASIC contient toutes les informations necessaires pour la conformite fiscale : identification vendeur/acheteur, lignes de facturation, TVA, totaux, conditions de paiement. C'est le profil minimum accepte par la reforme 2026.",
+        text: "Devizly génère des factures au profil BASIC, qui est le profil recommandé pour les TPE, PME et micro-entrepreneurs. Le profil BASIC contient toutes les informations nécessaires pour la conformité fiscale : identification vendeur/acheteur, lignes de facturation, TVA, totaux, conditions de paiement. C'est le profil minimum accepté par la réforme 2026.",
       },
     },
     {
@@ -49,7 +49,7 @@ const faqSchema = {
       name: "Comment valider qu'une facture est conforme Factur-X ?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Vous pouvez valider n'importe quelle facture Factur-X sur le site du Forum National de la Facture Electronique (FNFE-MPE) a l'adresse services.fnfe-mpe.org. Le validateur verifie la structure PDF/A-3, les metadonnees XMP, la validite XSD du XML et la conformite Schematron. Toutes les factures generees par Devizly passent ces 4 validations avec le statut Fully Valid.",
+        text: "Vous pouvez valider n'importe quelle facture Factur-X sur le site du Forum National de la Facture Électronique (FNFE-MPE) à l'adresse services.fnfe-mpe.org. Le validateur vérifie la structure PDF/A-3, les métadonnées XMP, la validité XSD du XML et la conformité Schematron. Toutes les factures générées par Devizly passent ces 4 validations avec le statut Fully Valid.",
       },
     },
   ],
@@ -58,11 +58,11 @@ const faqSchema = {
 const softwareSchema = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  name: "Devizly — Generateur Factur-X",
+  name: "Devizly — Générateur Factur-X",
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
   offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
-  description: "Generateur de factures Factur-X BASIC conformes pour freelances et artisans.",
+  description: "Générateur de factures Factur-X BASIC conformes pour freelances et artisans.",
   url: "https://devizly.fr/facturx-conforme",
 };
 
@@ -80,13 +80,13 @@ export default function FacturxConformePage() {
             <span className="text-sm font-medium text-emerald-300">Fully Valid FNFE-MPE</span>
           </div>
           <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl">
-            Generez vos factures Factur-X<br className="hidden sm:block" />
+            Générez vos factures Factur-X<br className="hidden sm:block" />
             <span className="text-violet-400"> conformes en un clic</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-400">
             Devizly transforme vos factures en documents Factur-X conformes
-            au standard BASIC — PDF/A-3 avec XML CII embarque. Vos factures
-            passent les 4 validations du FNFE-MPE sans que vous ayez a y penser.
+            au standard BASIC — PDF/A-3 avec XML CII embarqué. Vos factures
+            passent les 4 validations du FNFE-MPE sans que vous ayez à y penser.
           </p>
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link
@@ -100,7 +100,7 @@ export default function FacturxConformePage() {
               href="/facture-electronique-2026"
               className="text-sm text-slate-400 transition-colors hover:text-white"
             >
-              Comprendre la reforme 2026 &rarr;
+              Comprendre la réforme 2026 &rarr;
             </Link>
           </div>
         </header>
@@ -109,9 +109,9 @@ export default function FacturxConformePage() {
         <section>
           <h2 className="mb-6 text-2xl font-bold">Qu'est-ce que Factur-X ?</h2>
           <p className="mb-4 text-base leading-relaxed text-slate-300">
-            Factur-X est le standard de facturation electronique developpe
+            Factur-X est le standard de facturation électronique développé
             conjointement par la France (FNFE-MPE) et l'Allemagne (FeRD).
-            Il combine deux elements dans un seul fichier :
+            Il combine deux éléments dans un seul fichier :
           </p>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="rounded-xl border border-white/10 bg-white/[0.03] p-5">
@@ -125,20 +125,20 @@ export default function FacturxConformePage() {
             </div>
             <div className="rounded-xl border border-white/10 bg-white/[0.03] p-5">
               <Layers className="mb-3 h-6 w-6 text-violet-400" />
-              <h3 className="mb-2 font-semibold">Le XML structure</h3>
+              <h3 className="mb-2 font-semibold">Le XML structuré</h3>
               <p className="text-sm leading-relaxed text-slate-400">
                 Un fichier XML au format CII (Cross-Industry Invoice)
-                embarque dans le PDF. Il contient les memes donnees dans
+                embarqué dans le PDF. Il contient les mêmes données dans
                 un format lisible par les logiciels comptables, l'administration
-                fiscale et les Plateformes Agreees.
+                fiscale et les Plateformes Agréées.
               </p>
             </div>
           </div>
           <p className="mt-6 text-base leading-relaxed text-slate-300">
             Le format final est un <strong>PDF/A-3</strong> — une norme ISO
-            qui garantit la perennite du document (polices embarquees, profil
-            colorimetrique sRGB, pas de contenu dynamique). C'est le seul
-            format accepte pour les factures electroniques en France a partir
+            qui garantit la pérennité du document (polices embarquées, profil
+            colorimétrique sRGB, pas de contenu dynamique). C'est le seul
+            format accepté pour les factures électroniques en France à partir
             de 2026.
           </p>
         </section>
@@ -147,8 +147,8 @@ export default function FacturxConformePage() {
         <section>
           <h2 className="mb-6 text-2xl font-bold">Les profils Factur-X</h2>
           <p className="mb-4 text-base leading-relaxed text-slate-300">
-            Factur-X definit 5 niveaux de detail croissants. Plus le profil
-            est eleve, plus le XML contient d'informations. Pour la reforme
+            Factur-X définit 5 niveaux de détail croissants. Plus le profil
+            est élevé, plus le XML contient d'informations. Pour la réforme
             2026, le profil <strong>BASIC</strong> est le minimum requis.
           </p>
           <div className="overflow-x-auto rounded-xl border border-white/10">
@@ -162,11 +162,11 @@ export default function FacturxConformePage() {
               </thead>
               <tbody>
                 {[
-                  { name: "MINIMUM", usage: "Donnees minimales (pas de lignes de detail)", ok: false },
-                  { name: "BASIC WL", usage: "Sans lignes de detail", ok: false },
+                  { name: "MINIMUM", usage: "Données minimales (pas de lignes de détail)", ok: false },
+                  { name: "BASIC WL", usage: "Sans lignes de détail", ok: false },
                   { name: "BASIC", usage: "Lignes + TVA + paiement — pour TPE/PME", ok: true, highlight: true },
-                  { name: "EN 16931", usage: "Norme europeenne complete", ok: true },
-                  { name: "EXTENDED", usage: "Donnees detaillees (grands comptes)", ok: true },
+                  { name: "EN 16931", usage: "Norme européenne complète", ok: true },
+                  { name: "EXTENDED", usage: "Données détaillées (grands comptes)", ok: true },
                 ].map((p) => (
                   <tr
                     key={p.name}
@@ -197,20 +197,20 @@ export default function FacturxConformePage() {
             Les profils MINIMUM et BASIC WL ne contiennent pas assez
             d'informations pour constituer une facture au sens fiscal.
             Devizly utilise le profil <strong>BASIC</strong>, qui est le
-            bon equilibre entre simplicite et conformite.
+            bon équilibre entre simplicité et conformité.
           </p>
         </section>
 
-        {/* Comment Devizly genere vos Factur-X */}
+        {/* Comment Devizly génère vos Factur-X */}
         <section>
           <h2 className="mb-6 text-2xl font-bold">
-            Comment Devizly genere vos Factur-X
+            Comment Devizly génère vos Factur-X
           </h2>
           <div className="grid gap-6 sm:grid-cols-3">
             {[
-              { num: "01", title: "Facture creee depuis votre devis", desc: "Quand votre client signe et paie, Devizly cree automatiquement la facture avec toutes les mentions obligatoires (SIRET, TVA, conditions de paiement)." },
-              { num: "02", title: "Generation Factur-X en un clic", desc: "Depuis le tableau de bord Factures, cliquez sur le bouton FX. Devizly genere le XML CII, l'embarque dans un PDF/A-3 avec le template Devizly, et valide le tout contre le XSD officiel." },
-              { num: "03", title: "Telechargez ou envoyez a Pennylane", desc: "Le PDF Factur-X est stocke dans votre espace securise. Telechargez-le, ou envoyez-le directement a votre expert-comptable via Pennylane en un clic." },
+              { num: "01", title: "Facture créée depuis votre devis", desc: "Quand votre client signe et paie, Devizly crée automatiquement la facture avec toutes les mentions obligatoires (SIRET, TVA, conditions de paiement)." },
+              { num: "02", title: "Génération Factur-X en un clic", desc: "Depuis le tableau de bord Factures, cliquez sur le bouton FX. Devizly génère le XML CII, l'embarque dans un PDF/A-3 avec le template Devizly, et valide le tout contre le XSD officiel." },
+              { num: "03", title: "Téléchargez ou transmettez via SUPER PDP", desc: "Le PDF Factur-X est stocké dans votre espace sécurisé. Téléchargez-le, ou transmettez-le en un clic via SUPER PDP, Plateforme Agréée immatriculée DGFiP, une fois votre entreprise connectée depuis vos paramètres." },
             ].map((step) => (
               <div key={step.num} className="rounded-xl border border-white/10 bg-white/[0.03] p-5">
                 <span className="mb-3 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/15 text-sm font-bold text-violet-400">{step.num}</span>
@@ -225,15 +225,15 @@ export default function FacturxConformePage() {
         <section>
           <h2 className="mb-6 text-2xl font-bold">Validation officielle FNFE-MPE</h2>
           <p className="mb-4 text-base leading-relaxed text-slate-300">
-            Chaque facture generee par Devizly passe les 4 controles du
-            validateur officiel du Forum National de la Facture Electronique :
+            Chaque facture générée par Devizly passe les 4 contrôles du
+            validateur officiel du Forum National de la Facture Électronique :
           </p>
           <div className="grid gap-3 sm:grid-cols-2">
             {[
-              { label: "Metadonnees XMP", desc: "Identification Factur-X dans les metadonnees PDF" },
-              { label: "Validation XSD", desc: "Structure XML conforme au schema CII officiel" },
-              { label: "Validation Schematron", desc: "Regles metier EN 16931 respectees" },
-              { label: "Conformite PDF/A-3", desc: "Polices embarquees, profil colorimetrique, pas de contenu dynamique" },
+              { label: "Métadonnées XMP", desc: "Identification Factur-X dans les métadonnées PDF" },
+              { label: "Validation XSD", desc: "Structure XML conforme au schéma CII officiel" },
+              { label: "Validation Schematron", desc: "Règles métier EN 16931 respectées" },
+              { label: "Conformité PDF/A-3", desc: "Polices embarquées, profil colorimétrique, pas de contenu dynamique" },
             ].map((check) => (
               <div key={check.label} className="flex items-start gap-3 rounded-lg border border-white/10 bg-white/[0.03] p-4">
                 <Shield className="mt-0.5 h-5 w-5 shrink-0 text-emerald-400" />
@@ -246,7 +246,7 @@ export default function FacturxConformePage() {
           </div>
           <p className="mt-4 text-sm text-slate-400">
             Statut : <strong className="text-emerald-400">Fully Valid</strong> sur
-            les 4 controles. Vous pouvez verifier vous-meme sur{" "}
+            les 4 contrôles. Vous pouvez vérifier vous-même sur{" "}
             <a
               href="https://services.fnfe-mpe.org/"
               target="_blank"
@@ -264,16 +264,16 @@ export default function FacturxConformePage() {
             Les 4 nouvelles mentions obligatoires 2026
           </h2>
           <p className="mb-4 text-base leading-relaxed text-slate-300">
-            La reforme ajoute 4 mentions obligatoires sur toutes les factures
-            a partir du 1er septembre 2026. Devizly les integre directement
+            La réforme ajoute 4 mentions obligatoires sur toutes les factures
+            à partir du 1er septembre 2026. Devizly les intègre directement
             dans le XML et le PDF de vos factures Factur-X.
           </p>
           <div className="grid gap-4 sm:grid-cols-2">
             {[
-              { label: "Categorie de l'operation", desc: "Vente de biens, prestation de services ou operation mixte." },
-              { label: "TVA sur les debits", desc: "Mention specifique si vous avez opte pour ce regime plutot que l'encaissement." },
-              { label: "Adresse de livraison", desc: "Utile pour le BTP : l'adresse du chantier quand elle differe de celle du client." },
-              { label: "SIREN de l'acheteur", desc: "Identifiant de votre client professionnel, derive automatiquement de son SIRET." },
+              { label: "Catégorie de l'opération", desc: "Vente de biens, prestation de services ou opération mixte." },
+              { label: "TVA sur les débits", desc: "Mention spécifique si vous avez opté pour ce régime plutôt que l'encaissement." },
+              { label: "Adresse de livraison", desc: "Utile pour le BTP : l'adresse du chantier quand elle diffère de celle du client." },
+              { label: "SIREN de l'acheteur", desc: "Identifiant de votre client professionnel, dérivé automatiquement de son SIRET." },
             ].map((item) => (
               <div key={item.label} className="flex items-start gap-3 rounded-lg border border-white/10 bg-white/[0.03] p-4">
                 <Check className="mt-0.5 h-5 w-5 shrink-0 text-emerald-400" />
@@ -288,7 +288,7 @@ export default function FacturxConformePage() {
 
         {/* FAQ */}
         <section>
-          <h2 className="mb-8 text-2xl font-bold">Questions frequentes</h2>
+          <h2 className="mb-8 text-2xl font-bold">Questions fréquentes</h2>
           <div className="space-y-0">
             {(faqSchema.mainEntity as Array<{ "@type": string; name: string; acceptedAnswer: { text: string } }>).map((faq) => (
               <details

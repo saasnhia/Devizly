@@ -8,6 +8,7 @@ import { EditorialHero } from "./sections/editorial-hero";
 import { TrustStrip } from "./sections/trust-strip";
 import { FlowSteps } from "./sections/flow-steps";
 import { TreasurySection } from "./sections/treasury-section";
+import { ComplianceSection } from "./sections/compliance-section";
 import { MetricsBanner } from "./sections/metrics-banner";
 import { EditorialPricing } from "./sections/editorial-pricing";
 import { FaqSection } from "./sections/faq-section";
@@ -35,6 +36,7 @@ function LandingPageInner() {
         <TrustStrip />
         <FlowSteps />
         <TreasurySection />
+        <ComplianceSection />
         <MetricsBanner />
         <EditorialPricing />
         <FaqSection />

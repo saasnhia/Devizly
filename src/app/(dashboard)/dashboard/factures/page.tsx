@@ -62,14 +62,6 @@ export default async function FacturesPage() {
 
   if (!user) redirect("/login");
 
-  // Check if Pennylane is connected
-  const { data: userProfile } = await supabase
-    .from("profiles")
-    .select("pa_provider")
-    .eq("id", user.id)
-    .single();
-  const pennylaneConnected = userProfile?.pa_provider === "pennylane";
-
   // Fetch invoices with client info
   const { data: invoices, error: invoicesError } = await supabase
     .from("invoices")
@@ -298,8 +290,6 @@ export default async function FacturesPage() {
                         refundedAmount={Number(inv.refunded_amount) || 0}
                         checkoutUrl={inv.stripe_checkout_url}
                         facturxPdfPath={inv.facturx_pdf_path}
-                        paStatus={inv.pa_status}
-                        pennylaneConnected={pennylaneConnected}
                         superpdpStatus={inv.superpdp_status}
                         superpdpLifecycleCode={inv.superpdp_lifecycle_code}
                         superpdpError={inv.superpdp_error}

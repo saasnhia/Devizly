@@ -102,7 +102,7 @@ export const plans: Plan[] = [
     description: "Pour les agences et pros exigeants",
     features: [
       "Tout le plan Pro",
-      "Envoi automatique Pennylane",
+      "Transmission via Plateforme Agréée (SUPER PDP)",
       "Lead forms (5+ types)",
       "Contrats récurrents",
       "Gestion d'équipe",
@@ -144,7 +144,7 @@ export const faqs = [
   },
   {
     q: "Devizly fonctionne-t-il avec mon logiciel comptable ?",
-    a: "Oui. Devizly s'intègre directement avec Pennylane : vos factures Factur-X sont envoyées automatiquement à votre expert-comptable, sans export manuel. Pour les autres logiciels (Indy, Sage, etc.), vous pouvez exporter vos données au format CSV ou FEC depuis le tableau de bord.",
+    a: "Oui. Vos factures Factur-X sont transmises via SUPER PDP, une Plateforme Agréée immatriculée par la DGFiP. Pour votre expert-comptable ou tout autre logiciel (Pennylane, Indy, Sage...), vous pouvez exporter vos données au format CSV ou FEC.",
   },
   {
     q: "La signature électronique a-t-elle une valeur juridique ?",
@@ -155,8 +155,8 @@ export const faqs = [
     a: "Factur-X est le standard français de facturation électronique (PDF + XML structuré). À partir de septembre 2026, la facturation électronique devient obligatoire. Les PME et micro-entreprises devront émettre en format électronique au plus tard en septembre 2027 — Devizly vous y prépare dès maintenant avec des factures Factur-X conformes au profil BASIC, validées PDF/A-3.",
   },
   {
-    q: "Devizly est-il compatible avec mon expert-comptable sur Pennylane ?",
-    a: "Oui. Si votre expert-comptable utilise Pennylane, vous pouvez connecter votre compte en un clic dans les paramètres. Vos factures Factur-X seront envoyées automatiquement — plus besoin de transmettre vos documents manuellement. Les écritures comptables sont générées automatiquement côté Pennylane.",
+    q: "Devizly est-il prêt pour la réforme de la facturation électronique ?",
+    a: "Oui. Devizly génère des factures Factur-X conformes à la norme EN 16931, validées par l'outil officiel FNFE-MPE, et les transmet via SUPER PDP, une Plateforme Agréée immatriculée par la DGFiP. Les nouvelles mentions obligatoires sont déjà intégrées. L'obligation d'émettre en électronique arrive en septembre 2027 pour les TPE/PME — avec Devizly, vous êtes prêt en avance. À noter : l'obligation de RECEVOIR des factures électroniques démarre le 1er septembre 2026 et passe par votre plateforme agréée ou votre expert-comptable.",
   },
   {
     q: "Devizly gère-t-il les paiements BTP en plusieurs fois ?",

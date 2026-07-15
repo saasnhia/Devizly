@@ -39,7 +39,7 @@ const comparisonFeatures: PlanFeature[] = [
   { text: "Multi-clients", free: false, pro: true, business: true },
   { text: "Logo personnalisé", free: false, pro: true, business: true },
   // Business gates (plan === "business")
-  { text: "Envoi automatique Pennylane", free: false, pro: false, business: true },
+  { text: "Transmission via Plateforme Agréée (SUPER PDP)", free: false, pro: false, business: true },
   { text: "Lead forms (5+ types)", free: false, pro: false, business: true },
   { text: "Contrats récurrents", free: false, pro: false, business: true },
   { text: "Gestion d'équipe", free: false, pro: false, business: true },
@@ -122,7 +122,7 @@ const plans: PlanCard[] = [
     popular: false,
     features: [
       "Tout le plan Pro",
-      "Envoi automatique Pennylane",
+      "Transmission via Plateforme Agréée (SUPER PDP)",
       "Lead forms (5+ types)",
       "Contrats récurrents",
       "Gestion d'équipe",

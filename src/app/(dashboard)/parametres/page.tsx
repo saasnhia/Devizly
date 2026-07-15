@@ -17,7 +17,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Save, Loader2, CreditCard, Building, ExternalLink, Upload, Trash2, ImageIcon, Wallet, CheckCircle2, Zap, Globe, Copy, Check, Calendar, FileText, Info, Lightbulb, ShieldCheck } from "lucide-react";
+import { Save, Loader2, CreditCard, Building, ExternalLink, Upload, Trash2, ImageIcon, Wallet, CheckCircle2, Zap, Globe, Copy, Check, Calendar, Info, Lightbulb, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
 import { CompanyAutocomplete } from "@/components/company-autocomplete";
@@ -61,10 +61,6 @@ export default function ParametresPage() {
   const [founderNumber, setFounderNumber] = useState<number | null>(null);
   const [refCopied, setRefCopied] = useState(false);
   const [ibanWarning, setIbanWarning] = useState(false);
-  const [pennylaneToken, setPennylaneToken] = useState("");
-  const [pennylaneConnected, setPennylaneConnected] = useState(false);
-  const [pennylaneConnectedAt, setPennylaneConnectedAt] = useState<string | null>(null);
-  const [pennylaneLoading, setPennylaneLoading] = useState(false);
   const [superpdpConnected, setSuperpdpConnected] = useState(false);
   const [superpdpCompanyName, setSuperpdpCompanyName] = useState<string | null>(null);
   const [superpdpSiren, setSuperpdpSiren] = useState<string | null>(null);
@@ -125,12 +121,6 @@ export default function ParametresPage() {
           iban: billingRow?.iban || "",
           bic: billingRow?.bic || "",
         });
-      }
-
-      // Load Pennylane connection state from profiles
-      if (billingRow?.pa_provider === "pennylane") {
-        setPennylaneConnected(true);
-        setPennylaneConnectedAt(billingRow.pa_connected_at || null);
       }
 
       // Load SUPER PDP connection state (multi-tenant — one row per user)
@@ -1319,123 +1309,6 @@ export default function ParametresPage() {
         </CardContent>
       </Card>
 
-      {/* Plateforme Agréée — Pennylane */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-violet-400" />
-            Plateforme Agréée — Pennylane
-          </CardTitle>
-          <p className="text-sm text-muted-foreground">
-            Connectez votre compte Pennylane pour envoyer vos factures
-            Factur-X automatiquement à votre expert-comptable.
-          </p>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {pennylaneConnected ? (
-            <>
-              <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
-                <div>
-                  <p className="text-sm font-medium text-emerald-800">
-                    Pennylane connecté
-                  </p>
-                  {pennylaneConnectedAt && (
-                    <p className="text-xs text-emerald-600">
-                      Depuis le{" "}
-                      {new Date(pennylaneConnectedAt).toLocaleDateString("fr-FR", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <Button
-                variant="outline"
-                className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
-                disabled={pennylaneLoading}
-                onClick={async () => {
-                  setPennylaneLoading(true);
-                  try {
-                    const res = await fetch("/api/settings/pennylane", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ action: "disconnect" }),
-                    });
-                    if (!res.ok) throw new Error("Erreur déconnexion");
-                    setPennylaneConnected(false);
-                    setPennylaneConnectedAt(null);
-                    toast.success("Pennylane déconnecté");
-                  } catch {
-                    toast.error("Erreur lors de la déconnexion");
-                  } finally {
-                    setPennylaneLoading(false);
-                  }
-                }}
-              >
-                {pennylaneLoading ? "..." : "Déconnecter Pennylane"}
-              </Button>
-            </>
-          ) : (
-            <>
-              <div className="space-y-2">
-                <Label htmlFor="pennylane-token">Token API Pennylane</Label>
-                <Input
-                  id="pennylane-token"
-                  type="password"
-                  value={pennylaneToken}
-                  onChange={(e) => setPennylaneToken(e.target.value)}
-                  placeholder="plnl_..."
-                  className="font-mono"
-                />
-                <a
-                  href="https://help.pennylane.com/fr/articles/18770"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-violet-600 hover:underline"
-                >
-                  Comment obtenir mon token ? →
-                </a>
-              </div>
-              <Button
-                className="w-full"
-                disabled={pennylaneLoading || pennylaneToken.length < 10}
-                onClick={async () => {
-                  setPennylaneLoading(true);
-                  try {
-                    const res = await fetch("/api/settings/pennylane", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ token: pennylaneToken }),
-                    });
-                    const data = await res.json();
-                    if (!res.ok) throw new Error(data.error || "Erreur connexion");
-                    setPennylaneConnected(true);
-                    setPennylaneConnectedAt(data.connected_at || new Date().toISOString());
-                    setPennylaneToken("");
-                    toast.success("Pennylane connecté");
-                  } catch (err) {
-                    toast.error(
-                      err instanceof Error ? err.message : "Erreur de connexion"
-                    );
-                  } finally {
-                    setPennylaneLoading(false);
-                  }
-                }}
-              >
-                {pennylaneLoading ? "Connexion..." : "Connecter Pennylane"}
-              </Button>
-              <p className="text-xs text-muted-foreground text-center">
-                Votre token est stocké de manière sécurisée et n&apos;est jamais
-                exposé côté client.
-              </p>
-            </>
-          )}
-        </CardContent>
-      </Card>
-
       {/* Facturation électronique — SUPER PDP (multi-tenant, authorization_code) */}
       <Card>
         <CardHeader>
@@ -1512,44 +1385,43 @@ export default function ParametresPage() {
         </CardContent>
       </Card>
 
-      {/* Réception factures fournisseurs — info only, shown if Pennylane
-          isn't connected (users with Pennylane are already covered for
-          reception via their expert-comptable). */}
-      {!pennylaneConnected && (
-        <Card className="border-sky-200 bg-sky-50">
-          <CardContent className="pt-6">
-            <div className="flex items-start gap-3">
-              <Info className="h-5 w-5 shrink-0 text-sky-500 mt-0.5" />
-              <div className="space-y-2 text-sm text-sky-900">
-                <p className="font-semibold">
-                  📋 Réforme sept. 2026 — Réception de factures
-                </p>
-                <p>
-                  À partir du 1er septembre 2026, vous devrez recevoir vos
-                  factures fournisseurs via une plateforme agréée (PA).
-                  Devizly gère l&apos;émission de vos factures, mais pas la
-                  réception.
-                </p>
-                <p>Pour la réception, vous pouvez utiliser :</p>
-                <ul className="list-disc pl-5 space-y-1">
-                  <li>Votre expert-comptable (s&apos;il utilise Pennylane, Cegid, etc.)</li>
-                  <li>Le Portail Public de Facturation (PPF) — gratuit</li>
-                  <li>Une plateforme agréée de votre choix</li>
-                </ul>
-                <a
-                  href="https://www.impots.gouv.fr/facturation-electronique"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 font-medium text-sky-700 hover:underline"
-                >
-                  Voir la liste des plateformes agréées
-                  <ExternalLink className="h-3.5 w-3.5" />
-                </a>
-              </div>
+      {/* Réception factures fournisseurs — info only. L'obligation de
+          réception (sept. 2026) concerne tout le monde ; Devizly ne la
+          couvre pas (émission uniquement), donc l'encart s'affiche pour
+          tous les utilisateurs, quel que soit leur statut de connexion PA. */}
+      <Card className="border-sky-200 bg-sky-50">
+        <CardContent className="pt-6">
+          <div className="flex items-start gap-3">
+            <Info className="h-5 w-5 shrink-0 text-sky-500 mt-0.5" />
+            <div className="space-y-2 text-sm text-sky-900">
+              <p className="font-semibold">
+                📋 Réforme sept. 2026 — Réception de factures
+              </p>
+              <p>
+                À partir du 1er septembre 2026, vous devrez recevoir vos
+                factures fournisseurs via une plateforme agréée (PA).
+                Devizly gère l&apos;émission de vos factures, mais pas la
+                réception.
+              </p>
+              <p>Pour la réception, vous pouvez utiliser :</p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Votre expert-comptable (s&apos;il est connecté à une PA)</li>
+                <li>Le Portail Public de Facturation (PPF) — gratuit</li>
+                <li>Une plateforme agréée de votre choix</li>
+              </ul>
+              <a
+                href="https://www.impots.gouv.fr/facturation-electronique"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 font-medium text-sky-700 hover:underline"
+              >
+                Voir la liste des plateformes agréées
+                <ExternalLink className="h-3.5 w-3.5" />
+              </a>
             </div>
-          </CardContent>
-        </Card>
-      )}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Préférences */}
       <Card>

@@ -30,7 +30,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // Factur-X / reforme 2026
     { url: `${SITE_URL}/facture-electronique-2026`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
     { url: `${SITE_URL}/facturx-conforme`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
-    { url: `${SITE_URL}/integration-pennylane`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${SITE_URL}/e-reporting-b2c`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
 
     // BTP payments & URSSAF

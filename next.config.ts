@@ -6,6 +6,17 @@ const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
   },
+  async redirects() {
+    return [
+      {
+        // Pennylane retired in favor of SUPER PDP — send any existing
+        // traffic/backlinks to the current e-invoicing reform page.
+        source: "/integration-pennylane",
+        destination: "/facture-electronique-2026",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [{
       source: "/:path*",

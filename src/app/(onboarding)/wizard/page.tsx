@@ -78,7 +78,8 @@ const SIRET_TAKEN_MSG =
 
 const RECAP_FEATURES = [
   "Génération de devis par IA",
-  "Factures Factur-X (PDF/A-3) conformes 2026",
+  "Factur-X conforme EN 16931 (validé FNFE-MPE)",
+  "Transmission via Plateforme Agréée immatriculée DGFiP",
   "Relances automatiques J+2, J+5, J+7",
   "Signature électronique eIDAS",
   "Briefing quotidien de votre activité",

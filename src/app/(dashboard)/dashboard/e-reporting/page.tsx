@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -51,7 +50,6 @@ export default function EReportingPage() {
   const [rows, setRows] = useState<EReportingRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
-  const [pennylaneConnected, setPennylaneConnected] = useState(false);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -64,22 +62,9 @@ export default function EReportingPage() {
     }
   }, []);
 
-  const fetchPennylaneStatus = useCallback(async () => {
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    const { data } = await supabase
-      .from("profiles")
-      .select("pa_provider")
-      .eq("id", user.id)
-      .single();
-    setPennylaneConnected(data?.pa_provider === "pennylane");
-  }, []);
-
   useEffect(() => {
     fetchData();
-    fetchPennylaneStatus();
-  }, [fetchData, fetchPennylaneStatus]);
+  }, [fetchData]);
 
   // B2B rows are already covered by Factur-X/PDP — e-reporting only
   // concerns B2C and international sales.
@@ -203,12 +188,10 @@ export default function EReportingPage() {
                 <Button
                   variant="outline"
                   disabled
-                  title="Envoi automatique via Pennylane — disponible dans une prochaine version"
+                  title="Envoi automatique via votre Plateforme Agréée — disponible dans une prochaine version"
                 >
                   <Zap className="mr-2 h-4 w-4" />
-                  {pennylaneConnected
-                    ? "Envoyer via Pennylane (bientôt)"
-                    : "Envoyer via Pennylane (connectez-le d'abord)"}
+                  Envoyer via Plateforme Agréée (bientôt)
                 </Button>
               </div>
             </>

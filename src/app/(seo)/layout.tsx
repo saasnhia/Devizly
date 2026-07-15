@@ -45,7 +45,6 @@ export default function SeoLayout({ children }: { children: React.ReactNode }) {
           <Link href="/generateur-devis-ia" className="transition-colors hover:text-white">Générateur IA</Link>
           <Link href="/facture-electronique-2026" className="transition-colors hover:text-white">Réforme 2026</Link>
           <Link href="/facturx-conforme" className="transition-colors hover:text-white">Factur-X</Link>
-          <Link href="/integration-pennylane" className="transition-colors hover:text-white">Pennylane</Link>
           <Link href="/e-reporting-b2c" className="transition-colors hover:text-white">E-reporting B2C</Link>
           <Link href="/paiement-btp" className="transition-colors hover:text-white">Paiement BTP</Link>
           <Link href="/suivi-urssaf" className="transition-colors hover:text-white">Suivi URSSAF</Link>

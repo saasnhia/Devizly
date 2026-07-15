@@ -49,7 +49,7 @@ const faqSchema = {
       name: "Devizly peut-il envoyer les données directement à l'administration ?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Devizly enregistre automatiquement chaque transaction B2C ou internationale dès qu'une facture est payée, avec toutes les données requises (montant HT, TVA, TTC, taux, date de paiement). Ces transactions sont visibles dans un tableau de bord dédié et exportables en CSV au format attendu par les plateformes agréées. L'envoi automatique vers une plateforme agréée comme Pennylane est en cours de déploiement. Précision importante : l'e-reporting transite par une Plateforme Agréée immatriculée DGFiP, pas par l'URSSAF — l'URSSAF gère vos cotisations sociales, pas la transmission fiscale de vos ventes.",
+        text: "Devizly enregistre automatiquement chaque transaction B2C ou internationale dès qu'une facture est payée, avec toutes les données requises (montant HT, TVA, TTC, taux, date de paiement). Ces transactions sont visibles dans un tableau de bord dédié et exportables en CSV au format attendu par les plateformes agréées. L'envoi automatique vers votre Plateforme Agréée est en cours de déploiement. Précision importante : l'e-reporting transite par une Plateforme Agréée immatriculée DGFiP, pas par l'URSSAF — l'URSSAF gère vos cotisations sociales, pas la transmission fiscale de vos ventes.",
       },
     },
   ],

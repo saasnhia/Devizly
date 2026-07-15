@@ -17,8 +17,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Send, Copy, ExternalLink, Download, FileText, FileCheck, Loader2, AlertTriangle, Undo2, ShieldCheck, ShieldAlert } from "lucide-react";
+import { Send, Copy, ExternalLink, Download, FileText, FileCheck, Loader2, AlertTriangle, Undo2, ShieldCheck, ShieldAlert, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+import { superpdpStatusLabel } from "@/lib/superpdp/status-codes";
 
 const REFUND_REASONS = [
   "Chantier annulé",
@@ -37,6 +38,9 @@ interface InvoiceActionsProps {
   facturxPdfPath: string | null;
   paStatus: string | null;
   pennylaneConnected: boolean;
+  superpdpStatus: string | null;
+  superpdpLifecycleCode: string | null;
+  superpdpError: string | null;
   escrowStatus: string | null;
   escrowReleasedAt: string | null;
 }
@@ -51,6 +55,9 @@ export function InvoiceActions({
   facturxPdfPath,
   paStatus,
   pennylaneConnected,
+  superpdpStatus,
+  superpdpLifecycleCode,
+  superpdpError,
   escrowStatus,
   escrowReleasedAt,
 }: InvoiceActionsProps) {
@@ -59,6 +66,11 @@ export function InvoiceActions({
   const [hasFacturx, setHasFacturx] = useState(!!facturxPdfPath);
   const [pennylaneLoading, setPennylaneLoading] = useState(false);
   const [currentPaStatus, setCurrentPaStatus] = useState(paStatus);
+  const [superpdpLoading, setSuperpdpLoading] = useState(false);
+  const [superpdpRefreshing, setSuperpdpRefreshing] = useState(false);
+  const [currentSuperpdpStatus, setCurrentSuperpdpStatus] = useState(superpdpStatus);
+  const [currentSuperpdpCode, setCurrentSuperpdpCode] = useState(superpdpLifecycleCode);
+  const [currentSuperpdpError, setCurrentSuperpdpError] = useState(superpdpError);
   const [currentStatus, setCurrentStatus] = useState(status);
   const [currentRefundedAmount, setCurrentRefundedAmount] = useState(refundedAmount);
 
@@ -147,6 +159,57 @@ export function InvoiceActions({
       );
     } finally {
       setPennylaneLoading(false);
+    }
+  }
+
+  async function handleSuperpdp() {
+    setSuperpdpLoading(true);
+    try {
+      const res = await fetch(`/api/invoices/${invoiceId}/send-superpdp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || data.detail || "Erreur SUPER PDP");
+      }
+      setCurrentSuperpdpStatus("sent");
+      setCurrentSuperpdpError(null);
+      toast.success(
+        data.already_sent ? "Facture déjà transmise à SUPER PDP" : "Facture transmise à SUPER PDP"
+      );
+    } catch (err) {
+      setCurrentSuperpdpStatus("error");
+      const msg = err instanceof Error ? err.message : "Erreur envoi SUPER PDP";
+      setCurrentSuperpdpError(msg);
+      toast.error(msg);
+    } finally {
+      setSuperpdpLoading(false);
+    }
+  }
+
+  async function handleSuperpdpRefresh() {
+    setSuperpdpRefreshing(true);
+    try {
+      const res = await fetch(`/api/invoices/${invoiceId}/superpdp-refresh`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Erreur lors de la synchronisation");
+      }
+      if (data.transmission) {
+        setCurrentSuperpdpStatus(data.transmission.status);
+        setCurrentSuperpdpError(data.transmission.error_message);
+      }
+      if (data.latest_event) {
+        setCurrentSuperpdpCode(data.latest_event.status_code);
+      }
+      toast.success("Statut SUPER PDP synchronisé");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur de synchronisation");
+    } finally {
+      setSuperpdpRefreshing(false);
     }
   }
 
@@ -301,6 +364,59 @@ export function InvoiceActions({
         <span className="inline-flex items-center rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700">
           PA ✓
         </span>
+      )}
+
+      {hasFacturx && currentSuperpdpStatus !== "sent" && (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-7 px-2 text-xs"
+          onClick={handleSuperpdp}
+          disabled={superpdpLoading}
+          title={
+            currentSuperpdpStatus === "error"
+              ? `Réessayer SUPER PDP${currentSuperpdpError ? ` — ${currentSuperpdpError}` : ""}`
+              : "Transmettre la facture via SUPER PDP"
+          }
+        >
+          {superpdpLoading ? (
+            <>
+              <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+              ...
+            </>
+          ) : currentSuperpdpStatus === "error" ? (
+            <>
+              <AlertTriangle className="mr-1 h-3 w-3 text-red-500" />
+              SUPER PDP
+            </>
+          ) : (
+            <>
+              <Send className="mr-1 h-3 w-3 text-emerald-500" />
+              SUPER PDP
+            </>
+          )}
+        </Button>
+      )}
+
+      {hasFacturx && currentSuperpdpStatus === "sent" && (
+        <div className="flex items-center gap-1">
+          <span
+            className="inline-flex items-center rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700"
+            title={currentSuperpdpCode ? undefined : "Transmise — en attente de statut"}
+          >
+            {currentSuperpdpCode ? superpdpStatusLabel(currentSuperpdpCode) : "Transmise"}
+          </span>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-5 w-5"
+            onClick={handleSuperpdpRefresh}
+            disabled={superpdpRefreshing}
+            title="Rafraîchir le statut SUPER PDP"
+          >
+            <RefreshCw className={`h-3 w-3 ${superpdpRefreshing ? "animate-spin" : ""}`} />
+          </Button>
+        </div>
       )}
 
       {(currentStatus === "draft" || currentStatus === "sent") && (

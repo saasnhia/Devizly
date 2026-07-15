@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,13 +17,14 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Save, Loader2, CreditCard, Building, ExternalLink, Upload, Trash2, ImageIcon, Wallet, CheckCircle2, Zap, Globe, Copy, Check, Calendar, FileText, Info, Lightbulb } from "lucide-react";
+import { Save, Loader2, CreditCard, Building, ExternalLink, Upload, Trash2, ImageIcon, Wallet, CheckCircle2, Zap, Globe, Copy, Check, Calendar, FileText, Info, Lightbulb, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
 import { CompanyAutocomplete } from "@/components/company-autocomplete";
 import type { CompanyData } from "@/components/company-autocomplete";
 
 export default function ParametresPage() {
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
   const [logoLoading, setLogoLoading] = useState(false);
@@ -63,6 +65,11 @@ export default function ParametresPage() {
   const [pennylaneConnected, setPennylaneConnected] = useState(false);
   const [pennylaneConnectedAt, setPennylaneConnectedAt] = useState<string | null>(null);
   const [pennylaneLoading, setPennylaneLoading] = useState(false);
+  const [superpdpConnected, setSuperpdpConnected] = useState(false);
+  const [superpdpCompanyName, setSuperpdpCompanyName] = useState<string | null>(null);
+  const [superpdpSiren, setSuperpdpSiren] = useState<string | null>(null);
+  const [superpdpConnectedAt, setSuperpdpConnectedAt] = useState<string | null>(null);
+  const [superpdpDisconnecting, setSuperpdpDisconnecting] = useState(false);
   const [tipsEnabled, setTipsEnabled] = useState(true);
   const [profile, setProfile] = useState({
     full_name: "",
@@ -124,6 +131,19 @@ export default function ParametresPage() {
       if (billingRow?.pa_provider === "pennylane") {
         setPennylaneConnected(true);
         setPennylaneConnectedAt(billingRow.pa_connected_at || null);
+      }
+
+      // Load SUPER PDP connection state (multi-tenant — one row per user)
+      const { data: superpdpRow } = await supabase
+        .from("superpdp_connections")
+        .select("company_name, company_siren, connected_at")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (superpdpRow) {
+        setSuperpdpConnected(true);
+        setSuperpdpCompanyName(superpdpRow.company_name);
+        setSuperpdpSiren(superpdpRow.company_siren);
+        setSuperpdpConnectedAt(superpdpRow.connected_at);
       }
 
       const { data } = await supabase
@@ -237,6 +257,20 @@ export default function ParametresPage() {
     }
     loadLeadForm();
   }, []);
+
+  useEffect(() => {
+    const superpdpParam = searchParams.get("superpdp");
+    if (superpdpParam === "connected") {
+      toast.success("Connecté à SUPER PDP");
+    } else if (superpdpParam === "error") {
+      const reason = searchParams.get("reason");
+      toast.error(
+        reason === "state_mismatch"
+          ? "Échec de connexion — recommencez depuis Paramètres"
+          : "Erreur lors de la connexion à SUPER PDP"
+      );
+    }
+  }, [searchParams]);
 
   async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -1396,6 +1430,82 @@ export default function ParametresPage() {
               <p className="text-xs text-muted-foreground text-center">
                 Votre token est stocké de manière sécurisée et n&apos;est jamais
                 exposé côté client.
+              </p>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Facturation électronique — SUPER PDP (multi-tenant, authorization_code) */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <ShieldCheck className="h-5 w-5 text-emerald-500" />
+            Facturation électronique — SUPER PDP
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Plateforme Agréée (PA) immatriculée DGFiP. Connectez votre entreprise
+            pour transmettre vos factures conformément à la réforme facturation
+            électronique 2026.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {superpdpConnected ? (
+            <>
+              <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+                <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-emerald-800">
+                    Connecté — {superpdpCompanyName || "Entreprise"}
+                    {superpdpSiren && ` (SIREN ${superpdpSiren})`}
+                  </p>
+                  {superpdpConnectedAt && (
+                    <p className="text-xs text-emerald-600">
+                      Depuis le{" "}
+                      {new Date(superpdpConnectedAt).toLocaleDateString("fr-FR", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
+                disabled={superpdpDisconnecting}
+                onClick={async () => {
+                  setSuperpdpDisconnecting(true);
+                  try {
+                    const res = await fetch("/api/superpdp/disconnect", { method: "POST" });
+                    if (!res.ok) throw new Error("Erreur déconnexion");
+                    setSuperpdpConnected(false);
+                    setSuperpdpCompanyName(null);
+                    setSuperpdpSiren(null);
+                    setSuperpdpConnectedAt(null);
+                    toast.success("SUPER PDP déconnecté");
+                  } catch {
+                    toast.error("Erreur lors de la déconnexion");
+                  } finally {
+                    setSuperpdpDisconnecting(false);
+                  }
+                }}
+              >
+                {superpdpDisconnecting ? "..." : "Déconnecter"}
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button className="w-full" asChild>
+                <a href="/api/superpdp/connect">
+                  <ShieldCheck className="mr-2 h-4 w-4" />
+                  Connecter mon entreprise à SUPER PDP
+                </a>
+              </Button>
+              <p className="text-xs text-muted-foreground text-center">
+                Vous serez redirigé vers SUPER PDP pour autoriser l&apos;accès.
+                Vos identifiants ne transitent jamais par Devizly.
               </p>
             </>
           )}

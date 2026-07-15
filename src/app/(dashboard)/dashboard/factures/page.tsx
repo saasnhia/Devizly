@@ -4,6 +4,7 @@ import { formatCurrency, formatDate } from "@/lib/utils/quote";
 import { Badge } from "@/components/ui/badge";
 import { InvoiceActions } from "./invoice-actions";
 import { PaymentScheduleList, type ScheduleGroup } from "./payment-schedule-list";
+import { superpdpStatusLabel } from "@/lib/superpdp/status-codes";
 
 export const metadata = {
   title: "Factures — Worthifast",
@@ -80,9 +81,38 @@ export default async function FacturesPage() {
     console.error("[Factures] Fetch failed:", invoicesError.message);
   }
 
+  // SUPER PDP transmission state + latest lifecycle event per invoice
+  const { data: superpdpTransmissions } = await supabase
+    .from("superpdp_transmissions")
+    .select("invoice_id, status, error_message")
+    .eq("user_id", user.id);
+
+  const superpdpByInvoice = new Map(
+    (superpdpTransmissions || []).map((t) => [t.invoice_id, t])
+  );
+
+  const { data: superpdpEvents } = await supabase
+    .from("superpdp_events")
+    .select("invoice_id, status_code, event_date")
+    .order("event_date", { ascending: false });
+
+  const latestSuperpdpCodeByInvoice = new Map<string, string>();
+  for (const ev of superpdpEvents || []) {
+    if (ev.invoice_id && !latestSuperpdpCodeByInvoice.has(ev.invoice_id)) {
+      latestSuperpdpCodeByInvoice.set(ev.invoice_id, ev.status_code);
+    }
+  }
+
   const allInvoices = (invoices || []).map((inv) => {
     const client = Array.isArray(inv.clients) ? inv.clients[0] : inv.clients;
-    return { ...inv, client };
+    const superpdp = superpdpByInvoice.get(inv.id);
+    return {
+      ...inv,
+      client,
+      superpdp_status: superpdp?.status ?? null,
+      superpdp_error: superpdp?.error_message ?? null,
+      superpdp_lifecycle_code: latestSuperpdpCodeByInvoice.get(inv.id) ?? null,
+    };
   });
 
   // Fetch payment schedules (échéanciers BTP), grouped by quote
@@ -228,6 +258,18 @@ export default async function FacturesPage() {
                           PA !
                         </span>
                       )}
+                      {inv.superpdp_status === "sent" && (
+                        <span className="ml-1 inline-flex items-center rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700">
+                          {inv.superpdp_lifecycle_code
+                            ? superpdpStatusLabel(inv.superpdp_lifecycle_code)
+                            : "SUPER PDP"}
+                        </span>
+                      )}
+                      {inv.superpdp_status === "error" && (
+                        <span className="ml-1 inline-flex items-center rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-medium text-red-700">
+                          SUPER PDP !
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       {inv.client?.name || "—"}
@@ -258,6 +300,9 @@ export default async function FacturesPage() {
                         facturxPdfPath={inv.facturx_pdf_path}
                         paStatus={inv.pa_status}
                         pennylaneConnected={pennylaneConnected}
+                        superpdpStatus={inv.superpdp_status}
+                        superpdpLifecycleCode={inv.superpdp_lifecycle_code}
+                        superpdpError={inv.superpdp_error}
                         escrowStatus={inv.escrow_status}
                         escrowReleasedAt={inv.escrow_released_at}
                       />

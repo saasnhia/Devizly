@@ -3,11 +3,14 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { X } from "lucide-react";
+import { useFounderSlots } from "@/hooks/use-founder-slots";
 
 const STORAGE_KEY = "devizly:founder-banner-dismissed";
 
 export function TopBar() {
+  const { isFounderAvailable } = useFounderSlots();
   const [dismissed, setDismissed] = useState(false);
+  const hidden = dismissed || !isFounderAvailable;
 
   useEffect(() => {
     try {
@@ -33,9 +36,9 @@ export function TopBar() {
   return (
     <div
       className={`sticky top-0 z-[60] overflow-hidden transition-[max-height,opacity] duration-300 ease-out ${
-        dismissed ? "max-h-0 opacity-0" : "max-h-14 opacity-100"
+        hidden ? "max-h-0 opacity-0" : "max-h-14 opacity-100"
       }`}
-      aria-hidden={dismissed}
+      aria-hidden={hidden}
     >
       <div className="relative w-full bg-gradient-to-r from-[#0d0d14] via-[#12101f] to-[#0d0d14] border-b border-[#5B5BD6]/20 py-2 pl-3 pr-10 text-center text-xs">
         <Link

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DevizlyLogo } from "@/components/devizly-logo";
+import { useFounderSlots } from "@/hooks/use-founder-slots";
 import { toast } from "sonner";
 import {
   Building2,
@@ -96,6 +97,7 @@ export default function OnboardingWizard() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { isFounderAvailable } = useFounderSlots();
 
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -763,10 +765,16 @@ export default function OnboardingWizard() {
                     </p>
                     <div className="rounded-lg bg-white border border-violet-100 p-4 text-left text-sm">
                       <p className="font-semibold text-violet-600 mb-2">
-                        🎁 Offre Fondateur — 9€/mois à vie{" "}
-                        <span className="font-normal text-slate-400 line-through">
-                          19€
-                        </span>
+                        {isFounderAvailable ? (
+                          <>
+                            🎁 Offre Fondateur — 9€/mois à vie{" "}
+                            <span className="font-normal text-slate-400 line-through">
+                              19€
+                            </span>
+                          </>
+                        ) : (
+                          "Plan Pro — 19€/mois"
+                        )}
                       </p>
                       <ul className="space-y-1 text-slate-500">
                         <li>→ Acomptes 30%/50% encaissés automatiquement</li>

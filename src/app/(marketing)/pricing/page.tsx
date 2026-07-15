@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Check, X, Loader2, ArrowRight, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
+import { useFounderSlots } from "@/hooks/use-founder-slots";
 
 /* ── Real feature gates (audited from codebase) ────── */
 
@@ -155,9 +157,35 @@ const faqs = [
 
 const IS_BETA = process.env.NEXT_PUBLIC_BETA_MODE === "true";
 
+/**
+ * Resolves what to actually display for a plan's price. When the
+ * founder offer is sold out, a founderOffer plan falls back to its
+ * standard (originally crossed-out) price instead of the 9€ — so the
+ * page never shows a price /api/stripe/checkout won't honor.
+ */
+function effectivePrice(
+  plan: PlanCard,
+  isAnnual: boolean,
+  isFounderAvailable: boolean
+): { price: string; original: string | undefined; showFounderBadge: boolean } {
+  const rawPrice = isAnnual ? plan.annualPrice : plan.monthlyPrice;
+  const rawOriginal = isAnnual ? plan.annualOriginalPrice : plan.monthlyOriginalPrice;
+
+  if (plan.founderOffer && !isFounderAvailable) {
+    return { price: rawOriginal ?? rawPrice, original: undefined, showFounderBadge: false };
+  }
+  return {
+    price: rawPrice,
+    original: rawOriginal,
+    showFounderBadge: Boolean(plan.founderOffer),
+  };
+}
+
 /* ── Component ───────────────────────────────────── */
 
 export default function PricingPage() {
+  const router = useRouter();
+  const { isFounderAvailable } = useFounderSlots();
   const [currentPlan, setCurrentPlan] = useState<string>("free");
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   // Founder offer is flat 9€/month for life — no annual toggle.
@@ -187,6 +215,15 @@ export default function PricingPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ priceId }),
       });
+
+      if (response.status === 401) {
+        // Registered but no active session (e.g. clicked from an email
+        // on a different device) — send to login, then straight back
+        // here so they can retry the checkout in one extra step.
+        router.push("/login?next=/pricing");
+        return;
+      }
+
       const result = await response.json();
       if (result.url) {
         window.location.href = result.url;
@@ -221,15 +258,17 @@ export default function PricingPage() {
     <div className="min-h-screen bg-[#08090a] text-white">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
 
-        {/* ── Founder banner ── */}
-        <div className="mx-auto mb-8 flex w-fit items-center gap-2 rounded-full border border-yellow-500/30 bg-yellow-500/10 px-4 py-2">
-          <span className="text-sm font-semibold text-yellow-400">
-            &#11088; Offre Fondateur
-          </span>
-          <span className="text-sm text-yellow-400/70">
-            — Les 100 premiers abonnés Pro : 9&euro;/mois à vie
-          </span>
-        </div>
+        {/* ── Founder banner — hidden once the 100 seats are gone ── */}
+        {isFounderAvailable && (
+          <div className="mx-auto mb-8 flex w-fit items-center gap-2 rounded-full border border-yellow-500/30 bg-yellow-500/10 px-4 py-2">
+            <span className="text-sm font-semibold text-yellow-400">
+              &#11088; Offre Fondateur
+            </span>
+            <span className="text-sm text-yellow-400/70">
+              — Les 100 premiers abonnés Pro : 9&euro;/mois à vie
+            </span>
+          </div>
+        )}
 
         {/* ── Header ── */}
         <div className="text-center">
@@ -254,7 +293,11 @@ export default function PricingPage() {
         <div className="mt-12 grid gap-6 md:grid-cols-3">
           {plans.map((plan) => {
             const isCurrent = currentPlan === plan.id;
-            const price = isAnnual ? plan.annualPrice : plan.monthlyPrice;
+            const { price, original, showFounderBadge } = effectivePrice(
+              plan,
+              isAnnual,
+              isFounderAvailable
+            );
             const isBetaPaid = IS_BETA && plan.id !== "free";
 
             return (
@@ -286,15 +329,15 @@ export default function PricingPage() {
                 <p className="mt-1 text-sm text-slate-400">{plan.description}</p>
 
                 <div className="mt-5">
-                  {(isAnnual ? plan.annualOriginalPrice : plan.monthlyOriginalPrice) && (
+                  {original && (
                     <span className="mr-2 text-2xl font-medium text-slate-500 line-through">
-                      {isAnnual ? plan.annualOriginalPrice : plan.monthlyOriginalPrice}&euro;
+                      {original}&euro;
                     </span>
                   )}
                   <span className="text-5xl font-bold text-white">{price}&euro;</span>
                   {price !== "0" && (
                     <span className="text-lg text-slate-400">
-                      {plan.founderOffer ? "/mois à vie" : "/mois HT"}
+                      {showFounderBadge ? "/mois à vie" : "/mois HT"}
                     </span>
                   )}
                   {price === "0" && (
@@ -309,7 +352,7 @@ export default function PricingPage() {
                         </span>
                       </p>
                     )}
-                  {plan.founderOffer && (
+                  {showFounderBadge && (
                     <div className="mt-3">
                       <span className="inline-flex items-center gap-1 rounded-full border border-yellow-400/30 bg-yellow-400/10 px-2.5 py-0.5 text-[11px] font-semibold text-yellow-300">
                         &#11088; Offre Fondateur &mdash; 100 premières places
@@ -441,10 +484,7 @@ export default function PricingPage() {
                 <tr className="bg-white/[0.02]">
                   <td className="px-5 py-4 font-medium text-white">Prix</td>
                   {plans.map((p) => {
-                    const price = isAnnual ? p.annualPrice : p.monthlyPrice;
-                    const original = isAnnual
-                      ? p.annualOriginalPrice
-                      : p.monthlyOriginalPrice;
+                    const { price, original } = effectivePrice(p, isAnnual, isFounderAvailable);
                     return (
                       <td
                         key={p.id}

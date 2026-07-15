@@ -3,13 +3,44 @@
 import Link from "next/link";
 import { Check, ArrowRight } from "lucide-react";
 import { useReveal } from "../hooks/useReveal";
+import { useFounderSlots } from "@/hooks/use-founder-slots";
 import { plans } from "../data/landing-data";
+
+/**
+ * Resolves what to actually display for a plan. When the founder offer
+ * is sold out, a founderOffer plan falls back to its standard price
+ * (the crossed-out originalPrice) instead of 9€ — kept in sync with
+ * /api/stripe/checkout via GET /api/founder-slots.
+ */
+function effectivePlan(plan: (typeof plans)[number], isFounderAvailable: boolean) {
+  if (plan.founderOffer && !isFounderAvailable) {
+    return {
+      price: plan.originalPrice ?? plan.price,
+      originalPrice: undefined as number | undefined,
+      period: "/mois HT",
+      showFounderBadge: false,
+    };
+  }
+  return {
+    price: plan.price,
+    originalPrice: plan.originalPrice,
+    period: plan.period,
+    showFounderBadge: Boolean(plan.founderOffer),
+  };
+}
 
 function PricingCard({
   plan,
+  isFounderAvailable,
 }: {
   plan: (typeof plans)[number];
+  isFounderAvailable: boolean;
 }) {
+  const { price, originalPrice, period, showFounderBadge } = effectivePlan(
+    plan,
+    isFounderAvailable
+  );
+
   const cardInner = (
     <div
       className={`relative flex h-full flex-col p-6 ${
@@ -40,28 +71,28 @@ function PricingCard({
       <p className="mt-1 text-sm text-slate-400">{plan.description}</p>
 
       <div className="mt-5">
-        {plan.originalPrice && (
+        {originalPrice && (
           <span className="mr-2 text-2xl font-medium text-slate-500 line-through">
-            {plan.originalPrice}&euro;
+            {originalPrice}&euro;
           </span>
         )}
         <span className="text-5xl font-bold text-white">
-          {plan.price}&euro;
+          {price}&euro;
         </span>
-        {plan.price > 0 && (
-          <span className="text-lg text-slate-400">{plan.period}</span>
+        {price > 0 && (
+          <span className="text-lg text-slate-400">{period}</span>
         )}
-        {plan.price === 0 && (
+        {price === 0 && (
           <p className="mt-1 text-xs text-slate-500">Gratuit pour toujours</p>
         )}
-        {plan.founderOffer && (
+        {showFounderBadge && (
           <div className="mt-2">
             <span className="inline-flex items-center gap-1 rounded-full border border-yellow-400/30 bg-yellow-400/10 px-2.5 py-0.5 text-[11px] font-semibold text-yellow-300">
               &#11088; Offre Fondateur &mdash; 100 premi&egrave;res places
             </span>
           </div>
         )}
-        {plan.popular && !plan.founderOffer && (
+        {plan.popular && !showFounderBadge && (
           <span className="badge-shimmer mt-2 inline-flex items-center rounded-full border border-[#5B5BD6]/20 bg-[#5B5BD6]/10 px-2 py-0.5 text-[10px] font-medium text-[#818cf8]">
             Prêt réforme 2026
           </span>
@@ -116,6 +147,7 @@ function PricingCard({
 
 export function EditorialPricing() {
   const ref = useReveal<HTMLElement>();
+  const { isFounderAvailable } = useFounderSlots();
 
   return (
     <section ref={ref} id="tarifs" className="reveal-fade py-24 lg:py-32">
@@ -124,8 +156,17 @@ export function EditorialPricing() {
           className="mb-4 text-center font-bold tracking-tight text-white"
           style={{ fontSize: "clamp(28px, 5vw, 48px)" }}
         >
-          Gratuit pour d&eacute;marrer.{" "}
-          <span className="text-[#5B5BD6]">9&euro;/mois &agrave; vie</span> pour tout d&eacute;bloquer.
+          {isFounderAvailable ? (
+            <>
+              Gratuit pour d&eacute;marrer.{" "}
+              <span className="text-[#5B5BD6]">9&euro;/mois &agrave; vie</span> pour tout d&eacute;bloquer.
+            </>
+          ) : (
+            <>
+              Gratuit pour d&eacute;marrer.{" "}
+              <span className="text-[#5B5BD6]">19&euro;/mois</span> pour tout d&eacute;bloquer.
+            </>
+          )}
         </h2>
         <p className="mx-auto mb-14 max-w-md text-center text-base text-slate-400">
           Commencez gratuitement. &Eacute;voluez quand vous &ecirc;tes pr&ecirc;t.
@@ -138,7 +179,7 @@ export function EditorialPricing() {
               key={plan.name}
               className={i === 1 ? "order-first md:order-none" : ""}
             >
-              <PricingCard plan={plan} />
+              <PricingCard plan={plan} isFounderAvailable={isFounderAvailable} />
             </div>
           ))}
         </div>
@@ -150,12 +191,14 @@ export function EditorialPricing() {
           <span>&#10003; RGPD &amp; h&eacute;berg&eacute; en France</span>
         </div>
 
-        {/* Founder banner */}
-        <p className="mt-8 text-center text-sm text-slate-500">
-          &#11088;{" "}
-          <strong className="text-white">Offre Fondateur</strong> &mdash; Les 100
-          premiers abonn&eacute;s Pro obtiennent 9&euro;/mois &agrave; vie.
-        </p>
+        {/* Founder banner — only while seats remain */}
+        {isFounderAvailable && (
+          <p className="mt-8 text-center text-sm text-slate-500">
+            &#11088;{" "}
+            <strong className="text-white">Offre Fondateur</strong> &mdash; Les 100
+            premiers abonn&eacute;s Pro obtiennent 9&euro;/mois &agrave; vie.
+          </p>
+        )}
       </div>
     </section>
   );

@@ -522,15 +522,21 @@ export default function NouveauDevisPage() {
       return;
     }
     setAiLoading(true);
+    const aiFailureMessage =
+      "La génération IA a rencontré un problème, réessayez ou créez votre devis manuellement.";
     try {
       const response = await fetch("/api/ai/generate-quote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: aiPrompt }),
       });
-      const result = await response.json();
-      if (!response.ok) {
-        toast.error(result.error || "Erreur IA");
+      // A Vercel timeout or crash returns an HTML page, not JSON
+      const result = await response.json().catch(() => null);
+      if (!response.ok || !result?.data) {
+        // Keep server-side business errors (quota, auth); everything else gets the AI failure message
+        toast.error(response.status === 403 || response.status === 401 || response.status === 429
+          ? result?.error || aiFailureMessage
+          : aiFailureMessage);
         return;
       }
       const data = result.data;

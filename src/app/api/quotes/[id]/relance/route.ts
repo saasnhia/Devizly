@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getMistral, parseAIResponse } from "@/lib/mistral";
+import { completeWithFallback, parseAIResponse } from "@/lib/mistral";
+import { NO_COMPLIANCE_CLAIMS_RULE } from "@/lib/ai/prompts";
 import { formatCurrency } from "@/lib/utils/quote";
 
 export async function POST(
@@ -56,9 +57,7 @@ export async function POST(
   const totalTTC = formatCurrency(Number(quote.total_ttc));
 
   try {
-    const mistral = getMistral();
-    const completion = await mistral.chat.complete({
-      model: "mistral-small-latest",
+    const { content } = await completeWithFallback("relance", {
       messages: [
         {
           role: "system",
@@ -66,7 +65,8 @@ export async function POST(
 Ton : chaleureux, professionnel, pas insistant — style HoneyBook.
 Retourne un JSON avec "subject" (string) et "body" (string, texte brut avec sauts de ligne).
 Le body ne doit PAS contenir de HTML. Utilise des sauts de ligne simples.
-Reponds UNIQUEMENT en JSON valide, sans markdown ni backticks.`,
+Reponds UNIQUEMENT en JSON valide, sans markdown ni backticks.
+${NO_COMPLIANCE_CLAIMS_RULE}`,
         },
         {
           role: "user",
@@ -86,16 +86,18 @@ L'email doit rappeler le devis, etre bienveillant, et proposer de repondre aux q
       maxTokens: 500,
     });
 
-    const content = completion.choices?.[0]?.message?.content;
-    if (!content || typeof content !== "string") {
-      return NextResponse.json({ error: "Reponse vide de l'IA" }, { status: 500 });
-    }
-
     let parsed: { subject: string; body: string };
     try {
       parsed = parseAIResponse<{ subject: string; body: string }>(content);
     } catch (parseError) {
-      console.error("[relance] JSON parse failed:", parseError, "Raw:", content.slice(0, 500));
+      console.error(
+        JSON.stringify({
+          event: "ai_parse_failed",
+          tag: "relance",
+          error: parseError instanceof Error ? parseError.message : "UnknownError",
+          contentLength: content.length,
+        })
+      );
       return NextResponse.json({ error: "Réponse IA invalide — veuillez réessayer" }, { status: 500 });
     }
 
@@ -109,8 +111,11 @@ L'email doit rappeler le devis, etre bienveillant, et proposer de repondre aux q
         quoteRef,
       },
     });
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "Erreur IA";
-    return NextResponse.json({ error: message }, { status: 500 });
+  } catch {
+    // completeWithFallback already logged every failed attempt
+    return NextResponse.json(
+      { error: "La génération IA a rencontré un problème, réessayez ou rédigez la relance manuellement." },
+      { status: 503 }
+    );
   }
 }

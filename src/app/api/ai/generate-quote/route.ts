@@ -1,8 +1,34 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { getMistral, parseAIResponse } from "@/lib/mistral";
+import { completeWithFallback, parseAIResponse } from "@/lib/mistral";
+import { QUOTE_SYSTEM_PROMPT } from "@/lib/ai/prompts";
+import { filterQuoteClaims } from "@/lib/ai/compliance-filter";
 import { checkRateLimit } from "@/lib/ratelimit";
 import { canCreateDevis, type PlanId } from "@/lib/stripe";
+
+// Small fallback models sometimes return numbers as strings ("2", "1 200,50") — coerce them
+const aiNumber = z.preprocess(
+  (v) => (typeof v === "string" ? Number(v.replace(/[^\d,.-]/g, "").replace(",", ".")) : v),
+  z.number().finite().nonnegative()
+);
+
+const aiQuoteSchema = z.object({
+  title: z.string().trim().min(1),
+  items: z
+    .array(
+      z.object({
+        description: z.string().trim().min(1),
+        quantity: aiNumber,
+        unit_price: aiNumber,
+      })
+    )
+    .min(1),
+  notes: z.string().optional().catch(undefined),
+});
+
+const AI_FAILURE_MESSAGE =
+  "La génération IA a rencontré un problème, réessayez ou créez votre devis manuellement.";
 
 export async function POST(request: Request) {
   // Rate limit check
@@ -43,19 +69,12 @@ export async function POST(request: Request) {
   }
 
   try {
-    const mistral = getMistral();
-    const completion = await mistral.chat.complete({
-      model: "mistral-small-latest",
+    const { content, model } = await completeWithFallback("generate-quote", {
       responseFormat: { type: "json_object" },
       messages: [
         {
           role: "system",
-          content: `[STRICT MODE] Tu es un assistant qui génère des devis professionnels français.
-Tu dois répondre UNIQUEMENT avec du JSON brut valide.
-Pas de markdown, pas de backticks, pas de \`\`\`json, pas de texte avant ou après. Pas de commentaires. JSON pur uniquement.
-Structure attendue : { "title": string, "items": [{ "description": string, "quantity": number, "unit_price": number }], "notes": string }.
-Les descriptions doivent être courtes (10 mots max par ligne).
-Les prix doivent être en euros HT, réalistes pour le marché français.`,
+          content: QUOTE_SYSTEM_PROMPT,
         },
         {
           role: "user",
@@ -66,21 +85,37 @@ Les prix doivent être en euros HT, réalistes pour le marché français.`,
       maxTokens: 2000,
     });
 
-    const content = completion.choices?.[0]?.message?.content;
-    if (!content || typeof content !== "string") {
-      return NextResponse.json({ error: "Réponse vide de l'IA" }, { status: 500 });
+    let parsed: z.infer<typeof aiQuoteSchema>;
+    try {
+      parsed = aiQuoteSchema.parse(parseAIResponse(content));
+    } catch (parseError) {
+      console.error(
+        JSON.stringify({
+          event: "ai_parse_failed",
+          tag: "generate-quote",
+          model,
+          error: parseError instanceof z.ZodError ? "SchemaMismatch" : parseError instanceof Error ? parseError.message : "UnknownError",
+          contentLength: content.length,
+        })
+      );
+      return NextResponse.json({ error: AI_FAILURE_MESSAGE, code: "AI_INVALID_RESPONSE" }, { status: 502 });
     }
 
-    let parsed;
-    try {
-      parsed = parseAIResponse(content);
-    } catch (parseError) {
-      console.error("[generate-quote] JSON parse failed:", parseError, "Raw:", content.slice(0, 500));
-      return NextResponse.json({ error: "Réponse IA invalide — veuillez réessayer" }, { status: 500 });
+    // The prompt discourages compliance claims; this filter guarantees none reaches the client
+    const filtered = filterQuoteClaims("generate-quote", {
+      title: parsed.title,
+      notes: parsed.notes,
+      lines: parsed.items,
+    });
+    if (filtered.lines.length === 0) {
+      return NextResponse.json({ error: AI_FAILURE_MESSAGE, code: "AI_INVALID_RESPONSE" }, { status: 502 });
     }
-    return NextResponse.json({ success: true, data: parsed });
-  } catch (error) {
-    console.error("[generate-quote] Error:", error);
-    return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 });
+    return NextResponse.json({
+      success: true,
+      data: { title: filtered.title, notes: filtered.notes, items: filtered.lines },
+    });
+  } catch {
+    // completeWithFallback already logged every failed attempt
+    return NextResponse.json({ error: AI_FAILURE_MESSAGE, code: "AI_UNAVAILABLE" }, { status: 503 });
   }
 }

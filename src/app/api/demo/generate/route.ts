@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
-import { getMistral, parseAIResponse } from "@/lib/mistral";
+import { AIGenerationError, completeWithFallback, parseAIResponse } from "@/lib/mistral";
+import { NO_COMPLIANCE_CLAIMS_RULE, QUOTE_LINE_RULES } from "@/lib/ai/prompts";
+import { filterQuoteClaims, stripClaimSentences } from "@/lib/ai/compliance-filter";
 
 // Allow up to 30s on Vercel Pro (ignored on Hobby)
 export const maxDuration = 30;
@@ -75,67 +77,69 @@ export async function POST(request: Request) {
     );
   }
 
-  // 3. Generate with Mistral (with timeout + 1 retry)
-  const MAX_RETRIES = 1;
-
-  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-    try {
-      const mistral = getMistral();
-      const completion = await mistral.chat.complete(
-        {
-          model: "mistral-small-latest",
-          responseFormat: { type: "json_object" },
-          messages: [
-            {
-              role: "system",
-              content: `[STRICT MODE] Tu génères des devis professionnels français.
+  // 3. Generate with Mistral (primary model, then fallback model — 12s each to stay under maxDuration)
+  try {
+    const { content } = await completeWithFallback(
+      "demo",
+      {
+        responseFormat: { type: "json_object" },
+        messages: [
+          {
+            role: "system",
+            content: `[STRICT MODE] Tu génères des devis professionnels français.
 Réponds UNIQUEMENT en JSON brut valide. Pas de markdown, pas de backticks.
 Structure : { "title": string, "lines": [{ "description": string, "quantity": number, "unit": string, "unitPrice": number, "total": number }], "subtotal": number, "vatRate": 20, "vatAmount": number, "total": number, "validityDays": 30, "paymentConditions": string, "notes": string }
-Règles : 3-6 lignes réalistes, prix marché français 2026, montants en euros HT, descriptions courtes (10 mots max).`,
-            },
-            {
-              role: "user",
-              content: `Métier : ${metier}\nPrestation : ${description}`,
-            },
-          ],
-          temperature: 0.7,
-          maxTokens: 800,
-        },
-        { timeoutMs: 25_000 }
-      );
+Règles : 3-6 lignes réalistes, prix marché français 2026. "total" de chaque ligne = quantity × unitPrice.
+${QUOTE_LINE_RULES}
+${NO_COMPLIANCE_CLAIMS_RULE}`,
+          },
+          {
+            role: "user",
+            content: `Métier : ${metier}
+Prestation : ${description}`,
+          },
+        ],
+        temperature: 0.7,
+        maxTokens: 800,
+      },
+      { timeoutMs: 12_000 }
+    );
 
-      const content = completion.choices?.[0]?.message?.content;
-      if (!content || typeof content !== "string") {
-        if (attempt < MAX_RETRIES) continue;
-        return NextResponse.json(
-          { error: "Réponse IA vide — veuillez réessayer" },
-          { status: 500 }
-        );
-      }
+    const raw = parseAIResponse<DemoQuote>(content);
 
-      const quote = parseAIResponse<DemoQuote>(content);
+    // The prompt discourages compliance claims; this filter guarantees none reaches the visitor
+    const filtered = filterQuoteClaims("demo", { title: raw.title, notes: raw.notes, lines: raw.lines ?? [] });
+    if (filtered.lines.length === 0) {
+      throw new Error("No quote line left after filtering");
+    }
+    const quote: DemoQuote = { ...raw, title: filtered.title, notes: filtered.notes ?? "", lines: filtered.lines };
+    if (typeof quote.paymentConditions === "string") {
+      quote.paymentConditions = stripClaimSentences(quote.paymentConditions);
+    }
+    if (filtered.lines.length !== (raw.lines ?? []).length) {
+      // A line was dropped — totals from the model no longer match
+      quote.subtotal = Math.round(filtered.lines.reduce((s, l) => s + Number(l.total || 0), 0) * 100) / 100;
+      quote.vatAmount = Math.round(quote.subtotal * (Number(quote.vatRate) || 20)) / 100;
+      quote.total = Math.round((quote.subtotal + quote.vatAmount) * 100) / 100;
+    }
 
-      return NextResponse.json({
-        quote,
-        remainingGenerations: remaining,
-      });
-    } catch (err: unknown) {
-      const errMsg = err instanceof Error ? err.message : String(err);
-      const errStatus = (err as Record<string, unknown>)?.statusCode ?? (err as Record<string, unknown>)?.status;
-      console.error(`[Demo] Generation failed (attempt ${attempt + 1}/${MAX_RETRIES + 1}):`, errMsg, errStatus ?? "");
-
-      // Retry on timeout or transient errors
-      if (attempt < MAX_RETRIES) continue;
-
-      return NextResponse.json(
-        {
-          error: "Génération impossible. Réessayez dans quelques secondes.",
-          ...(process.env.NODE_ENV !== "production" && {
-            debug: { message: errMsg, status: errStatus ?? null },
-          }),
-        },
-        { status: 500 }
+    return NextResponse.json({
+      quote,
+      remainingGenerations: remaining,
+    });
+  } catch (err: unknown) {
+    if (!(err instanceof AIGenerationError)) {
+      console.error(
+        JSON.stringify({
+          event: "ai_parse_failed",
+          tag: "demo",
+          error: err instanceof Error ? err.message : "UnknownError",
+        })
       );
     }
+    return NextResponse.json(
+      { error: "Génération impossible. Réessayez dans quelques secondes." },
+      { status: 500 }
+    );
   }
 }

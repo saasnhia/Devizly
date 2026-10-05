@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
-import { getMistral, parseAIResponse } from "@/lib/mistral";
+import { completeWithFallback, parseAIResponse } from "@/lib/mistral";
+import { NO_COMPLIANCE_CLAIMS_RULE } from "./prompts";
 import { formatCurrency } from "@/lib/utils/quote";
 
 function createServiceClient() {
@@ -155,14 +156,13 @@ Genere un briefing matinal en JSON avec :
 Reponds UNIQUEMENT en JSON valide, sans markdown ni backticks.`;
 
   try {
-    const mistral = getMistral();
-    const completion = await mistral.chat.complete({
-      model: "mistral-small-latest",
+    const { content } = await completeWithFallback("daily-briefing", {
       messages: [
         {
           role: "system",
           content:
-            "Vous etes l'assistant IA de Devizly. Vous generez des briefings matinaux concis et actionnables pour des independants et freelancers francais. Votre role : les aider a prioriser leur journee. Soyez direct, vouvoyez l'utilisateur, pas de formules de politesse inutiles.",
+            "Vous etes l'assistant IA de Devizly. Vous generez des briefings matinaux concis et actionnables pour des independants et freelancers francais. Votre role : les aider a prioriser leur journee. Soyez direct, vouvoyez l'utilisateur, pas de formules de politesse inutiles.\n" +
+            NO_COMPLIANCE_CLAIMS_RULE,
         },
         { role: "user", content: contextPrompt },
       ],
@@ -170,16 +170,18 @@ Reponds UNIQUEMENT en JSON valide, sans markdown ni backticks.`;
       maxTokens: 600,
     });
 
-    const content = completion.choices?.[0]?.message?.content;
-    if (!content || typeof content !== "string") {
-      return fallbackBriefing(stats);
-    }
-
     let parsed: { summary: string; actions: string[] };
     try {
       parsed = parseAIResponse<{ summary: string; actions: string[] }>(content);
     } catch (parseError) {
-      console.error("[daily-briefing] JSON parse failed:", parseError, "Raw:", content.slice(0, 500));
+      console.error(
+        JSON.stringify({
+          event: "ai_parse_failed",
+          tag: "daily-briefing",
+          error: parseError instanceof Error ? parseError.message : "UnknownError",
+          contentLength: content.length,
+        })
+      );
       return fallbackBriefing(stats);
     }
     return { ...parsed, stats };

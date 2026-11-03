@@ -50,10 +50,7 @@ export function SocialProof() {
           Stripe sécurisé
         </span>
         <span className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1">
-          RGPD conforme
-        </span>
-        <span className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1">
-          Hébergé en France
+          Base de données en UE
         </span>
       </div>
 

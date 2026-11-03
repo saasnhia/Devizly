@@ -120,7 +120,7 @@ export const plans: Plan[] = [
 export const faqs = [
   {
     q: "Est-ce conforme aux exigences légales françaises ?",
-    a: "Oui. Devizly génère des devis avec toutes les mentions obligatoires : SIRET, TVA, conditions de paiement, date de validité. L'IA est hébergée en France — vos données ne quittent jamais l'UE.",
+    a: "Oui. Devizly génère des devis avec toutes les mentions obligatoires : SIRET, TVA, conditions de paiement, date de validité. L'IA est hébergée dans l'Union européenne.",
   },
   {
     q: "L'IA décide-t-elle de mes prix ?",
@@ -140,7 +140,7 @@ export const faqs = [
   },
   {
     q: "Mes données sont-elles sécurisées ?",
-    a: "Hébergement européen (Supabase EU), chiffrement en transit et au repos, conforme RGPD. L'IA est 100% hébergée en France.",
+    a: "Base de données hébergée dans l'Union européenne (Supabase, AWS eu-west), chiffrement en transit et au repos. L'IA (Mistral AI) est hébergée dans l'Union européenne. Le détail de nos sous-traitants figure dans la politique de confidentialité.",
   },
   {
     q: "Devizly fonctionne-t-il avec mon logiciel comptable ?",

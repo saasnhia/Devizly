@@ -426,7 +426,7 @@ export default function PricingPage() {
         <div className="mt-10 flex flex-wrap items-center justify-center gap-8 text-sm text-slate-500">
           <span>&#10003; Sans carte bancaire</span>
           <span>&#10003; Annulation à tout moment</span>
-          <span>&#10003; RGPD &amp; hébergé en France</span>
+          <span>&#10003; Base de données hébergée dans l&apos;UE</span>
         </div>
 
         {/* ── Comparison table ── */}

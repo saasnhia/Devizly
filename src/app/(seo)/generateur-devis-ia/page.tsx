@@ -11,19 +11,19 @@ import { SocialProof } from "@/components/seo/social-proof";
 export const metadata: Metadata = {
   title: "Générateur de Devis IA — Créez un Devis en 30s | Devizly",
   description:
-    "Générez un devis pro par IA en 30 secondes. Prestations structurées, mentions légales auto, signature & paiement. Hébergé en France.",
+    "Générez un devis pro par IA en 30 secondes. Prestations structurées, mentions légales auto, signature & paiement. IA hébergée dans l'UE.",
   alternates: { canonical: "https://devizly.fr/generateur-devis-ia" },
   openGraph: {
     title: "Générateur de Devis IA — Créez un Devis en 30s",
     description:
-      "Générez un devis pro par IA en 30 secondes. Prestations structurées, mentions légales auto, signature & paiement. Hébergé en France.",
+      "Générez un devis pro par IA en 30 secondes. Prestations structurées, mentions légales auto, signature & paiement. IA hébergée dans l'UE.",
     url: "https://devizly.fr/generateur-devis-ia",
     images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Devizly — Générateur de devis par intelligence artificielle en 30s" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Générateur de Devis IA — Créez un Devis en 30s",
-    description: "Devis IA en 30s. Prestations structurées, mentions légales auto, signature & paiement. Hébergé en France.",
+    description: "Devis IA en 30s. Prestations structurées, mentions légales auto, signature & paiement. IA hébergée dans l'UE.",
     images: ["/og-image.png"],
   },
 };
@@ -35,7 +35,7 @@ const schema = {
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
   offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
-  description: "Générateur de devis par intelligence artificielle, gratuit et hébergé en France.",
+  description: "Générateur de devis par intelligence artificielle, gratuit, avec une IA hébergée dans l'Union européenne.",
   url: "https://devizly.fr/generateur-devis-ia",
 };
 
@@ -136,9 +136,9 @@ export default function GenerateurDevisIAPage() {
         </p>
 
         <p className="mt-4 text-base leading-relaxed text-slate-400">
-          Côté technique, l&apos;IA est hébergée en France, conformément aux exigences RGPD. Vos
-          descriptions de prestations et les données de vos clients sont anonymisées avant d&apos;être
-          envoyées au modèle. Aucune donnée personnelle n&apos;est utilisée pour entraîner le modèle.
+          Côté technique, l&apos;IA (Mistral AI) est hébergée dans l&apos;Union européenne. Les
+          données transmises au moteur IA sont traitées uniquement pour la génération du devis
+          demandé.
           La génération prend entre 10 et 30 secondes selon la complexité de la prestation. Vous
           pouvez régénérer le devis autant de fois que nécessaire, ou partir d&apos;un template
           existant et demander à l&apos;IA de l&apos;adapter.
@@ -162,9 +162,10 @@ export default function GenerateurDevisIAPage() {
           </div>
           <div className="rounded-xl border border-white/10 bg-white/5 p-6">
             <Shield className="mb-3 h-8 w-8 text-amber-400" />
-            <h3 className="text-lg font-semibold">Hébergé en France</h3>
+            <h3 className="text-lg font-semibold">IA hébergée dans l&apos;UE</h3>
             <p className="mt-2 text-sm text-slate-400">
-              IA conforme RGPD. Données anonymisées. Aucune utilisation pour l&apos;entraînement.
+              Base de données hébergée dans l&apos;Union européenne. Les données transmises au
+              moteur IA sont traitées uniquement pour la génération du devis demandé.
             </p>
           </div>
         </div>

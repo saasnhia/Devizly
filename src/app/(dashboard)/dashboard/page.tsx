@@ -271,7 +271,7 @@ function OnboardingDashboard({
           </span>
           <span className="flex items-center gap-1.5">
             <Shield className="h-3.5 w-3.5 text-emerald-400" />
-            Données hébergées en France · RGPD
+            Base de données hébergée dans l&apos;UE
           </span>
           <span className="flex items-center gap-1.5">
             <Lock className="h-3.5 w-3.5 text-blue-400" />

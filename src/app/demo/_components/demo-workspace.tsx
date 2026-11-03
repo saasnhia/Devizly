@@ -316,7 +316,7 @@ export function DemoWorkspace() {
               <span className="text-green-400">&#10003;</span> IA Mistral
             </span>
             <span className="flex items-center gap-1 text-xs text-slate-500">
-              <span className="text-green-400">&#10003;</span> RGPD conforme
+              <span className="text-green-400">&#10003;</span> Base de données en UE
             </span>
           </div>
         </div>

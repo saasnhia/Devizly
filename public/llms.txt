@@ -4,7 +4,7 @@
 
 ## Produit
 
-Devizly est un logiciel de devis en ligne propulsé par l'IA Mistral (hébergée en France). Il permet aux freelances, artisans et indépendants de :
+Devizly est un logiciel de devis en ligne propulsé par l'IA Mistral (hébergée dans l'Union européenne). Il permet aux freelances, artisans et indépendants de :
 - Générer un devis professionnel en 30 secondes en langage naturel
 - Faire signer le client électroniquement (signature eIDAS, valeur légale)
 - Encaisser un acompte ou le total via Stripe Connect directement depuis le devis
@@ -65,7 +65,7 @@ Devizly se différencie de Tolteck, Obat, Batappli et Square par :
 - Génération IA du contenu du devis (unique)
 - Paiement intégré directement dans le devis
 - Interface moderne, sans installation
-- 100% hébergé en France, RGPD conforme
+- Base de données hébergée dans l'Union européenne
 
 ## Public cible
 
@@ -107,8 +107,8 @@ Non. Le client reçoit un lien, signe et paie sans inscription.
 ### La signature a-t-elle une valeur légale ?
 Oui. Signature eIDAS, conforme au règlement européen, valeur juridique reconnue en France.
 
-### Devizly est-il conforme RGPD ?
-Oui. Données hébergées en Europe, aucune revente de données.
+### Où sont hébergées les données ?
+La base de données est hébergée dans l'Union européenne (Supabase, AWS eu-west). Aucune revente de données. Le détail des sous-traitants figure dans la politique de confidentialité : https://devizly.fr/confidentialite
 
 ### Peut-on importer ses clients existants ?
 Oui, via CSV ou manuellement.

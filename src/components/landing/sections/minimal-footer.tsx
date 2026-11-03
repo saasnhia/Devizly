@@ -129,7 +129,7 @@ export function MinimalFooter() {
                 Un produit NBHC
               </a>
               <span aria-hidden="true">&middot;</span>
-              <span>&#127467;&#127479; H&eacute;berg&eacute; en France &middot; Conforme RGPD</span>
+              <span>Base de donn&eacute;es h&eacute;berg&eacute;e dans l&apos;UE</span>
             </div>
           </div>
         </div>

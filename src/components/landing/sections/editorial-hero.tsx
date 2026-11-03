@@ -260,7 +260,7 @@ export function EditorialHero({ segment }: { segment?: string }) {
               <span className="relative inline-flex h-2 w-2 rounded-full bg-[#5B5BD6]" />
             </span>
             <span className="text-xs font-medium text-[#818cf8]">
-              {seg ? seg.badge : "Propulsé par l'IA — hébergé en France"}
+              {seg ? seg.badge : "Propulsé par l'IA — hébergée dans l'UE"}
             </span>
           </div>
 
@@ -316,7 +316,7 @@ export function EditorialHero({ segment }: { segment?: string }) {
               <span className="text-green-400">&#10003;</span> Sans carte bancaire
             </span>
             <span className="stagger-item flex items-center gap-1.5">
-              <span className="text-green-400">&#10003;</span> RGPD
+              <span className="text-green-400">&#10003;</span> Base de données en UE
             </span>
             <span className="stagger-item flex items-center gap-1.5">
               <span className="text-green-400">&#10003;</span> IA française

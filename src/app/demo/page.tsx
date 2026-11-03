@@ -9,7 +9,7 @@ import { DemoPostCta } from "./_components/demo-post-cta";
 export const metadata: Metadata = {
   title: "Démo en direct — Générez un devis en 30 secondes",
   description:
-    "Essayez Devizly sans inscription. L'IA Mistral génère un devis professionnel adapté à votre métier en 30 secondes. RGPD conforme.",
+    "Essayez Devizly sans inscription. L'IA Mistral génère un devis professionnel adapté à votre métier en 30 secondes.",
 };
 
 export default function DemoPage() {

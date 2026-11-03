@@ -42,7 +42,7 @@ Devizly est conforme à la réforme française de la facturation électronique :
 ## Suivi URSSAF
 
 - Calcul automatique des cotisations depuis le CA facturé
-- Support ACRE (taux réduit 50% la 1ère année)
+- Support ACRE (taux réduit publié par l'Urssaf, jusqu'à la fin du 3e trimestre civil suivant le début d'activité)
 - Rappels email avant échéance de déclaration
 - Double seuils : franchise TVA + plafond micro-entrepreneur
 

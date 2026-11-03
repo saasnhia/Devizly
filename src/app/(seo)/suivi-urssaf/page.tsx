@@ -3,6 +3,7 @@ import Link from "next/link";
 import { JsonLd } from "@/components/seo/json-ld";
 import { CTABanner } from "@/components/seo/cta-banner";
 import { Calculator, Percent, Bell, TrendingUp, ArrowRight } from "lucide-react";
+import { SEUILS_TVA, SEUILS_TVA_MAJORES, PLAFONDS_MICRO, formatSeuil } from "@/lib/urssaf/rates";
 
 export const metadata: Metadata = {
   title: "Suivi URSSAF auto-entrepreneur — CA, cotisations, ACRE | Devizly",
@@ -41,7 +42,7 @@ const faqSchema = {
       name: "Comment fonctionne l'ACRE dans Devizly ?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "L'ACRE (Aide à la Création ou Reprise d'Entreprise) réduit de 50% le taux de cotisation pendant les 12 mois suivant le début d'activité. Dans l'onglet URSSAF de Devizly, cochez « J'ai l'ACRE » et indiquez votre date de début d'activité : le taux réduit est appliqué automatiquement sur toutes les périodes concernées, avec un badge visible sur le calcul. Passé les 12 mois, Devizly repasse automatiquement au taux plein.",
+        text: "L'ACRE (Aide à la Création ou à la Reprise d'Entreprise) réduit le taux de cotisation jusqu'à la fin du 3e trimestre civil suivant le début d'activité : réduction de 50 % pour une création jusqu'au 30 juin 2026, de 25 % pour une création à partir du 1er juillet 2026. Dans l'onglet URSSAF de Devizly, cochez « J'ai l'ACRE » et indiquez votre date de début d'activité : le taux réduit publié par l'Urssaf est appliqué automatiquement sur les périodes concernées, avec un badge visible sur le calcul. À la fin de la période réduite, Devizly repasse automatiquement au taux plein.",
       },
     },
     {
@@ -49,7 +50,7 @@ const faqSchema = {
       name: "Quels sont les seuils micro-entrepreneur 2026 ?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Deux seuils distincts s'appliquent. Le plafond de chiffre d'affaires du régime micro-entrepreneur : 203 100 € pour la vente de marchandises et l'hébergement, 83 600 € pour les prestations de services et professions libérales. Le seuil de franchise en base de TVA (différent) : 85 000 € (majoré 93 500 €) pour la vente, 37 500 € (majoré 41 250 €) pour les prestations de services. Devizly affiche les deux seuils en temps réel dans l'onglet URSSAF, avec une alerte dès 90% du seuil atteint.",
+        text: `Deux seuils distincts s'appliquent. Le plafond de chiffre d'affaires du régime micro-entrepreneur : ${formatSeuil(PLAFONDS_MICRO.vente_marchandises)} pour la vente de marchandises et l'hébergement, ${formatSeuil(PLAFONDS_MICRO.prestations_bnc)} pour les prestations de services et professions libérales. Le seuil de franchise en base de TVA (différent) : ${formatSeuil(SEUILS_TVA.vente_marchandises)} (majoré ${formatSeuil(SEUILS_TVA_MAJORES.vente_marchandises)}) pour la vente, ${formatSeuil(SEUILS_TVA.prestations_bnc)} (majoré ${formatSeuil(SEUILS_TVA_MAJORES.prestations_bnc)}) pour les prestations de services. Devizly affiche les deux seuils en temps réel dans l'onglet URSSAF, avec une alerte dès 90% du seuil atteint.`,
       },
     },
   ],
@@ -139,20 +140,23 @@ export default function SuiviUrssafPage() {
 
         {/* ACRE */}
         <section>
-          <h2 className="mb-6 text-2xl font-bold">ACRE : le taux réduit de 50%</h2>
+          <h2 className="mb-6 text-2xl font-bold">ACRE : le taux réduit en début d&apos;activité</h2>
           <div className="rounded-xl border border-white/10 bg-white/[0.03] p-6">
             <div className="flex items-start gap-4">
               <Percent className="mt-1 h-6 w-6 shrink-0 text-violet-400" />
               <div>
                 <p className="text-sm leading-relaxed text-slate-400">
                   Si vous bénéficiez de l&apos;ACRE, votre taux de cotisation
-                  est réduit de 50% pendant les 12 mois suivant votre début
-                  d&apos;activité. Dans Devizly, un simple toggle « J&apos;ai
-                  l&apos;ACRE » avec votre date de début d&apos;activité
-                  suffit — le taux réduit est appliqué automatiquement sur
-                  toutes les périodes concernées, avec un badge « Taux ACRE
-                  -50% appliqué » visible sur le calcul. Passé les 12 mois,
-                  Devizly repasse au taux plein sans action de votre part.
+                  est réduit jusqu&apos;à la fin du 3e trimestre civil suivant
+                  votre début d&apos;activité : réduction de 50 % pour une
+                  création jusqu&apos;au 30 juin 2026, de 25 % pour une
+                  création à partir du 1er juillet 2026. Dans Devizly, un
+                  simple toggle « J&apos;ai l&apos;ACRE » avec votre date de
+                  début d&apos;activité suffit — le taux réduit publié par
+                  l&apos;Urssaf est appliqué automatiquement sur les périodes
+                  concernées, avec un badge « Taux ACRE appliqué » visible sur
+                  le calcul. À la fin de la période réduite, Devizly repasse
+                  au taux plein sans action de votre part.
                 </p>
               </div>
             </div>
@@ -203,13 +207,13 @@ export default function SuiviUrssafPage() {
               <tbody>
                 <tr className="border-b border-white/5">
                   <td className="px-4 py-2.5 font-medium">Franchise TVA</td>
-                  <td className="px-4 py-2.5 text-slate-400">85 000 € (majoré 93 500 €)</td>
-                  <td className="px-4 py-2.5 text-slate-400">37 500 € (majoré 41 250 €)</td>
+                  <td className="px-4 py-2.5 text-slate-400">{formatSeuil(SEUILS_TVA.vente_marchandises)} (majoré {formatSeuil(SEUILS_TVA_MAJORES.vente_marchandises)})</td>
+                  <td className="px-4 py-2.5 text-slate-400">{formatSeuil(SEUILS_TVA.prestations_bnc)} (majoré {formatSeuil(SEUILS_TVA_MAJORES.prestations_bnc)})</td>
                 </tr>
                 <tr>
                   <td className="px-4 py-2.5 font-medium">Plafond micro-entrepreneur</td>
-                  <td className="px-4 py-2.5 text-slate-400">203 100 €</td>
-                  <td className="px-4 py-2.5 text-slate-400">83 600 €</td>
+                  <td className="px-4 py-2.5 text-slate-400">{formatSeuil(PLAFONDS_MICRO.vente_marchandises)}</td>
+                  <td className="px-4 py-2.5 text-slate-400">{formatSeuil(PLAFONDS_MICRO.prestations_bnc)}</td>
                 </tr>
               </tbody>
             </table>

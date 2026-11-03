@@ -43,30 +43,21 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import type { UrssafDeclaration, UrssafActiviteType } from "@/types";
+import {
+  TAUX_CFP,
+  SEUILS_TVA,
+  PLAFONDS_MICRO,
+  formatTaux,
+  tauxCotisationPourPeriode,
+} from "@/lib/urssaf/rates";
 
 // ── Constants ──────────────────────────────────────────────
 
-const TAUX_COTISATIONS: Record<UrssafActiviteType, { label: string; taux: number; cfp: number }> = {
-  vente_marchandises: { label: "Vente de marchandises", taux: 12.3, cfp: 0.1 },
-  prestations_bic: { label: "Prestations de services (BIC)", taux: 21.2, cfp: 0.3 },
-  prestations_bnc: { label: "Prestations de services (BNC)", taux: 21.1, cfp: 0.2 },
-  liberale_cipav: { label: "Activité libérale (CIPAV)", taux: 21.1, cfp: 0.2 },
-};
-
-// Seuils de franchise TVA 2026 (loi n°2025-1044 du 3 novembre 2025 — seuils historiques maintenus)
-const SEUILS_TVA: Record<UrssafActiviteType, number> = {
-  vente_marchandises: 85000,
-  prestations_bic: 37500,
-  prestations_bnc: 37500,
-  liberale_cipav: 37500,
-};
-
-// Plafonds de chiffre d'affaires micro-entrepreneur 2026 (LégiFiscal)
-const PLAFONDS_MICRO: Record<UrssafActiviteType, number> = {
-  vente_marchandises: 203100,
-  prestations_bic: 83600,
-  prestations_bnc: 83600,
-  liberale_cipav: 83600,
+const ACTIVITE_LABELS: Record<UrssafActiviteType, string> = {
+  vente_marchandises: "Vente de marchandises",
+  prestations_bic: "Prestations de services (BIC)",
+  prestations_bnc: "Prestations de services (BNC)",
+  liberale_cipav: "Activité libérale (CIPAV)",
 };
 
 const MONTHS_FR = [
@@ -76,16 +67,6 @@ const MONTHS_FR = [
 
 function fmtEur(n: number): string {
   return new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(n);
-}
-
-/** ACRE: taux de cotisation réduit de 50% pendant les 12 mois suivant le début d'activité. */
-function isAcreActiveForPeriod(acreActive: boolean, acreStartDate: string, periodeStartISO: string): boolean {
-  if (!acreActive || !acreStartDate) return false;
-  const start = new Date(acreStartDate);
-  if (Number.isNaN(start.getTime())) return false;
-  const oneYearLater = new Date(start);
-  oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
-  return new Date(periodeStartISO) < oneYearLater;
 }
 
 // ── Component ──────────────────────────────────────────────
@@ -115,12 +96,13 @@ export default function UrssafPage() {
   const [declarations, setDeclarations] = useState<UrssafDeclaration[]>([]);
 
   // ── Computed values ──
-  const config = TAUX_COTISATIONS[activite];
+  const tauxCfp = TAUX_CFP[activite];
   const { start: periodeStart, label: periodeLabel } = getPeriodBounds();
-  const acreApplies = isAcreActiveForPeriod(acreActive, acreStartDate, periodeStart);
-  const effectiveTaux = acreApplies ? config.taux / 2 : config.taux;
+  const { taux: effectiveTaux, acre: acreApplies } = tauxCotisationPourPeriode(
+    activite, periodeStart, acreActive, acreStartDate,
+  );
   const cotisations = Math.round(caHt * effectiveTaux) / 100;
-  const cfp = Math.round(caHt * config.cfp) / 100;
+  const cfp = Math.round(caHt * tauxCfp) / 100;
   const totalDu = cotisations + cfp;
   const seuilTva = SEUILS_TVA[activite];
   const plafondMicro = PLAFONDS_MICRO[activite];
@@ -223,18 +205,19 @@ export default function UrssafPage() {
         .filter((q) => q.paid_at && q.paid_at >= p.start && q.paid_at <= p.end + "T23:59:59")
         .reduce((s, q) => s + Number(q.total_ht), 0);
       const ca = invCA + qCA;
-      const rowAcreApplies = isAcreActiveForPeriod(acreActive, acreStartDate, p.start);
-      const rowTaux = rowAcreApplies ? config.taux / 2 : config.taux;
+      const { taux: rowTaux } = tauxCotisationPourPeriode(
+        activite, p.start, acreActive, acreStartDate,
+      );
       return {
         label: p.label,
         ca,
         cotisations: Math.round(ca * rowTaux) / 100,
-        cfp: Math.round(ca * config.cfp) / 100,
+        cfp: Math.round(ca * tauxCfp) / 100,
       };
     });
     setAnnualData(result);
     setAnnualTotal(result.reduce((s, r) => s + r.ca, 0));
-  }, [year, periodeType, config.taux, config.cfp, acreActive, acreStartDate]);
+  }, [year, periodeType, activite, tauxCfp, acreActive, acreStartDate]);
 
   // ── Fetch declarations history ──
   const fetchDeclarations = useCallback(async () => {
@@ -416,7 +399,7 @@ export default function UrssafPage() {
             onChange={(e) => handleAcreToggle(e.target.checked)}
             className="h-4 w-4 rounded border-gray-300 accent-primary"
           />
-          J&apos;ai l&apos;ACRE (taux de cotisation r&eacute;duit de 50% la 1&egrave;re ann&eacute;e)
+          J&apos;ai l&apos;ACRE (taux r&eacute;duit jusqu&apos;&agrave; la fin du 3e trimestre civil suivant le d&eacute;but d&apos;activit&eacute;)
         </label>
         {acreActive && (
           <div className="flex items-center gap-2">
@@ -431,7 +414,7 @@ export default function UrssafPage() {
         )}
         {acreApplies && (
           <Badge className="bg-primary/10 text-primary border border-primary/20">
-            Taux ACRE -50% appliqu&eacute;
+            Taux ACRE appliqu&eacute;
           </Badge>
         )}
       </div>
@@ -443,8 +426,8 @@ export default function UrssafPage() {
           <Select value={activite} onValueChange={(v) => setActivite(v as UrssafActiviteType)}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
-              {Object.entries(TAUX_COTISATIONS).map(([key, val]) => (
-                <SelectItem key={key} value={key}>{val.label}</SelectItem>
+              {Object.entries(ACTIVITE_LABELS).map(([key, label]) => (
+                <SelectItem key={key} value={key}>{label}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -521,12 +504,12 @@ export default function UrssafPage() {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">
-                      Cotisations sociales ({effectiveTaux}%{acreApplies ? " — ACRE" : ""})
+                      Cotisations sociales ({formatTaux(effectiveTaux)}{acreApplies ? " — ACRE" : ""})
                     </span>
                     <span className="font-medium">{fmtEur(cotisations)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">CFP ({config.cfp}%)</span>
+                    <span className="text-muted-foreground">CFP ({formatTaux(tauxCfp)})</span>
                     <span className="font-medium">{fmtEur(cfp)}</span>
                   </div>
                   <Separator />

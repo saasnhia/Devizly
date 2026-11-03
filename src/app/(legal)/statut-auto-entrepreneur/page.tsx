@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
+import {
+  TAUX_COTISATIONS,
+  SEUILS_TVA,
+  PLAFONDS_MICRO,
+  formatTaux,
+  formatSeuil,
+} from "@/lib/urssaf/rates";
 
 export const metadata: Metadata = {
   title: "Le statut auto-entrepreneur — cotisations et obligations | Devizly",
@@ -27,7 +34,7 @@ export default function StatutAutoEntrepreneurPage() {
         Le statut d&apos;auto-entrepreneur
       </h1>
       <p className="mt-3 text-base text-slate-500">
-        Dernière mise à jour : juillet 2026
+        Dernière mise à jour : novembre 2026
       </p>
 
       {/* Official resource callout — prominent, at the top */}
@@ -136,15 +143,15 @@ export default function StatutAutoEntrepreneurPage() {
               <td className="px-4 py-3 font-medium text-slate-700">
                 Vente de marchandises
               </td>
-              <td className="px-4 py-3 text-slate-600">85 000 &euro;</td>
-              <td className="px-4 py-3 text-slate-600">203 100 &euro;</td>
+              <td className="px-4 py-3 text-slate-600">{formatSeuil(SEUILS_TVA.vente_marchandises)}</td>
+              <td className="px-4 py-3 text-slate-600">{formatSeuil(PLAFONDS_MICRO.vente_marchandises)}</td>
             </tr>
             <tr className="border-t border-slate-100">
               <td className="px-4 py-3 font-medium text-slate-700">
                 Prestations de services (BIC/BNC) &amp; professions libérales
               </td>
-              <td className="px-4 py-3 text-slate-600">37 500 &euro;</td>
-              <td className="px-4 py-3 text-slate-600">83 600 &euro;</td>
+              <td className="px-4 py-3 text-slate-600">{formatSeuil(SEUILS_TVA.prestations_bnc)}</td>
+              <td className="px-4 py-3 text-slate-600">{formatSeuil(PLAFONDS_MICRO.prestations_bnc)}</td>
             </tr>
           </tbody>
         </table>
@@ -212,30 +219,40 @@ export default function StatutAutoEntrepreneurPage() {
           <tbody>
             <tr className="border-t border-slate-100">
               <td className="px-4 py-3 font-medium text-slate-700">
-                Vente de marchandises
+                Vente de marchandises (BIC)
               </td>
-              <td className="px-4 py-3 text-slate-600">12,3 %</td>
+              <td className="px-4 py-3 text-slate-600">{formatTaux(TAUX_COTISATIONS.vente_marchandises)}</td>
             </tr>
             <tr className="border-t border-slate-100">
               <td className="px-4 py-3 font-medium text-slate-700">
-                Prestations de services (BIC)
+                Prestations de services commerciales et artisanales (BIC)
               </td>
-              <td className="px-4 py-3 text-slate-600">21,2 %</td>
+              <td className="px-4 py-3 text-slate-600">{formatTaux(TAUX_COTISATIONS.prestations_bic)}</td>
             </tr>
             <tr className="border-t border-slate-100">
               <td className="px-4 py-3 font-medium text-slate-700">
-                Prestations de services (BNC) &amp; activité libérale (CIPAV)
+                Autres prestations de services (BNC)
               </td>
-              <td className="px-4 py-3 text-slate-600">21,1 %</td>
+              <td className="px-4 py-3 text-slate-600">{formatTaux(TAUX_COTISATIONS.prestations_bnc)}</td>
+            </tr>
+            <tr className="border-t border-slate-100">
+              <td className="px-4 py-3 font-medium text-slate-700">
+                Professions libérales réglementées relevant de la CIPAV
+              </td>
+              <td className="px-4 py-3 text-slate-600">{formatTaux(TAUX_COTISATIONS.liberale_cipav)}</td>
             </tr>
           </tbody>
         </table>
       </div>
       <p className="mt-3 text-sm text-slate-500">
-        Un taux réduit de moitié s&apos;applique pendant 12 mois aux
-        bénéficiaires de l&apos;ACRE. Une contribution à la formation
-        professionnelle (CFP, 0,1 % à 0,3 % selon l&apos;activité) s&apos;y
-        ajoute.
+        Taux applicables à partir du 1er janvier 2026 (source : Urssaf). Les
+        bénéficiaires de l&apos;ACRE paient un taux réduit jusqu&apos;à la fin
+        du 3e trimestre civil suivant le début d&apos;activité : réduction de
+        50 % pour une création jusqu&apos;au 30 juin 2026, de 25 % pour une
+        création à partir du 1er juillet 2026. Une contribution à la
+        formation professionnelle (CFP) s&apos;y ajoute : 0,1 % pour les
+        commerçants, 0,2 % pour les professions libérales, 0,3 % pour les
+        artisans.
       </p>
 
       {/* Amber callout */}

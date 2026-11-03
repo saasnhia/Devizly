@@ -25,7 +25,7 @@ export default function SecuritePage() {
         Sécurité
       </h1>
       <p className="mt-3 text-base text-slate-500">
-        Dernière mise à jour : mars 2026 &middot; SAS NBHC
+        Dernière mise à jour : novembre 2026 &middot; SAS NBHC
       </p>
 
       {/* Summary box */}
@@ -120,8 +120,9 @@ export default function SecuritePage() {
         <li className="flex items-start gap-2">
           <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />
           <span className="leading-relaxed">
-            <strong>Au repos :</strong> les données sont chiffrées au repos dans
-            la base de données (AES-256 via AWS).
+            <strong>Au repos :</strong> chiffrement au repos assuré par notre
+            hébergeur de base de données ; les jetons d&apos;accès aux services
+            tiers sont en plus chiffrés par Devizly (AES-256-GCM).
           </span>
         </li>
         <li className="flex items-start gap-2">
@@ -152,19 +153,19 @@ export default function SecuritePage() {
         <li className="flex items-start gap-2">
           <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />
           <span className="leading-relaxed">
-            <strong>Vérification serveur :</strong> chaque requête API vérifie
-            l&apos;identité de l&apos;utilisateur via{" "}
+            <strong>Vérification serveur :</strong> chaque requête authentifiée
+            vérifie l&apos;identité de l&apos;utilisateur via{" "}
             <code>getUser()</code> (validation JWT côté serveur).
           </span>
         </li>
       </ul>
 
-      {/* Callout: Isolation totale */}
+      {/* Callout: Isolation des données */}
       <div className="my-6 rounded-xl border-l-4 border-green-500 bg-green-50 p-5">
-        <p className="font-semibold text-green-800">Isolation totale</p>
+        <p className="font-semibold text-green-800">Isolation des données</p>
         <p className="mt-1 text-sm text-green-700">
-          Row Level Security (RLS) garantit que chaque utilisateur n&apos;accède
-          qu&apos;à ses propres données. Aucun accès croisé n&apos;est possible.
+          Row Level Security (RLS) limite l&apos;accès de chaque utilisateur à
+          ses propres données.
         </p>
       </div>
 
@@ -194,9 +195,10 @@ export default function SecuritePage() {
         <li className="flex items-start gap-2">
           <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />
           <span className="leading-relaxed">
-            <strong>Stripe Connect :</strong> les fonds de vos clients
-            transitent directement vers votre compte Stripe, sans passer par
-            Devizly.
+            <strong>Stripe Connect :</strong> les paiements sont traités par
+            Stripe. Lorsque le séquestre est activé sur un devis, les fonds sont
+            conservés sur le compte Stripe de la plateforme jusqu&apos;à leur
+            libération, puis transférés sur votre compte.
           </span>
         </li>
       </ul>
@@ -236,8 +238,10 @@ export default function SecuritePage() {
         <li className="flex items-start gap-2">
           <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />
           <span className="leading-relaxed">
-            <strong>Signature électronique :</strong> conforme eIDAS avec
-            empreinte SHA-256, horodatage, IP et user-agent enregistrés.
+            <strong>Signature électronique :</strong> signature électronique
+            simple au sens du règlement eIDAS (UE n° 910/2014), avec
+            horodatage, adresse IP, user-agent et empreinte SHA-256 de la
+            signature (devis, signataire, date et tracé).
           </span>
         </li>
       </ul>
@@ -254,7 +258,7 @@ export default function SecuritePage() {
           <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />
           <span className="leading-relaxed">
             Sauvegardes automatiques quotidiennes de la base de données par
-            Supabase (retention 7 jours).
+            Supabase (rétention 7 jours).
           </span>
         </li>
         <li className="flex items-start gap-2">
@@ -275,10 +279,10 @@ export default function SecuritePage() {
       <p className="leading-relaxed text-slate-600">
         Si vous découvrez une faille de sécurité, contactez-nous à{" "}
         <a
-          href="mailto:security@devizly.fr"
+          href="mailto:contact@devizly.fr"
           className="font-medium text-violet-600 hover:text-violet-500"
         >
-          security@devizly.fr
+          contact@devizly.fr
         </a>
         . Nous nous engageons à traiter chaque signalement sous 48 heures.
       </p>
@@ -291,10 +295,10 @@ export default function SecuritePage() {
         <p className="mt-1 text-sm text-amber-700">
           Toute vulnérabilité signalée à{" "}
           <a
-            href="mailto:security@devizly.fr"
+            href="mailto:contact@devizly.fr"
             className="font-medium underline"
           >
-            security@devizly.fr
+            contact@devizly.fr
           </a>{" "}
           sera traitée sous 48 heures.
         </p>
@@ -305,10 +309,10 @@ export default function SecuritePage() {
         <p className="text-sm text-slate-600">
           Signaler une vulnérabilité :{" "}
           <a
-            href="mailto:security@devizly.fr"
+            href="mailto:contact@devizly.fr"
             className="font-medium text-violet-600 hover:text-violet-500"
           >
-            security@devizly.fr
+            contact@devizly.fr
           </a>
         </p>
         <p className="mt-2 text-xs text-slate-400">

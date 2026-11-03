@@ -23,7 +23,7 @@ export default function CookiesPage() {
         Politique de cookies
       </h1>
       <p className="mt-3 text-base text-slate-500">
-        Dernière mise à jour : mars 2026 &middot; SAS NBHC
+        Dernière mise à jour : novembre 2026 &middot; SAS NBHC
       </p>
 
       {/* Summary box */}
@@ -128,17 +128,24 @@ export default function CookiesPage() {
             </tr>
             <tr className="border-t border-slate-100">
               <td className="px-4 py-3 font-medium text-slate-700">
-                cookie-consent
+                superpdp_oauth_state
               </td>
               <td className="px-4 py-3 text-slate-600">
-                Mémorisation du choix de consentement cookies
+                Sécurisation de la connexion de votre entreprise à SUPER PDP
+                (protection contre la falsification de requête), déposé
+                uniquement lors de cette connexion
               </td>
-              <td className="px-4 py-3 text-slate-600">6 mois</td>
+              <td className="px-4 py-3 text-slate-600">10 minutes</td>
               <td className="px-4 py-3 text-slate-600">Devizly</td>
             </tr>
           </tbody>
         </table>
       </div>
+      <p className="mt-4 leading-relaxed text-slate-600">
+        Votre choix exprimé dans le bandeau cookies est mémorisé pendant 6 mois
+        dans le stockage local de votre navigateur (clé « cookie-consent »),
+        et non dans un cookie.
+      </p>
 
       <h3 className="mt-8 mb-3 text-base font-semibold text-slate-700">
         2.2 Cookies tiers

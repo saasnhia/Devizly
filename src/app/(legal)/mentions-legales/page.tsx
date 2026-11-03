@@ -57,7 +57,7 @@ export default function MentionsLegalesPage() {
           <strong>Hébergeur :</strong> Vercel Inc.
         </li>
         <li>
-          <strong>Adresse :</strong> 340 Pine Street Suite 701, San Francisco, CA 94104, États-Unis
+          <strong>Adresse :</strong> 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis
         </li>
         <li>
           <strong>Site web :</strong> vercel.com
@@ -117,7 +117,7 @@ export default function MentionsLegalesPage() {
       </p>
 
       <p className="text-sm text-muted-foreground">
-        Dernière mise à jour : mars 2026
+        Dernière mise à jour : novembre 2026
       </p>
     </article>
   );

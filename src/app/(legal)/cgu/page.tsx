@@ -30,7 +30,7 @@ export default function CGUPage() {
         Conditions Générales d&apos;Utilisation
       </h1>
       <p className="mt-3 text-base text-slate-500">
-        Dernière mise à jour : mars 2026 &middot; SAS NBHC
+        Dernière mise à jour : novembre 2026 &middot; SAS NBHC
       </p>
 
       {/* Summary box */}
@@ -171,8 +171,8 @@ export default function CGUPage() {
         </li>
       </ul>
       <p className="mt-4 leading-relaxed text-slate-600">
-        L&apos;authentification est gérée via Supabase Auth (email/mot de
-        passe). L&apos;utilisateur est seul responsable de la sécurité de son
+        L&apos;authentification est gérée via Supabase Auth (email et mot
+        de passe, ou connexion avec un compte Google). L&apos;utilisateur est seul responsable de la sécurité de son
         mot de passe.
       </p>
 
@@ -259,8 +259,8 @@ export default function CGUPage() {
         <li className="flex items-start gap-2">
           <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />
           <span className="leading-relaxed">
-            Les données transmises au moteur IA sont traitées uniquement pour
-            la génération du devis demandé
+            Les données transmises au moteur IA servent uniquement à générer
+            le contenu demandé (devis, relances, briefing quotidien)
           </span>
         </li>
       </ul>
@@ -438,6 +438,12 @@ export default function CGUPage() {
           </span>
         </li>
       </ul>
+      <p className="mt-4 leading-relaxed text-slate-600">
+        La suspension ou la résiliation intervient après une mise en demeure
+        restée sans effet pendant 15 jours. En cas de manquement grave
+        (fraude, atteinte à la sécurité du service ou de ses utilisateurs),
+        elle peut être immédiate.
+      </p>
 
       {/* Section 11 */}
       <h2

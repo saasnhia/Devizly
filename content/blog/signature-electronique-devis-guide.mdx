@@ -55,10 +55,12 @@ Il ouvre le lien, consulte le devis, tape son nom et trace sa signature sur l'é
 ### 4. Le certificat est généré
 
 Devizly génère automatiquement :
-- Un hash SHA-256 du document (empreinte numérique)
+- Une empreinte SHA-256 de la signature (devis, signataire, date et tracé)
 - L'horodatage précis de la signature
 - L'adresse IP et le navigateur du signataire
-- Un certificat de signature conforme eIDAS
+- Une page de preuve de signature jointe au PDF du devis
+
+Il s'agit d'une signature électronique simple au sens du règlement eIDAS (UE n° 910/2014).
 
 ### 5. Vous êtes notifié
 
@@ -69,8 +71,6 @@ Notification in-app + email. Le devis passe au statut "Signé" dans votre pipeli
 | Critère | Devizly | Yousign | DocuSign | HelloSign |
 |---|---|---|---|---|
 | Prix | Inclus (Pro 19€/mois) | 9€/signature | 10€/mois | 15€/mois |
-| Niveau eIDAS | Avancée | Avancée | Simple | Simple |
-| Certificat SHA-256 | Oui | Oui | Non | Non |
 | Intégré au devis | Oui | Non (app séparée) | Non | Non |
 | Paiement après signature | Oui (Stripe) | Non | Non | Non |
 | IA génération devis | Oui | Non | Non | Non |
@@ -91,7 +91,7 @@ Le règlement européen eIDAS harmonise les règles de signature électronique d
 
 ### En pratique pour les artisans
 
-Un devis signé électroniquement avec Devizly constitue un engagement contractuel ferme. Si le client conteste, le certificat eIDAS sert de preuve devant le tribunal.
+Un devis signé électroniquement avec Devizly constitue un engagement contractuel ferme. Si le client conteste, le dossier de preuve (horodatage, adresse IP, user-agent, empreinte SHA-256) peut être produit devant le juge, qui en apprécie la fiabilité.
 
 ## FAQ
 
@@ -105,7 +105,7 @@ Le client peut cliquer "Refuser" depuis la même page. Vous recevez une notifica
 
 ### La signature est-elle valable pour des gros montants ?
 
-Oui. La signature avancée eIDAS est valide quel que soit le montant. Pour des marchés publics ou des actes immobiliers, une signature qualifiée peut être exigée.
+La signature électronique simple est recevable comme preuve (article 1367 du Code civil). En cas de contestation, le juge apprécie sa fiabilité au vu du dossier de preuve. Pour des marchés publics ou des actes immobiliers, une signature qualifiée peut être exigée.
 
 ### Puis-je encaisser un acompte après la signature ?
 

@@ -28,7 +28,7 @@ export default function ConfidentialitePage() {
         Politique de confidentialité
       </h1>
       <p className="mt-3 text-base text-slate-500">
-        Dernière mise à jour : mars 2026 &middot; SAS NBHC
+        Dernière mise à jour : novembre 2026 &middot; SAS NBHC
       </p>
 
       {/* Summary box */}
@@ -293,7 +293,8 @@ export default function ConfidentialitePage() {
           <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />
           <span className="leading-relaxed">
             <strong>Finalité :</strong> les données transmises au moteur IA
-            sont traitées uniquement pour la génération du devis demandé
+            servent uniquement à générer le contenu demandé (devis, relances,
+            briefing quotidien)
           </span>
         </li>
       </ul>
@@ -403,6 +404,30 @@ export default function ConfidentialitePage() {
               <td className="px-4 py-3 text-slate-600">UE</td>
               <td className="px-4 py-3 text-slate-600">
                 DPA, données éphémères uniquement
+              </td>
+            </tr>
+            <tr className="border-t border-slate-100">
+              <td className="px-4 py-3 font-medium text-slate-700">
+                SUPER PDP
+              </td>
+              <td className="px-4 py-3 text-slate-600">
+                Transmission des factures électroniques
+              </td>
+              <td className="px-4 py-3 text-slate-600">France</td>
+              <td className="px-4 py-3 text-slate-600">
+                Plateforme Agréée immatriculée par la DGFiP
+              </td>
+            </tr>
+            <tr className="border-t border-slate-100">
+              <td className="px-4 py-3 font-medium text-slate-700">
+                Google
+              </td>
+              <td className="px-4 py-3 text-slate-600">
+                Connexion avec un compte Google (OAuth)
+              </td>
+              <td className="px-4 py-3 text-slate-600">International</td>
+              <td className="px-4 py-3 text-slate-600">
+                Uniquement si vous choisissez la connexion Google
               </td>
             </tr>
           </tbody>
@@ -597,7 +622,7 @@ export default function ConfidentialitePage() {
         <li className="flex items-start gap-2">
           <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />
           <span className="leading-relaxed">
-            Tokens de partage à usage unique pour les devis partagés
+            Liens de partage uniques et non devinables pour les devis partagés
           </span>
         </li>
       </ul>
@@ -614,6 +639,11 @@ export default function ConfidentialitePage() {
         internationalement. Des <strong>clauses contractuelles types</strong>{" "}
         (CCT) approuvées par la Commission européenne encadrent ces transferts
         conformément aux articles 46 et 49 du RGPD.
+      </p>
+      <p className="mt-4 leading-relaxed text-slate-600">
+        La connexion avec un compte Google, si vous la choisissez, implique un
+        échange de données d&apos;authentification avec Google, qui opère
+        internationalement.
       </p>
 
       {/* Section 9 — Modifications */}

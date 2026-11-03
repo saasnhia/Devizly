@@ -29,7 +29,7 @@ export default function CGVPage() {
         Conditions Générales de Vente
       </h1>
       <p className="mt-3 text-base text-slate-500">
-        Dernière mise à jour : mars 2026 &middot; SAS NBHC
+        Dernière mise à jour : novembre 2026 &middot; SAS NBHC
       </p>
 
       {/* Summary box */}
@@ -225,6 +225,23 @@ export default function CGVPage() {
         19 &euro;/mois s&apos;applique. La TVA applicable sera ajoutée au taux
         en vigueur.
       </p>
+      <p className="mt-4 leading-relaxed text-slate-600">
+        <strong>Parrainage.</strong> Chaque utilisateur dispose d&apos;un lien
+        de parrainage personnel. Le filleul qui souscrit un plan payant
+        bénéficie d&apos;une réduction de 50 % sur son premier mois
+        d&apos;abonnement ; le parrain reçoit alors un crédit de 19 &euro;
+        sur son compte Devizly, imputé sur ses prochaines factures
+        d&apos;abonnement. La réduction de parrainage ne se cumule pas avec
+        l&apos;Offre Fondateur.
+      </p>
+      <p className="mt-4 leading-relaxed text-slate-600">
+        <strong>Codes promotionnels.</strong> Certains codes, envoyés par
+        email, ouvrent droit à une période d&apos;essai gratuite de 14 jours
+        lors de la souscription d&apos;un plan payant. Chaque code est
+        personnel, à usage unique et valable 24 heures. À l&apos;issue de
+        l&apos;essai, l&apos;abonnement est facturé au tarif en vigueur, sauf
+        résiliation avant la fin de l&apos;essai.
+      </p>
 
       {/* Section 4 */}
       <h2
@@ -279,7 +296,9 @@ export default function CGVPage() {
       <p className="leading-relaxed text-slate-600">
         L&apos;éditeur se réserve le droit de suspendre ou résilier un compte en
         cas de non-respect des présentes CGV ou des CGU, après mise en demeure
-        restée sans effet pendant 15 jours.
+        restée sans effet pendant 15 jours. En cas de manquement grave
+        (fraude, atteinte à la sécurité du service ou de ses utilisateurs),
+        la suspension peut être immédiate.
       </p>
 
       {/* Section 6 */}
@@ -290,9 +309,16 @@ export default function CGVPage() {
         6. Garantie satisfait ou remboursé 14 jours
       </h2>
       <p className="leading-relaxed text-slate-600">
-        Conformément au droit de rétractation européen, l&apos;utilisateur
-        bénéficie d&apos;une garantie satisfait ou remboursé de 14 jours à
-        compter de la date de souscription à un plan payant.
+        Garantie satisfait ou remboursé : pendant 14 jours après votre
+        première souscription à un plan payant, vous pouvez demander le
+        remboursement intégral de votre premier paiement en écrivant à{" "}
+        <a
+          href="mailto:contact@devizly.fr"
+          className="text-violet-600 hover:text-violet-500"
+        >
+          contact@devizly.fr
+        </a>
+        .
       </p>
 
       {/* Important callout: Remboursement */}
@@ -312,12 +338,6 @@ export default function CGVPage() {
         </p>
       </div>
 
-      <p className="leading-relaxed text-slate-600">
-        Passé ce délai de 14 jours, conformément à l&apos;article L.221-28 du
-        Code de la consommation, le droit de rétractation ne s&apos;applique
-        plus aux contrats de fourniture de contenu numérique dont
-        l&apos;exécution a commencé avec l&apos;accord du consommateur.
-      </p>
 
       {/* Section 7 */}
       <h2
@@ -344,8 +364,9 @@ export default function CGVPage() {
       </p>
       <p className="mt-4 leading-relaxed text-slate-600">
         L&apos;intelligence artificielle utilisée (Mistral AI) est hébergée dans
-        l&apos;Union européenne. Les données transmises au moteur IA sont
-        traitées uniquement pour la génération du devis demandé. Les éventuels
+        l&apos;Union européenne. Les données transmises au moteur IA servent
+        uniquement à générer le contenu demandé (devis, relances, briefing
+        quotidien). Les éventuels
         transferts de données hors de l&apos;Union européenne sont décrits dans
         la Politique de confidentialité.
       </p>

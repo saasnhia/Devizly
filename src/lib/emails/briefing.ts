@@ -61,7 +61,7 @@ export function briefingEmail(p: BriefingEmailParams): {
             <td style="width:50%;padding:16px;background:#F0FDF4;text-align:center;border-right:1px solid #E2E8F0;">
               <span style="font-size:12px;color:#64748B;display:block;">CA cette semaine</span>
               <span style="font-size:22px;font-weight:700;color:#16A34A;">${p.briefing.stats.caThisWeek}</span>
-              <span style="font-size:12px;color:#64748B;display:block;">${p.briefing.stats.caVariation} vs sem. derniere</span>
+              <span style="font-size:12px;color:#64748B;display:block;">${p.briefing.stats.caVariation} vs sem. dernière</span>
             </td>
             <td style="width:50%;padding:16px;background:#EFF6FF;text-align:center;">
               <span style="font-size:12px;color:#64748B;display:block;">En attente</span>
@@ -94,7 +94,7 @@ export function briefingEmail(p: BriefingEmailParams): {
     <tr>
       <td style="padding:16px 32px;background:#F8FAFC;border-top:1px solid #E2E8F0;">
         <p style="margin:0;font-size:12px;color:#94A3B8;text-align:center;">
-          Briefing genere par l'IA Devizly — Lun-Ven a 8h00.
+          Briefing généré par l'IA Devizly — lun.-ven. à 8h00.
         </p>
       </td>
     </tr>

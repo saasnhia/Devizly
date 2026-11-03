@@ -12,7 +12,7 @@ Devizly est un logiciel de devis en ligne propulsé par l'IA Mistral (hébergée
 - Gérer les prospects avec un pipeline Kanban
 - Générer des factures PDF automatiquement à la signature
 - Générer des factures Factur-X conformes (PDF/A-3 + XML CII, profil BASIC, validé FNFE-MPE Fully Valid)
-- Envoyer les factures Factur-X automatiquement à Pennylane (Plateforme Agréée DGFiP)
+- Transmettre les factures Factur-X via une Plateforme Agréée (SUPER PDP)
 - Prêt pour la réforme facturation électronique 2026
 
 ## Facturation électronique (réforme 2026)
@@ -20,8 +20,8 @@ Devizly est un logiciel de devis en ligne propulsé par l'IA Mistral (hébergée
 Devizly est conforme à la réforme française de la facturation électronique :
 - Génération automatique de factures au format Factur-X BASIC (standard franco-allemand)
 - PDF/A-3 avec XML CII embarqué, validé par le FNFE-MPE (Fully Valid sur XMP + XSD + Schematron + PDF/A-3)
-- Intégration directe avec Pennylane, Plateforme Agréée (PA) immatriculée DGFiP
-- Envoi automatique des factures à votre expert-comptable en 1 clic
+- Transmission via SUPER PDP, Plateforme Agréée immatriculée par la DGFiP
+- Export CSV et FEC pour votre expert-comptable
 - Devizly agit comme Opérateur de Dématérialisation (OD) au sens de la réforme
 - Calendrier : réception obligatoire sept. 2026, émission PME/TPE sept. 2027
 
@@ -57,7 +57,7 @@ Devizly est conforme à la réforme française de la facturation électronique :
 
 - Gratuit : 3 devis/mois, sans carte bancaire
 - Pro : 19€/mois HT — devis illimités, signature électronique, acomptes Stripe, relances auto, factures Factur-X conformes
-- Business : 39€/mois HT — tout le plan Pro + multi-utilisateurs, export CSV, branding, envoi automatique Pennylane
+- Business : 39€/mois HT — tout le plan Pro + multi-utilisateurs, export CSV, branding, transmission via Plateforme Agréée (SUPER PDP)
 
 ## Comparatif concurrents
 
@@ -88,7 +88,6 @@ Paiements : Stripe Connect
 - Blog : https://devizly.fr/blog
 - Facturation électronique 2026 : https://devizly.fr/facture-electronique-2026
 - Factur-X conforme : https://devizly.fr/facturx-conforme
-- Intégration Pennylane : https://devizly.fr/integration-pennylane
 - E-reporting B2C : https://devizly.fr/e-reporting-b2c
 - Paiement BTP en plusieurs fois : https://devizly.fr/paiement-btp
 - Suivi URSSAF auto-entrepreneur : https://devizly.fr/suivi-urssaf
@@ -114,10 +113,10 @@ La base de données est hébergée dans l'Union européenne (Supabase, AWS eu-we
 Oui, via CSV ou manuellement.
 
 ### Devizly est-il prêt pour la réforme 2026 ?
-Oui. Devizly génère des factures Factur-X BASIC conformes (PDF/A-3 + XML CII), validées Fully Valid par le FNFE-MPE. Intégration Pennylane pour l'envoi automatique à votre expert-comptable.
+Oui. Devizly génère des factures Factur-X BASIC conformes (PDF/A-3 + XML CII), validées Fully Valid par le FNFE-MPE. Transmission via une Plateforme Agréée (SUPER PDP).
 
 ### Qu'est-ce que Factur-X ?
 Factur-X est le standard de facturation électronique (PDF + XML structuré). Obligatoire à partir de sept. 2026. Devizly le génère automatiquement à partir de vos factures.
 
 ### Devizly s'intègre-t-il avec Pennylane ?
-Oui. Connectez votre token Pennylane dans les paramètres, et vos factures Factur-X sont envoyées en 1 clic à votre expert-comptable.
+Devizly ne propose pas d'intégration directe avec Pennylane. Vos factures Factur-X sont transmises via SUPER PDP, une Plateforme Agréée immatriculée par la DGFiP. Pour votre expert-comptable ou tout autre logiciel (Pennylane, Indy, Sage...), vous pouvez exporter vos données au format CSV ou FEC.

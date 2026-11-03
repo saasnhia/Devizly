@@ -63,7 +63,7 @@ export function devisEmail(p: DevisEmailParams): { subject: string; html: string
             <td style="padding:20px;">
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td style="font-size:14px;color:#64748B;padding-bottom:8px;">Reference</td>
+                  <td style="font-size:14px;color:#64748B;padding-bottom:8px;">Référence</td>
                   <td style="font-size:14px;color:#0F172A;font-weight:600;text-align:right;padding-bottom:8px;">${p.quoteRef}</td>
                 </tr>
                 <tr>
@@ -94,10 +94,10 @@ export function devisEmail(p: DevisEmailParams): { subject: string; html: string
     <tr>
       <td style="padding:16px 32px;background:#F8FAFC;border-top:1px solid #E2E8F0;">
         <p style="margin:0 0 4px;font-size:12px;color:#94A3B8;text-align:center;">
-          Cet email a ete envoye par ${p.companyName} via Devizly.
+          Cet email a été envoyé par ${p.companyName} via Devizly.
         </p>
         <p style="margin:0 0 4px;font-size:11px;color:#CBD5E1;text-align:center;">
-          Conformement au RGPD, vos donnees sont traitees uniquement pour la gestion de ce devis.
+          Conformément au RGPD, vos données sont traitées uniquement pour la gestion de ce devis.
         </p>
         <p style="margin:0;font-size:10px;color:#CBD5E1;text-align:center;">
           NBHC SAS — 55 Rue Henri Cl\u00e9ment, 71100 Saint-R\u00e9my — SIREN 102 637 899

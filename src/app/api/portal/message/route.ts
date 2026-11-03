@@ -76,10 +76,10 @@ export async function POST(request: Request) {
           </p>
           <p style="color:#1e293b;white-space:pre-wrap;margin:8px 0 0 0">${message.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</p>
         </div>
-        ${clientEmail ? `<p style="color:#64748b;font-size:13px">Repondez directement a cet email pour contacter votre client.</p>` : ""}
+        ${clientEmail ? `<p style="color:#64748b;font-size:13px">Répondez directement à cet email pour contacter votre client.</p>` : ""}
         <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0" />
         <p style="color:#94a3b8;font-size:12px">
-          Message envoye via votre portail client Devizly.
+          Message envoyé via votre portail client Devizly.
         </p>
       </div>
     `,

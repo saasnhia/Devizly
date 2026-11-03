@@ -96,14 +96,14 @@ export async function POST(
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:40px auto;background:#FFFFFF;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
     <tr>
       <td style="background:linear-gradient(135deg,#0F172A,#1E293B);padding:32px;text-align:center;">
-        <h1 style="color:#22D3A5;margin:0;font-size:24px;">Contrat a signer</h1>
+        <h1 style="color:#22D3A5;margin:0;font-size:24px;">Contrat à signer</h1>
       </td>
     </tr>
     <tr>
       <td style="padding:32px;">
         <p style="font-size:16px;color:#334155;">Bonjour ${client.name},</p>
         <p style="font-size:14px;color:#64748B;line-height:1.6;">
-          ${companyName} vous a envoye un contrat <strong>"${contract.title}"</strong> a signer electroniquement.
+          ${companyName} vous a envoyé un contrat <strong>"${contract.title}"</strong> à signer électroniquement.
         </p>
         <div style="text-align:center;margin:32px 0;">
           <a href="${signUrl}" style="display:inline-block;background:#22D3A5;color:#FFFFFF;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:600;font-size:16px;">
@@ -111,14 +111,14 @@ export async function POST(
           </a>
         </div>
         <p style="font-size:12px;color:#94A3B8;text-align:center;">
-          Ce lien est unique et securise. Ne le partagez pas.
+          Ce lien est unique et sécurisé. Ne le partagez pas.
         </p>
       </td>
     </tr>
     <tr>
       <td style="background:#F8FAFC;padding:16px 32px;text-align:center;">
         <p style="font-size:12px;color:#94A3B8;margin:0;">
-          Envoye via <a href="${appUrl}" style="color:#22D3A5;text-decoration:none;">Devizly</a>
+          Envoyé via <a href="${appUrl}" style="color:#22D3A5;text-decoration:none;">Devizly</a>
         </p>
       </td>
     </tr>

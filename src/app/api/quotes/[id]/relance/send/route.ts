@@ -85,7 +85,7 @@ export async function POST(
     <tr>
       <td style="padding:16px 32px;background:#F8FAFC;border-top:1px solid #E2E8F0;">
         <p style="margin:0;font-size:11px;color:#CBD5E1;text-align:center;">
-          Envoye via Devizly — Conformement au RGPD, vos donnees sont traitees uniquement pour la gestion de ce devis.
+          Envoyé via Devizly — Conformément au RGPD, vos données sont traitées uniquement pour la gestion de ce devis.
         </p>
       </td>
     </tr>

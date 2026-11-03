@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Politique de cookies | Devizly",
   description:
-    "Politique de cookies de Devizly. Cookies strictement essentiels pour l'authentification et la session. Aucun cookie publicitaire, aucun tracker tiers. Conforme RGPD.",
+    "Politique de cookies de Devizly. Cookies strictement essentiels pour l'authentification et la session. Aucun cookie publicitaire, aucun tracker tiers.",
   alternates: { canonical: "https://devizly.fr/cookies" },
 };
 
@@ -279,10 +279,10 @@ export default function CookiesPage() {
       <p className="leading-relaxed text-slate-600">
         Pour toute question relative aux cookies, contactez-nous à :{" "}
         <a
-          href="mailto:privacy@devizly.fr"
+          href="mailto:contact@devizly.fr"
           className="font-medium text-violet-600 hover:text-violet-500"
         >
-          privacy@devizly.fr
+          contact@devizly.fr
         </a>
       </p>
 
@@ -291,10 +291,10 @@ export default function CookiesPage() {
         <p className="text-sm text-slate-600">
           Pour toute question relative aux cookies :{" "}
           <a
-            href="mailto:privacy@devizly.fr"
+            href="mailto:contact@devizly.fr"
             className="font-medium text-violet-600 hover:text-violet-500"
           >
-            privacy@devizly.fr
+            contact@devizly.fr
           </a>
         </p>
         <p className="mt-2 text-xs text-slate-400">

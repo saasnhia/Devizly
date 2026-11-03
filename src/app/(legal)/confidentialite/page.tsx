@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Politique de confidentialité | Devizly",
   description:
-    "Politique de confidentialité de Devizly. Traitement des données personnelles conforme RGPD, hébergement européen Supabase, durées de conservation, droits d'accès et suppression.",
+    "Politique de confidentialité de Devizly — traitement des données, droits RGPD, durées de conservation.",
   alternates: { canonical: "https://devizly.fr/confidentialite" },
 };
 
@@ -39,7 +39,7 @@ export default function ConfidentialitePage() {
             <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-100 text-xs text-green-600">
               ✓
             </span>
-            Données hébergées en France
+            Base de données hébergée dans l&apos;Union européenne
           </li>
           <li className="flex items-start gap-2 text-sm text-slate-600">
             <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-100 text-xs text-green-600">
@@ -115,14 +115,14 @@ export default function ConfidentialitePage() {
             </tr>
             <tr>
               <td className="bg-slate-50 px-4 py-2.5 font-medium text-slate-700">
-                Email DPO
+                Contact données personnelles
               </td>
               <td className="px-4 py-2.5 text-slate-600">
                 <a
-                  href="mailto:privacy@devizly.fr"
+                  href="mailto:contact@devizly.fr"
                   className="text-violet-600 hover:text-violet-500"
                 >
-                  privacy@devizly.fr
+                  contact@devizly.fr
                 </a>
               </td>
             </tr>
@@ -279,53 +279,24 @@ export default function ConfidentialitePage() {
         3. Intelligence artificielle — Mistral AI
       </h2>
       <p className="leading-relaxed text-slate-600">
-        Devizly utilise l&apos;API Mistral AI pour la génération de devis. Voici
-        les garanties appliquées :
+        Devizly utilise l&apos;API Mistral AI pour la génération de devis :
       </p>
       <ul className="mt-4 space-y-2 text-slate-600">
         <li className="flex items-start gap-2">
           <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />
           <span className="leading-relaxed">
-            <strong>Hébergement :</strong> 100% en France (serveurs Mistral AI)
+            <strong>Hébergement :</strong> les données sont hébergées dans
+            l&apos;Union européenne (serveurs Mistral AI)
           </span>
         </li>
         <li className="flex items-start gap-2">
           <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />
           <span className="leading-relaxed">
-            <strong>Anonymisation :</strong> les données envoyées à Mistral sont
-            anonymisées — aucun nom de client, email ou donnée nominative
-            n&apos;est transmis. Seules les descriptions de prestations et
-            paramètres commerciaux sont envoyés.
-          </span>
-        </li>
-        <li className="flex items-start gap-2">
-          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />
-          <span className="leading-relaxed">
-            <strong>Pas d&apos;entraînement :</strong> les données transmises à
-            Mistral AI ne sont{" "}
-            <strong>pas utilisées pour l&apos;entraînement</strong> de ses
-            modèles, conformément aux conditions de leur API professionnelle.
-          </span>
-        </li>
-        <li className="flex items-start gap-2">
-          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />
-          <span className="leading-relaxed">
-            <strong>Rétention :</strong> Mistral AI ne conserve pas les données
-            au-delà du traitement de la requête.
+            <strong>Finalité :</strong> les données transmises au moteur IA
+            sont traitées uniquement pour la génération du devis demandé
           </span>
         </li>
       </ul>
-
-      {/* Green callout: IA hébergée en France */}
-      <div className="my-6 rounded-xl border-l-4 border-green-500 bg-green-50 p-5">
-        <p className="font-semibold text-green-800">
-          IA hébergée en France
-        </p>
-        <p className="mt-1 text-sm text-green-700">
-          Les données envoyées à Mistral AI sont anonymisées et ne sont jamais
-          utilisées pour l&apos;entraînement des modèles.
-        </p>
-      </div>
 
       {/* Section 4 — Sous-traitants */}
       <h2
@@ -405,9 +376,9 @@ export default function ConfidentialitePage() {
               <td className="px-4 py-3 text-slate-600">
                 Génération de devis par IA
               </td>
-              <td className="px-4 py-3 text-slate-600">France</td>
+              <td className="px-4 py-3 text-slate-600">UE</td>
               <td className="px-4 py-3 text-slate-600">
-                API professionnelle, pas d&apos;entraînement sur les données
+                Traitement limité à la génération du devis demandé
               </td>
             </tr>
             <tr className="border-t border-slate-100">
@@ -561,10 +532,10 @@ export default function ConfidentialitePage() {
         <p className="mt-1 text-sm text-blue-700">
           Pour exercer vos droits, contactez-nous à :{" "}
           <a
-            href="mailto:privacy@devizly.fr"
+            href="mailto:contact@devizly.fr"
             className="font-medium underline"
           >
-            privacy@devizly.fr
+            contact@devizly.fr
           </a>
         </p>
       </div>
@@ -589,7 +560,7 @@ export default function ConfidentialitePage() {
         7. Sécurité
       </h2>
       <p className="leading-relaxed text-slate-600">
-        Devizly met en oeuvre les mesures techniques suivantes :
+        Devizly met en œuvre les mesures techniques suivantes :
       </p>
       <ul className="mt-4 space-y-2 text-slate-600">
         <li className="flex items-start gap-2">
@@ -663,10 +634,10 @@ export default function ConfidentialitePage() {
         <p className="text-sm text-slate-600">
           Pour toute question relative à vos données :{" "}
           <a
-            href="mailto:privacy@devizly.fr"
+            href="mailto:contact@devizly.fr"
             className="font-medium text-violet-600 hover:text-violet-500"
           >
-            privacy@devizly.fr
+            contact@devizly.fr
           </a>
         </p>
         <p className="mt-2 text-xs text-slate-400">

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Sécurité des données — Devizly",
   description:
-    "Découvrez comment Devizly protège vos données : hébergement européen, chiffrement TLS et AES, paiements sécurisés Stripe, IA Mistral hébergée en France. Conforme RGPD.",
+    "Découvrez comment Devizly protège vos données : hébergement européen, chiffrement TLS et AES, paiements sécurisés Stripe, IA Mistral hébergée dans l'Union européenne.",
   alternates: { canonical: "https://devizly.fr/securite" },
 };
 
@@ -95,9 +95,9 @@ export default function SecuritePage() {
         <li className="flex items-start gap-2">
           <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />
           <span className="leading-relaxed">
-            <strong>IA Mistral :</strong> serveurs 100% en France. Les données
-            envoyées à l&apos;IA sont anonymisées et ne sont jamais utilisées
-            pour l&apos;entraînement des modèles.
+            <strong>IA Mistral :</strong> hébergée dans l&apos;Union
+            européenne. Les données transmises au moteur IA sont traitées
+            uniquement pour la génération du devis demandé.
           </span>
         </li>
       </ul>

@@ -343,10 +343,11 @@ export default function CGVPage() {
         données clients traitées pour le compte de l&apos;utilisateur.
       </p>
       <p className="mt-4 leading-relaxed text-slate-600">
-        L&apos;intelligence artificielle utilisée (Mistral AI) est hébergée en
-        France. Aucune donnée personnelle n&apos;est transmise à des services
-        hors Union Européenne. Les données sont anonymisées avant tout
-        traitement par l&apos;IA.
+        L&apos;intelligence artificielle utilisée (Mistral AI) est hébergée dans
+        l&apos;Union européenne. Les données transmises au moteur IA sont
+        traitées uniquement pour la génération du devis demandé. Les éventuels
+        transferts de données hors de l&apos;Union européenne sont décrits dans
+        la Politique de confidentialité.
       </p>
 
       {/* Section 8 */}

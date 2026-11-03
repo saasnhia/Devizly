@@ -14,11 +14,12 @@ const SECTIONS = [
   { id: "section-4", label: "Obligations de l'utilisateur" },
   { id: "section-5", label: "Intelligence artificielle" },
   { id: "section-6", label: "Propriété des données" },
-  { id: "section-7", label: "Disponibilité du service" },
-  { id: "section-8", label: "Limitation de responsabilité" },
-  { id: "section-9", label: "Suspension et résiliation" },
-  { id: "section-10", label: "Modification des CGU" },
-  { id: "section-11", label: "Droit applicable" },
+  { id: "section-7", label: "Données de vos clients" },
+  { id: "section-8", label: "Disponibilité du service" },
+  { id: "section-9", label: "Limitation de responsabilité" },
+  { id: "section-10", label: "Suspension et résiliation" },
+  { id: "section-11", label: "Modification des CGU" },
+  { id: "section-12", label: "Droit applicable" },
 ] as const;
 
 export default function CGUPage() {
@@ -237,8 +238,9 @@ export default function CGUPage() {
         5. Intelligence artificielle
       </h2>
       <p className="leading-relaxed text-slate-600">
-        Devizly utilise le modèle Mistral AI, hébergé en France, pour assister
-        la génération de devis. L&apos;utilisateur reconnaît que :
+        Devizly utilise le modèle Mistral AI, hébergé dans l&apos;Union
+        européenne, pour assister la génération de devis. L&apos;utilisateur
+        reconnaît que :
       </p>
       <ul className="mt-4 space-y-2 text-slate-600">
         <li className="flex items-start gap-2">
@@ -257,15 +259,8 @@ export default function CGUPage() {
         <li className="flex items-start gap-2">
           <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />
           <span className="leading-relaxed">
-            Les données envoyées à Mistral AI sont anonymisées (aucune donnée
-            nominative client n&apos;est transmise)
-          </span>
-        </li>
-        <li className="flex items-start gap-2">
-          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />
-          <span className="leading-relaxed">
-            Les données ne sont pas utilisées par Mistral AI pour
-            l&apos;entraînement de ses modèles
+            Les données transmises au moteur IA sont traitées uniquement pour
+            la génération du devis demandé
           </span>
         </li>
       </ul>
@@ -310,7 +305,67 @@ export default function CGUPage() {
         id="section-7"
         className="mt-12 mb-4 text-xl font-bold text-slate-900"
       >
-        7. Disponibilité du service
+        7. Gestion et droits sur les données de vos clients
+      </h2>
+      <p className="leading-relaxed text-slate-600">
+        En tant qu&apos;utilisateur de Devizly, vous êtes responsable de
+        traitement des données personnelles de vos clients que vous saisissez
+        dans l&apos;application. NBHC, éditeur de Devizly, agit en qualité de
+        sous-traitant au sens de l&apos;article 28 du RGPD.
+      </p>
+      <p className="mt-4 leading-relaxed text-slate-600">
+        Vous pouvez à tout moment, depuis votre espace, rubrique
+        «&nbsp;Clients&nbsp;» :
+      </p>
+      <ul className="mt-4 space-y-2 text-slate-600">
+        <li className="flex items-start gap-2">
+          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />
+          <span className="leading-relaxed">
+            <strong>Consulter</strong> les données de vos clients enregistrées
+            dans Devizly
+          </span>
+        </li>
+        <li className="flex items-start gap-2">
+          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />
+          <span className="leading-relaxed">
+            <strong>Modifier</strong> ces données (nom, email, téléphone,
+            adresse, ville, code postal, SIRET) via le bouton
+            «&nbsp;Modifier&nbsp;»
+          </span>
+        </li>
+        <li className="flex items-start gap-2">
+          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />
+          <span className="leading-relaxed">
+            <strong>Supprimer</strong> une fiche client via le bouton
+            «&nbsp;Supprimer&nbsp;». La fiche et ses coordonnées sont alors
+            effacées de votre répertoire. Les devis, factures et contrats déjà
+            émis pour ce client sont conservés, car ces documents sont soumis à
+            des obligations légales de conservation (notamment dix ans pour les
+            factures, article L123-22 du Code de commerce)
+          </span>
+        </li>
+      </ul>
+      <p className="mt-4 leading-relaxed text-slate-600">
+        Vos clients disposent des droits prévus par le RGPD (accès,
+        rectification, effacement, portabilité, opposition). En tant que
+        responsable de traitement, il vous appartient de répondre à leurs
+        demandes. Vous pouvez effectuer ces actions directement dans Devizly ou
+        nous contacter à{" "}
+        <a
+          href="mailto:contact@devizly.fr"
+          className="font-medium text-violet-600 hover:text-violet-500"
+        >
+          contact@devizly.fr
+        </a>{" "}
+        pour toute demande de suppression de données.
+      </p>
+
+      {/* Section 8 */}
+      <h2
+        id="section-8"
+        className="mt-12 mb-4 text-xl font-bold text-slate-900"
+      >
+        8. Disponibilité du service
       </h2>
       <p className="leading-relaxed text-slate-600">
         Devizly s&apos;efforce d&apos;assurer une disponibilité du service
@@ -337,12 +392,12 @@ export default function CGUPage() {
         </li>
       </ul>
 
-      {/* Section 8 */}
+      {/* Section 9 */}
       <h2
-        id="section-8"
+        id="section-9"
         className="mt-12 mb-4 text-xl font-bold text-slate-900"
       >
-        8. Limitation de responsabilité
+        9. Limitation de responsabilité
       </h2>
       <p className="leading-relaxed text-slate-600">
         L&apos;éditeur ne pourra être tenu responsable des dommages indirects
@@ -352,12 +407,12 @@ export default function CGUPage() {
         cours des 12 derniers mois.
       </p>
 
-      {/* Section 9 */}
+      {/* Section 10 */}
       <h2
-        id="section-9"
+        id="section-10"
         className="mt-12 mb-4 text-xl font-bold text-slate-900"
       >
-        9. Suspension et résiliation
+        10. Suspension et résiliation
       </h2>
       <p className="leading-relaxed text-slate-600">
         L&apos;éditeur se réserve le droit de suspendre ou supprimer un compte
@@ -384,12 +439,12 @@ export default function CGUPage() {
         </li>
       </ul>
 
-      {/* Section 10 */}
+      {/* Section 11 */}
       <h2
-        id="section-10"
+        id="section-11"
         className="mt-12 mb-4 text-xl font-bold text-slate-900"
       >
-        10. Modification des CGU
+        11. Modification des CGU
       </h2>
       <p className="leading-relaxed text-slate-600">
         L&apos;éditeur se réserve le droit de modifier les présentes CGU à tout
@@ -398,12 +453,12 @@ export default function CGUPage() {
         modification vaut acceptation des nouvelles CGU.
       </p>
 
-      {/* Section 11 */}
+      {/* Section 12 */}
       <h2
-        id="section-11"
+        id="section-12"
         className="mt-12 mb-4 text-xl font-bold text-slate-900"
       >
-        11. Droit applicable
+        12. Droit applicable
       </h2>
       <p className="leading-relaxed text-slate-600">
         Les présentes CGU sont soumises au droit français. Tout litige sera
